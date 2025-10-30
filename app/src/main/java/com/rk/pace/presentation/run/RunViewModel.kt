@@ -36,8 +36,8 @@ class RunViewModel @Inject constructor(
     var isheaderExpanded by mutableStateOf(true)
         private set
 
-    fun toggleHeaderHeight() {
-        isheaderExpanded = !isheaderExpanded
+    fun setHeaderExpanded(expanded: Boolean) {
+        isheaderExpanded = expanded
     }
 
     private suspend fun saveRun(run: Run, locations: List<RunLocation>) {

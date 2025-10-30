@@ -9,15 +9,10 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 
 @Composable
-fun Map(
+fun RunMap(
     hasLocationPermission: Boolean,
     cameraPositionState: CameraPositionState
 ) {
-
-//    val cameraPositionState = rememberCameraPositionState {
-//        position = CameraPosition.fromLatLngZoom(LatLng(28.6139, 77.209), 10f)
-//    }
-
     GoogleMap(
         modifier = Modifier.fillMaxSize(),
         cameraPositionState = cameraPositionState,

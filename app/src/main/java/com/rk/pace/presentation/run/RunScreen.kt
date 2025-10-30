@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
@@ -24,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -32,7 +32,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.rk.pace.presentation.run.components.Map
+import com.rk.pace.presentation.run.components.RunMap
 import com.rk.pace.presentation.theme.White
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,7 +82,7 @@ fun RunScreen(
     }
 
     if (viewModel.showRationale) {
-        BasicAlertDialog(
+        Dialog(
             onDismissRequest = {}) {
             Column(
                 modifier = Modifier
@@ -131,7 +131,7 @@ fun RunScreen(
                 }
             }
 
-            Map(
+            RunMap(
                 hasLocationPermission = viewModel.hasLocationPermission,
                 cameraPositionState = cameraPositionState
             )

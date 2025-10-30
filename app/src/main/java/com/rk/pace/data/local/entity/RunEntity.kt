@@ -6,10 +6,9 @@ import androidx.room.PrimaryKey
 @Entity(
     tableName = "runs"
 )
-data class Run(
+data class RunEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long,
-    val userId: Long,
     val startTime: Long,
     val endTime: Long,
     val distanceMeters: Float,

@@ -4,7 +4,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.Composable
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.rk.pace.presentation.Route
+import com.rk.pace.presentation.run.RunScreen
 import com.rk.pace.presentation.theme.PaceTheme
+import com.rk.pace.presentation.top.TopScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -13,7 +20,30 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            PaceTheme {}
+            PaceTheme {
+                PaceApp()
+            }
+        }
+    }
+}
+
+@Composable
+fun PaceApp() {
+    val navController = rememberNavController()
+
+    NavHost(
+        navController = navController,
+        startDestination = Route.Root.Top
+    ) {
+        composable<Route.Root.Top> {
+            TopScreen(
+                navController = navController
+            )
+        }
+        composable<Route.Root.Run> {
+            RunScreen(
+                goBack = { navController.popBackStack() }
+            )
         }
     }
 }

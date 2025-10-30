@@ -3,15 +3,13 @@ package com.rk.pace.data.local
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.rk.pace.data.local.dao.RunDao
-import com.rk.pace.data.local.entity.Run
-import com.rk.pace.data.local.entity.RunLocation
-import com.rk.pace.data.local.entity.RunWithLocation
+import com.rk.pace.data.local.entity.RunEntity
+import com.rk.pace.data.local.entity.RunLocationEntity
 
 @Database(
     entities = [
-        Run::class,
-        RunLocation::class,
-        RunWithLocation::class
+        RunEntity::class,
+        RunLocationEntity::class
     ],
     version = 1,
     exportSchema = false

@@ -48,6 +48,8 @@ android {
 
 dependencies {
 
+    implementation(libs.androidx.material.icons.extended)
+
     ksp(libs.hilt)
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation)
@@ -63,6 +65,10 @@ dependencies {
     implementation(libs.kserialization.json)
 
     implementation(libs.androidx.lifecycle.viewmodel)
+
+    implementation(libs.google.maps)
+    implementation(libs.play.services.maps)
+    implementation(libs.play.services.location)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

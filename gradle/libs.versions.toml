@@ -16,6 +16,9 @@ androidxN = "2.9.5"
 coroutines = "1.10.2"
 kserialization = "1.9.0"
 room = "2.8.3"
+maps = "6.12.1"
+servicesM = "19.2.0"
+servicesL = "21.3.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -33,13 +36,15 @@ androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 
+androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", name = "material-icons-extended" }
+
 hilt = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 androidx-hilt-navigation = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "androidxH" }
 androidx-hilt = { module = "androidx.hilt:hilt-compiler", version.ref = "androidxH" }
 
-coroutines = { module="org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
-coroutines-android = { module="org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 androidx-room-rt = { module = "androidx.room:room-runtime", version.ref = "room" }
 androidx-room = { module = "androidx.room:room-compiler", version.ref = "room" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
@@ -48,6 +53,10 @@ androidx-navigation = { module = "androidx.navigation:navigation-compose", versi
 kserialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kserialization" }
 
 androidx-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
+
+google-maps = { module = "com.google.maps.android:maps-compose", version.ref = "maps" }
+play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref="servicesM" }
+play-services-location = { module = "com.google.android.gms:play-services-location", version.ref="servicesL" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

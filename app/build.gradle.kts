@@ -81,6 +81,7 @@ dependencies {
     implementation(libs.kserialization.json)
 
     implementation(libs.androidx.lifecycle.viewmodel)
+    implementation(libs.androidx.lifecycle.service)
 
     implementation(libs.google.maps)
     implementation(libs.play.services.maps)

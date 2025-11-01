@@ -9,9 +9,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.rk.pace.presentation.Route
-import com.rk.pace.presentation.run.RunScreen
+import com.rk.pace.presentation.screens.run.RunScreen
 import com.rk.pace.presentation.theme.PaceTheme
-import com.rk.pace.presentation.top.TopScreen
+import com.rk.pace.presentation.screens.top.TopScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

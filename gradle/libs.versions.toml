@@ -53,10 +53,11 @@ androidx-navigation = { module = "androidx.navigation:navigation-compose", versi
 kserialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kserialization" }
 
 androidx-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
+androidx-lifecycle-service = { group = "androidx.lifecycle", name = "lifecycle-service", version.ref = "lifecycleRuntimeKtx" }
 
 google-maps = { module = "com.google.maps.android:maps-compose", version.ref = "maps" }
-play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref="servicesM" }
-play-services-location = { module = "com.google.android.gms:play-services-location", version.ref="servicesL" }
+play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "servicesM" }
+play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "servicesL" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

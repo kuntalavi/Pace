@@ -1,4 +1,4 @@
-package com.rk.pace.presentation.top
+package com.rk.pace.presentation.screens.top
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -20,8 +20,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.rk.pace.presentation.Route
-import com.rk.pace.presentation.top.home.HomeScreen
-import com.rk.pace.presentation.top.you.YouScreen
+import com.rk.pace.presentation.screens.home.HomeScreen
+import com.rk.pace.presentation.screens.you.YouScreen
 
 data class BottomNavItems(
     val route: Route,

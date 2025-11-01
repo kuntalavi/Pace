@@ -1,4 +1,4 @@
-package com.rk.pace.presentation.top.home
+package com.rk.pace.presentation.screens.home
 
 import androidx.compose.runtime.Composable
 

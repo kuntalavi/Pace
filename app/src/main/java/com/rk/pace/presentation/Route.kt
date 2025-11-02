@@ -1,5 +1,6 @@
 package com.rk.pace.presentation
 
+import androidx.navigation.navDeepLink
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -11,7 +12,14 @@ sealed interface Route {
         data object Top : Root
 
         @Serializable
-        data object Run : Root
+        data object Run : Root {
+            val runUriPattern = "https://pace.rk.com/${this}"
+            val deepLinks = listOf(
+                navDeepLink {
+                    uriPattern = runUriPattern
+                }
+            )
+        }
 
     }
 

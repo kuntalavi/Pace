@@ -2,7 +2,12 @@ package com.rk.pace.background.service
 
 import android.content.Intent
 import androidx.lifecycle.LifecycleService
-import com.rk.pace.background.service.notification.RunTrackingNotification
+import androidx.lifecycle.lifecycleScope
+import com.rk.pace.background.notification.RunTrackingNotification
+import com.rk.pace.domain.tracking.TrackerManager
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
 import javax.inject.Inject
 
 class RunTrackingService : LifecycleService() {
@@ -13,18 +18,33 @@ class RunTrackingService : LifecycleService() {
     }
 
     @Inject
+    lateinit var trackerManager: TrackerManager
+
+    @Inject
     lateinit var notification: RunTrackingNotification
+    private var job: Job? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
         when (intent?.action) {
-            ACTION_PAUSE_TRACKING -> {}
-            ACTION_RESUME_TRACKING -> {}
+            ACTION_PAUSE_TRACKING -> trackerManager.pauseTracking()
+            ACTION_RESUME_TRACKING -> trackerManager.startResumeTracking()
             ACTION_START_SERVICE -> {
                 startForeground(
                     RunTrackingNotification.TRACKING_NOTIFICATION_ID,
                     notification.getBaseNotification()
                 )
+
+                if (job == null) {
+                    job = combine(
+                        trackerManager.activeRunState,
+                        trackerManager.durationInMillis
+                    ) { runState, duration ->
+                        notification.updateNotification(
+                            durationInMillis = duration
+                        )
+                    }.launchIn(lifecycleScope)
+                }
             }
         }
         return START_STICKY
@@ -33,5 +53,8 @@ class RunTrackingService : LifecycleService() {
     override fun onDestroy() {
         super.onDestroy()
         notification.removeNotification()
+
+        job?.cancel()
+        job = null
     }
 }

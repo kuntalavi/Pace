@@ -10,8 +10,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.rk.pace.presentation.Route
 import com.rk.pace.presentation.screens.run.RunScreen
-import com.rk.pace.presentation.theme.PaceTheme
 import com.rk.pace.presentation.screens.top.TopScreen
+import com.rk.pace.presentation.theme.PaceTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -40,7 +40,9 @@ fun PaceApp() {
                 navController = navController
             )
         }
-        composable<Route.Root.Run> {
+        composable<Route.Root.Run>(
+            deepLinks = Route.Root.Run.deepLinks
+        ) {
             RunScreen(
                 goBack = { navController.popBackStack() }
             )

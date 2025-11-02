@@ -5,7 +5,7 @@ data class Run(
     val startTime: Long,
     val endTime: Long,
     val distanceMeters: Float,
-    val duration: Long,
+    val durationInMillis: Long,
     val avgPace: Float,
     val maxPace: Float,
     val elevationGainMeters: Float

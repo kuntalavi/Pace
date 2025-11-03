@@ -27,8 +27,8 @@ class RunTrackingService : LifecycleService() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
         when (intent?.action) {
-            ACTION_PAUSE_TRACKING -> trackerManager.pauseTracking()
-            ACTION_RESUME_TRACKING -> trackerManager.startResumeTracking()
+            ACTION_PAUSE_TRACKING -> trackerManager.pause()
+            ACTION_RESUME_TRACKING -> trackerManager.startResume()
             ACTION_START_SERVICE -> {
                 startForeground(
                     RunTrackingNotification.TRACKING_NOTIFICATION_ID,
@@ -37,8 +37,8 @@ class RunTrackingService : LifecycleService() {
 
                 if (job == null) {
                     job = combine(
-                        trackerManager.activeRunState,
-                        trackerManager.durationInMillis
+                        trackerManager.actRunState,
+                        trackerManager.durationInM
                     ) { runState, duration ->
                         notification.updateNotification(
                             durationInMillis = duration

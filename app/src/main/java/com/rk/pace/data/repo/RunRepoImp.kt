@@ -1,38 +1,38 @@
 package com.rk.pace.data.repo
 
-import com.rk.pace.data.local.dao.RunDao
 import com.rk.pace.data.mapper.toDomain
 import com.rk.pace.data.mapper.toEntity
+import com.rk.pace.data.room.RunDao
+import com.rk.pace.data.room.RunPathPointDao
 import com.rk.pace.domain.model.Run
-import com.rk.pace.domain.model.RunLocation
-import com.rk.pace.domain.model.RunWithLocations
 import com.rk.pace.domain.repo.RunRepo
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class RunRepoImp @Inject constructor(
-    private val runDao: RunDao
+    private val runDao: RunDao,
+    private val runPathPointDao: RunPathPointDao
+
 ) : RunRepo {
-    override suspend fun insertRun(run: Run, locations: List<RunLocation>) {
-        runDao.insertRun(run.toEntity())
-        val locationsWithRunId = locations.map {
-            it.copy(runId = run.id).toEntity()
+    override suspend fun insertRun(run: Run): Long {
+
+        val runId = runDao.insertRun(run.toEntity())
+
+        val runPath = run.path.map {
+            it.toEntity(runId)
         }
-        runDao.insertLocations(locationsWithRunId)
+        runPathPointDao.insertRunPath(runPath)
+        return runId
     }
 
-    override suspend fun deleteRun(run: Run) {
-        runDao.deleteRun(run.toEntity())
+    override suspend fun removeRun(run: Run) {
+        runDao.removeRun(run.toEntity())
     }
 
-    override fun getAllRuns(): Flow<List<Run>> {
-        return runDao.getAllRuns().map { entities ->
-            entities.map { it.toDomain() }
-        }
+    override suspend fun getARuns(): List<Run> {
+        return runDao.getARunsWithPath().map { it.toDomain() }
     }
 
-    override suspend fun getRunWithLocations(runId: Long): RunWithLocations? {
-        return runDao.getRunWithLocations(runId)?.toDomain()
+    override suspend fun getRunById(runId: Long): Run? {
+        return runDao.getRunWithPathByRunId(runId)?.toDomain()
     }
 }

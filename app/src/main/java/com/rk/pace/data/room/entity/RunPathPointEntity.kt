@@ -1,30 +1,27 @@
-package com.rk.pace.data.local.entity
+package com.rk.pace.data.room.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import androidx.room.Index
 import androidx.room.PrimaryKey
 
+
 @Entity(
-    tableName = "run_locations",
+    tableName = "r_path_points",
     foreignKeys = [
         ForeignKey(
             entity = RunEntity::class,
-            parentColumns = ["id"],
+            parentColumns = ["runId"],
             childColumns = ["runId"],
             onDelete = ForeignKey.CASCADE
         )
-    ],
-    indices = [Index("runId"), Index("timestamp")]
+    ]
 )
-data class RunLocationEntity(
+data class RunPathPointEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Long = 0,
+    val pointId: Long = 0,
     val runId: Long,
-    val latitude: Double,
-    val longitude: Double,
-    val altitude: Double,
-    val accuracy: Float,
     val timestamp: Long,
+    val lat: Double,
+    val l: Double,
     val speedMps: Float
 )

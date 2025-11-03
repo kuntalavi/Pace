@@ -5,6 +5,6 @@ import javax.inject.Inject
 
 class GetRunUseCase @Inject constructor(
     private val runRepo: RunRepo
-){
-    suspend operator fun invoke(runId: Long) = runRepo.getRunWithLocations(runId)
+) {
+    suspend operator fun invoke(runId: Long) = runRepo.getRunById(runId)
 }

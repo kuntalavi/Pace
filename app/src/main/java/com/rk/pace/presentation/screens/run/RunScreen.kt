@@ -5,10 +5,17 @@ import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresPermission
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,7 +41,7 @@ fun RunScreen(
     goBack: () -> Unit
 ) {
 
-    val segments = viewModel.pathPoints.collectAsState().value
+    val segments = viewModel.actRunState.collectAsState().value.path
 
     val context = LocalContext.current
 
@@ -88,10 +95,12 @@ fun RunScreen(
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
+                ShowMapLoadingProgressBar(!viewModel.isMapLoaded)
                 RunMap(
                     hasLocationPermission = viewModel.hasLocationPermission,
                     cameraPositionState = cameraPositionState,
-                    segments = segments
+                    segments = segments,
+                    onMapLoaded = { viewModel.mapLoaded(true) }
                 )
             }
 
@@ -122,4 +131,23 @@ fun moveToUserLocation(
 //            )
 //        )
 //    }
+}
+
+@Composable
+private fun ShowMapLoadingProgressBar(
+    visible: Boolean = false
+) {
+    AnimatedVisibility(
+        modifier = Modifier
+            .fillMaxSize(),
+        visible = visible,
+        enter = EnterTransition.None,
+        exit = fadeOut(),
+    ) {
+        CircularProgressIndicator(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.background)
+                .wrapContentSize()
+        )
+    }
 }

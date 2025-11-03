@@ -2,7 +2,8 @@ package com.rk.pace.di
 
 import android.content.Context
 import androidx.room.Room
-import com.rk.pace.data.local.PaceDatabase
+import com.rk.pace.data.room.PaceDatabase
+import com.rk.pace.data.room.PaceDatabase.Companion.PACE_DB_NAME
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,13 +23,17 @@ object DatabaseModule {
         return Room.databaseBuilder(
             context,
             PaceDatabase::class.java,
-            "pace_DB",
+            PACE_DB_NAME,
         )
-            .fallbackToDestructiveMigration(true)
+            .fallbackToDestructiveMigration(true) // development only
             .build()
     }
 
     @Provides
     @Singleton
     fun provideRunDao(database: PaceDatabase) = database.runDao()
+
+    @Provides
+    @Singleton
+    fun provideRunPathPointDao(database: PaceDatabase) = database.runPathPointDao()
 }

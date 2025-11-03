@@ -2,6 +2,8 @@ package com.rk.pace.data.tracking
 
 import android.app.Activity
 import android.content.IntentSender
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.IntentSenderRequest
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
@@ -18,25 +20,31 @@ object LocationRequest {
             LOCATION_UPDATE_INTERVAL
         )
 
-    const val LOCATION_ENABLE_REQUEST_CODE = 5234
-
-    fun checkAndRequestLocationSetting(activity: Activity) {
-        val locationRequest = locationRequest.build()
-        val builder = LocationSettingsRequest.Builder()
-            .addLocationRequest(locationRequest)
-        val client: SettingsClient = LocationServices.getSettingsClient(activity)
-
-        client.checkLocationSettings(builder.build())
-            .addOnFailureListener { exception ->
-                if (exception is ResolvableApiException) {
-                    try {
-                        exception.startResolutionForResult(
-                            activity,
-                            LOCATION_ENABLE_REQUEST_CODE
-                        )
-                    } catch (_: IntentSender.SendIntentException) {
-                    }
-                }
-            }
-    }
+//    fun checkAndRequestLocationSettings(
+//        activity: Activity,
+//        launcher: ActivityResultLauncher<IntentSenderRequest>
+//    ) {
+//        val locationRequest = locationRequest.build()
+//
+//        val locationSettingsRequest =
+//            LocationSettingsRequest.Builder()
+//                .addLocationRequest(locationRequest)
+//                .build()
+//
+//        val client: SettingsClient = LocationServices.getSettingsClient(activity)
+//
+//        client.checkLocationSettings(locationSettingsRequest)
+//            .addOnFailureListener { exception ->
+//                if (exception is ResolvableApiException) {
+//                    try {
+//                        val intentSenderRequest =
+//                            IntentSenderRequest.Builder(exception.resolution).build()
+//
+//                        launcher.launch(intentSenderRequest)
+//
+//                    } catch (_: IntentSender.SendIntentException) {
+//                    }
+//                }
+//            }
+//    }
 }

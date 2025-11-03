@@ -1,6 +1,6 @@
 package com.rk.pace.domain.tracking
 
-import com.rk.pace.domain.model.RunLocation
+import com.rk.pace.domain.model.RunPathPoint
 
 interface LocationTracker {
 
@@ -9,6 +9,6 @@ interface LocationTracker {
     fun removeCallback()
 
     interface LocationCallback {
-        fun onLocationUpdate(results: List<RunLocation>)
+        fun onLocationUpdate(results: List<RunPathPoint>)
     }
 }

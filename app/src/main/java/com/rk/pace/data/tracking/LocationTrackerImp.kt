@@ -8,7 +8,7 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.rk.pace.common.extension.hasLocationPermission
-import com.rk.pace.domain.model.RunLocation
+import com.rk.pace.domain.model.RunPathPoint
 import com.rk.pace.domain.tracking.LocationTracker
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -25,9 +25,10 @@ class LocationTrackerImp @Inject constructor(
         override fun onLocationResult(p0: LocationResult) {
             p0.locations.mapNotNull {
                 it?.let {
-                    RunLocation(
-                        latitude = it.latitude,
-                        longitude = it.longitude,
+                    RunPathPoint(
+                        timestamp = it.time, // idk if this is correct
+                        lat = it.latitude,
+                        l = it.longitude,
                         speedMps = it.speed
                     )
                 }

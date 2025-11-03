@@ -1,4 +1,4 @@
-package com.rk.pace.data.local.entity
+package com.rk.pace.data.room.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -8,12 +8,11 @@ import androidx.room.PrimaryKey
 )
 data class RunEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Long,
+    val runId: Long,
     val startTime: Long,
     val endTime: Long,
     val distanceMeters: Float,
-    val duration: Long,
+    val durationM: Long,
     val avgPace: Float,
-    val maxPace: Float,
-    val elevationGainMeters: Float
+    val maxPace: Float
 )

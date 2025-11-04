@@ -1,21 +1,22 @@
 package com.rk.pace.common.ut
 
 import android.location.Location
+import com.google.android.gms.maps.model.LatLng
 import com.rk.pace.domain.model.RunPathPoint
 import kotlin.math.roundToInt
 
 object DistanceUt {
     fun getDistanceBetweenRunPathPoints(
-        runPathPoint1: RunPathPoint,
-        runPathPoint2: RunPathPoint
+        runPathPoint1: LatLng,
+        runPathPoint2: LatLng
     ): Int {
 //        if () point exist check
         val distance = FloatArray(1)
         Location.distanceBetween(
-            runPathPoint1.lat,
-            runPathPoint1.l,
-            runPathPoint2.lat,
-            runPathPoint2.l,
+            runPathPoint1.latitude,
+            runPathPoint1.longitude,
+            runPathPoint2.latitude,
+            runPathPoint2.longitude,
             distance
         )
         return distance[0].roundToInt()

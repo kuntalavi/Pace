@@ -1,10 +1,10 @@
 package com.rk.pace.domain.tracking
 
 import com.rk.pace.common.ut.DistanceUt
-import com.rk.pace.domain.model.ActRunState
+import com.rk.pace.domain.mapper.PathUt.toLatLng
 import com.rk.pace.domain.model.RunPathPoint
+import com.rk.pace.domain.model.RunState
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -18,20 +18,18 @@ class TrackerManager @Inject constructor(
 
     private var isAct = false
         set(value) {
-            _actRunState.update { it.copy(isAct = value) }
+            _runState.update { it.copy(isAct = value) }
             field = value
         }
 
     private var firstStart = true
 
-    private val _actRunState = MutableStateFlow(ActRunState())
-    val actRunState = _actRunState
+    private val _runState = MutableStateFlow(RunState())
+    val runState = _runState
 
-    private val _durationInM = MutableStateFlow(0L)
-    val durationInM = _durationInM.asStateFlow()
 
     private val timeTrackerCback = { time: Long ->
-        _durationInM.update { time }
+        _runState.update { it.copy(durationInM = time) }
     }
 
     private val locationCBack = object : LocationTracker.LocationCallback {
@@ -45,11 +43,13 @@ class TrackerManager @Inject constructor(
     }
 
     private fun updatePath(info: RunPathPoint) {
-        _actRunState.update { actRunState ->
-            val path = actRunState.path + info
-            actRunState.copy(
+        _runState.update { runState ->
+            val path = runState.path + info.toLatLng()
+            val runPathPoints = runState.runPathPoints + info
+            runState.copy(
                 path = path,
-                distanceMeters = actRunState.distanceMeters.run {
+                runPathPoints = runPathPoints,
+                distanceInMeters = runState.distanceInMeters.run {
                     var distance = this
                     if (path.size > 1) {
                         distance += DistanceUt.getDistanceBetweenRunPathPoints(
@@ -58,20 +58,20 @@ class TrackerManager @Inject constructor(
                         )
                     }
                     distance
-                }
+                },
+                speedMps = info.speedMps
             )
         }
     }
 
     private fun startRunState() {
-        _actRunState.update {
-            ActRunState()
+        _runState.update {
+            RunState()
         }
-        _durationInM.update { 0 }
     }
 
     private fun pauseUpdatePath() {
-        _actRunState.update { actRunState ->
+        _runState.update { actRunState ->
             actRunState.copy(
                 path = actRunState.path + emptyList()
             )

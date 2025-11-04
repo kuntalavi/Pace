@@ -7,6 +7,7 @@ import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.net.toUri
 import com.rk.pace.MainActivity
@@ -93,7 +94,7 @@ class RunTrackingNotification @Inject constructor(
         val notificationChannel = NotificationChannel(
             TRACKING_NOTIFICATION_CHANNEL_ID,
             TRACKING_NOTIFICATION_CHANNEL_NAME,
-            NotificationManager.IMPORTANCE_LOW
+            NotificationManager.IMPORTANCE_HIGH
         )
         notificationManager.createNotificationChannel(notificationChannel)
     }

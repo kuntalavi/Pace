@@ -1,22 +1,18 @@
 package com.rk.pace.presentation.screens.run
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.rk.pace.di.ApplicationScope
 import com.rk.pace.di.IoDispatcher
-import com.rk.pace.domain.model.ActRunState
 import com.rk.pace.domain.model.Run
-import com.rk.pace.domain.model.RunPathPoint
+import com.rk.pace.domain.model.RunState
 import com.rk.pace.domain.tracking.TrackerManager
 import com.rk.pace.domain.use_case.SaveRunUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,20 +21,27 @@ class RunViewModel @Inject constructor(
     private val trackerManager: TrackerManager,
     private val saveRunUseCase: SaveRunUseCase,
     @param:ApplicationScope
-    private val appCoroutineScope: CoroutineScope,
+    private val appScope: CoroutineScope,
     @param:IoDispatcher
     private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
-    val actRunState = trackerManager.actRunState
-        .stateIn(
-            viewModelScope,
-            SharingStarted.Lazily,
-            ActRunState()
-        )
+    private val _state = MutableStateFlow(RunScreenState())
+    val state: StateFlow<RunScreenState> = _state
+
+    private val _runState: MutableStateFlow<RunState> = trackerManager.runState
+    val runState = _runState
+
+    fun onLocationPermissionGranted() {
+        _state.update { it.copy(hasLocationPermission = true) }
+    }
+
+    fun onMapLoaded() {
+        _state.update { it.copy(isMapLoaded = true) }
+    }
 
     fun pauseOrStartResumeRun() {
-        if (actRunState.value.isAct) {
+        if (runState.value.isAct) {
             trackerManager.pause()
         } else {
             trackerManager.startResume()
@@ -47,27 +50,23 @@ class RunViewModel @Inject constructor(
 
     fun finishRun() {
         trackerManager.pause()
-//        saveRun()
+
+        saveRun(
+            Run(
+                startTime = 0L, //
+                endTime = 0L, //
+                distanceMeters = runState.value.distanceInMeters,
+                durationM = runState.value.durationInM,
+                avgPace = 0f, //
+                maxPace = 0f, //
+                path = runState.value.runPathPoints,
+            )
+        )
         trackerManager.stop()
     }
 
-    var isMapLoaded by mutableStateOf(false)
-        private set
-
-    fun mapLoaded(loaded: Boolean) {
-        isMapLoaded = loaded
-    }
-
-    var hasLocationPermission by mutableStateOf(false)
-        private set
-
-    fun setLocationPermission(granted: Boolean) {
-        hasLocationPermission = granted
-    }
-
-
-    private fun saveRun(run: Run, locations: List<RunPathPoint>) {
-        appCoroutineScope.launch(ioDispatcher) {
+    private fun saveRun(run: Run) {
+        appScope.launch(ioDispatcher) {
             saveRunUseCase(run)
         }
     }

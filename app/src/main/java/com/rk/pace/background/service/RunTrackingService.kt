@@ -1,15 +1,17 @@
 package com.rk.pace.background.service
 
 import android.content.Intent
+import android.util.Log
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.rk.pace.background.notification.RunTrackingNotification
 import com.rk.pace.domain.tracking.TrackerManager
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class RunTrackingService : LifecycleService() {
     companion object {
         const val ACTION_PAUSE_TRACKING = "action_pause_tracking"
@@ -30,20 +32,30 @@ class RunTrackingService : LifecycleService() {
             ACTION_PAUSE_TRACKING -> trackerManager.pause()
             ACTION_RESUME_TRACKING -> trackerManager.startResume()
             ACTION_START_SERVICE -> {
+                val baseNotification = notification.getBaseNotification()
+                Log.d("RunTrackingNotification", "Notification built: $baseNotification")
                 startForeground(
                     RunTrackingNotification.TRACKING_NOTIFICATION_ID,
-                    notification.getBaseNotification()
+                    baseNotification
                 )
+                Log.d("RunTrackingService", "onStartCommand called with action: ${intent.action}")
 
                 if (job == null) {
-                    job = combine(
-                        trackerManager.actRunState,
-                        trackerManager.durationInM
-                    ) { runState, duration ->
-                        notification.updateNotification(
-                            durationInMillis = duration
-                        )
-                    }.launchIn(lifecycleScope)
+//                    job = combine(
+//                        trackerManager.runState,
+//                        trackerManager.durationInM
+//                    ) { runState, duration ->
+//                        notification.updateNotification(
+//                            durationInMillis = duration
+//                        )
+//                    }.launchIn(lifecycleScope)
+                    lifecycleScope.launch {
+                        trackerManager.runState.collect { runState ->
+                            notification.updateNotification(
+                                durationInMillis = runState.durationInM
+                            )
+                        }
+                    }
                 }
             }
         }

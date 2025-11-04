@@ -10,7 +10,7 @@ object DistanceUt {
         runPathPoint1: LatLng,
         runPathPoint2: LatLng
     ): Int {
-//        if () point exist check
+        //
         val distance = FloatArray(1)
         Location.distanceBetween(
             runPathPoint1.latitude,

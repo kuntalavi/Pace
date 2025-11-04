@@ -1,6 +1,7 @@
 package com.rk.pace.presentation.screens.run
 
 import android.Manifest
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -44,6 +45,13 @@ fun RunScreen(
         contract = ActivityResultContracts.RequestPermission()
     ) { granted ->
         if (granted) viewModel.onLocationPermissionGranted()
+    }
+
+    LaunchedEffect(runState) {
+        Log.d(
+            "MapScreen",
+            "PolyLine Points: ${runState.speedMps} "
+        )
     }
 
     LaunchedEffect(Unit) {

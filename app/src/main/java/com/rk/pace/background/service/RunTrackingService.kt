@@ -24,6 +24,7 @@ class RunTrackingService : LifecycleService() {
 
     @Inject
     lateinit var notification: RunTrackingNotification
+
     private var job: Job? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -35,7 +36,7 @@ class RunTrackingService : LifecycleService() {
                 val baseNotification = notification.getBaseNotification()
                 Log.d("RunTrackingNotification", "Notification built: $baseNotification")
                 startForeground(
-                    RunTrackingNotification.TRACKING_NOTIFICATION_ID,
+                    RunTrackingNotification.RUN_TRACK_NOTIFICATION_ID,
                     baseNotification
                 )
                 Log.d("RunTrackingService", "onStartCommand called with action: ${intent.action}")

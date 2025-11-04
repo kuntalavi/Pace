@@ -23,16 +23,16 @@ class LocationTrackerImp @Inject constructor(
 
     private val gLocationCallback = object : LocationCallback() {
         override fun onLocationResult(p0: LocationResult) {
-            p0.locations.mapNotNull {
-                it?.let {
+            locationCallback?.onLocationUpdate(
+                p0.locations.map {
                     RunPathPoint(
-                        timestamp = it.time, // idk if this is correct
+                        timestamp = it.time,
                         lat = it.latitude,
                         l = it.longitude,
                         speedMps = it.speed
                     )
                 }
-            }
+            )
         }
     }
 

@@ -7,7 +7,6 @@ import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.net.toUri
 import com.rk.pace.MainActivity
@@ -22,9 +21,9 @@ class RunTrackingNotification @Inject constructor(
 ) {
 
     companion object {
-        private const val TRACKING_NOTIFICATION_CHANNEL_ID = "track_notification"
-        private const val TRACKING_NOTIFICATION_CHANNEL_NAME = "Run Status"
-        const val TRACKING_NOTIFICATION_ID = 3
+        private const val RUN_TRACK_NOTIFICATION_CHANNEL_ID = "r_track_notification"
+        private const val RUN_TRACK_NOTIFICATION_CHANNEL_NAME = "R Track"
+        const val RUN_TRACK_NOTIFICATION_ID = 3
     }
 
     private val notificationManager =
@@ -45,7 +44,7 @@ class RunTrackingNotification @Inject constructor(
     private val baseNotification
         get() = NotificationCompat.Builder(
             context,
-            TRACKING_NOTIFICATION_CHANNEL_ID
+            RUN_TRACK_NOTIFICATION_CHANNEL_ID
         )
             .setSmallIcon(R.drawable.ic_run)
             .setAutoCancel(false)
@@ -79,22 +78,23 @@ class RunTrackingNotification @Inject constructor(
             .addAction(getNotificationAction())
             .build()
 
-        notificationManager.notify(TRACKING_NOTIFICATION_ID, notification)
+        notificationManager.notify(RUN_TRACK_NOTIFICATION_ID, notification)
     }
 
     fun removeNotification() {
-        notificationManager.cancel(TRACKING_NOTIFICATION_ID)
+        notificationManager.cancel(RUN_TRACK_NOTIFICATION_ID)
     }
 
     fun getBaseNotification() = baseNotification.build()
 
     fun createNotificationChannel() {
+
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
 
         val notificationChannel = NotificationChannel(
-            TRACKING_NOTIFICATION_CHANNEL_ID,
-            TRACKING_NOTIFICATION_CHANNEL_NAME,
-            NotificationManager.IMPORTANCE_HIGH
+            RUN_TRACK_NOTIFICATION_CHANNEL_ID,
+            RUN_TRACK_NOTIFICATION_CHANNEL_NAME,
+            NotificationManager.IMPORTANCE_DEFAULT
         )
         notificationManager.createNotificationChannel(notificationChannel)
     }

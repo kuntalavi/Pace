@@ -1,5 +1,6 @@
 package com.rk.pace.presentation.screens.run.components
 
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,13 +24,17 @@ fun RunMap(
     val cameraPositionState = rememberCameraPositionState()
 
     LaunchedEffect(path) {
+        Log.d(
+            "MapScreen",
+            "PolyLine Points: ${path.lastOrNull()?.latitude} ${path.lastOrNull()?.longitude}"
+        )
         cameraPositionState.animate(
             update = CameraUpdateFactory.newLatLngZoom(
                 LatLng(
                     path.lastOrNull()?.latitude ?: 28.7041,
                     path.lastOrNull()?.longitude ?: 77.1025
                 ),
-                20f
+                15f
             )
         )
     }

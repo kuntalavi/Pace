@@ -6,6 +6,7 @@
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
@@ -31,8 +32,9 @@
 
         <service
             android:name=".background.service.RunTrackingService"
+            android:enabled="true"
+            android:exported="false"
             android:foregroundServiceType="location" />
-        <!--            android:exported="false"-->
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

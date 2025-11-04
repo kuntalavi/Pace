@@ -48,7 +48,7 @@ class RunViewModel @Inject constructor(
         }
     }
 
-    fun finishRun() {
+    fun stopRun() {
         trackerManager.pause()
 
         saveRun(
@@ -71,3 +71,8 @@ class RunViewModel @Inject constructor(
         }
     }
 }
+
+// activities
+// services
+// broadcast receivers
+// content providers

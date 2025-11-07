@@ -80,7 +80,7 @@ class TrackerManagerImp @Inject constructor(
     private fun pauseUpdatePath() {
         if (cSegment.isNotEmpty()) {
             _runState.update { actRunState ->
-                actRunState.copy()
+                actRunState.copy(segments = actRunState.segments + listOf(cSegment.toList()))
             }
             cSegment.clear()
         }

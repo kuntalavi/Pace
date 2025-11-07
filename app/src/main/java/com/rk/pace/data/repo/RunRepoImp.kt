@@ -5,7 +5,10 @@ import com.rk.pace.data.mapper.toEntity
 import com.rk.pace.data.room.RunDao
 import com.rk.pace.data.room.RunPathPointDao
 import com.rk.pace.domain.model.Run
+import com.rk.pace.domain.model.RunWithPath
 import com.rk.pace.domain.repo.RunRepo
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class RunRepoImp @Inject constructor(
@@ -13,9 +16,9 @@ class RunRepoImp @Inject constructor(
     private val runPathPointDao: RunPathPointDao
 
 ) : RunRepo {
-    override suspend fun insertRun(run: Run): Long {
+    override suspend fun insertRun(run: RunWithPath): Long {
 
-        val runId = runDao.insertRun(run.toEntity())
+        val runId = runDao.insertRun(run.run.toEntity())
 
         val runPath = run.path.map {
             it.toEntity(runId)
@@ -28,11 +31,13 @@ class RunRepoImp @Inject constructor(
         runDao.removeRun(run.toEntity())
     }
 
-    override suspend fun getARuns(): List<Run> {
-        return runDao.getARunsWithPath().map { it.toDomain() }
+    override fun getARuns(): Flow<List<Run>> {
+        return runDao.getARuns().map { runE ->
+            runE.map { it.toDomain() }
+        }
     }
 
-    override suspend fun getRunById(runId: Long): Run? {
+    override suspend fun getRunById(runId: Long): RunWithPath? {
         return runDao.getRunWithPathByRunId(runId)?.toDomain()
     }
 }

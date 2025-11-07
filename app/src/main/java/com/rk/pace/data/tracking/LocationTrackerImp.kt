@@ -19,11 +19,11 @@ class LocationTrackerImp @Inject constructor(
     private val locationRequest: LocationRequest
 ) : LocationTracker {
 
-    private var locationCallback: LocationTracker.LocationCallback? = null
+    private var locationCback: LocationTracker.LocationCback? = null
 
-    private val gLocationCallback = object : LocationCallback() {
+    private val gLocationCback = object : LocationCallback() {
         override fun onLocationResult(p0: LocationResult) {
-            locationCallback?.onLocationUpdate(
+            locationCback?.onLocationUpdate(
                 p0.locations.map {
                     RunPathPoint(
                         timestamp = it.time,
@@ -37,19 +37,19 @@ class LocationTrackerImp @Inject constructor(
     }
 
     @SuppressLint("MissingPermission")
-    override fun setCallback(locationCallback: LocationTracker.LocationCallback) {
+    override fun setCback(locationCback: LocationTracker.LocationCback) {
         if (context.hasLocationPermission()) {
-            this.locationCallback = locationCallback
+            this.locationCback = locationCback
             fusedLocationProviderClient.requestLocationUpdates(
                 locationRequest,
-                gLocationCallback,
+                gLocationCback,
                 Looper.getMainLooper()
             )
         }
     }
 
-    override fun removeCallback() {
-        this.locationCallback = null
-        fusedLocationProviderClient.removeLocationUpdates(gLocationCallback)
+    override fun removeCback() {
+        this.locationCback = null
+        fusedLocationProviderClient.removeLocationUpdates(gLocationCback)
     }
 }

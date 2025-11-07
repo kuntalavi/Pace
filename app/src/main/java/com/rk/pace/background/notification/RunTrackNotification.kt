@@ -11,12 +11,12 @@ import androidx.core.app.NotificationCompat
 import androidx.core.net.toUri
 import com.rk.pace.MainActivity
 import com.rk.pace.R
-import com.rk.pace.background.service.RunTrackingService
+import com.rk.pace.background.service.RunTrackService
 import com.rk.pace.presentation.Route
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-class RunTrackingNotification @Inject constructor(
+class RunTrackNotification @Inject constructor(
     @param:ApplicationContext private val context: Context
 ) {
 
@@ -51,6 +51,7 @@ class RunTrackingNotification @Inject constructor(
             .setOngoing(true)
             .setContentTitle("Time")
             .setContentText("00:00:00")
+            .setContentIntent(intentToRunScreen)
 
     private fun getNotificationAction(): NotificationCompat.Action {
         return NotificationCompat.Action(
@@ -61,9 +62,9 @@ class RunTrackingNotification @Inject constructor(
                 43,
                 Intent(
                     context,
-                    RunTrackingService::class.java,
+                    RunTrackService::class.java,
                 ).apply {
-                    action = RunTrackingService.ACTION_PAUSE_TRACKING
+                    action = RunTrackService.ACTION_PAUSE_SERVICE
                 },
                 PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
 

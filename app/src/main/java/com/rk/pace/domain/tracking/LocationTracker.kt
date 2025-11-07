@@ -4,11 +4,11 @@ import com.rk.pace.domain.model.RunPathPoint
 
 interface LocationTracker {
 
-    fun setCallback(locationCallback: LocationCallback)
+    fun setCback(locationCback: LocationCback)
 
-    fun removeCallback()
+    fun removeCback()
 
-    interface LocationCallback {
+    interface LocationCback {
         fun onLocationUpdate(results: List<RunPathPoint>)
     }
 }

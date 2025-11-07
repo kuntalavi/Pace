@@ -31,7 +31,7 @@
         </activity>
 
         <service
-            android:name=".background.service.RunTrackingService"
+            android:name=".background.service.RunTrackService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="location" />

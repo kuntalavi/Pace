@@ -8,6 +8,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import com.rk.pace.data.room.entity.RunEntity
 import com.rk.pace.data.room.entity.RunWithPathEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface RunDao {
@@ -19,6 +20,9 @@ interface RunDao {
 
     @Delete
     suspend fun removeRun(run: RunEntity)
+
+    @Query("SELECT * FROM runs ORDER BY timestamp DESC")
+    fun getARuns(): Flow<List<RunEntity>>
 
     // RUN PATH ENTITY
 
@@ -35,7 +39,7 @@ interface RunDao {
     suspend fun getRunWithPathByRunId(runId: Long): RunWithPathEntity?
 
     @Transaction
-    @Query("SELECT * FROM runs ORDER BY startTime DESC")
-    suspend fun getARunsWithPath(): List<RunWithPathEntity>
+    @Query("SELECT * FROM runs ORDER BY timestamp DESC")
+    fun getARunsWithPath(): Flow<List<RunWithPathEntity>>
 }
 

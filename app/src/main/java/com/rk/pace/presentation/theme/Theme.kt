@@ -11,15 +11,29 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = Emerald60,
+    secondary = Teal40,
+    tertiary = Lime50,
+
+    onPrimary = Black,
+    onSecondary = Black,
+    onTertiary = Black,
+    background = Neutral10,
+    surface = Neutral20,
+    error = Red40
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = Emerald80,
+    secondary = Teal80,
+    tertiary = Lime70,
+
+    onPrimary = White,
+    onSecondary = White,
+    onTertiary = White,
+    background = Neutral99,
+    surface = Neutral95,
+    error = Red40
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -35,18 +49,23 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun PaceTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
+//    val colorScheme = when {
+//        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+//            val context = LocalContext.current
+//            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+//        }
+//
+//        darkTheme -> DarkColorScheme
+//        else -> LightColorScheme
+//    }
 
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+    val colorScheme = if (darkTheme) {
+        DarkColorScheme
+    } else {
+        LightColorScheme
     }
 
     MaterialTheme(

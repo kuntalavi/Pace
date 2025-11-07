@@ -2,9 +2,8 @@ package com.rk.pace.domain.tracking
 
 interface TimeTracker {
 
-    fun startResumeTimer(callback: (timeInMillis: Long) -> Unit)
-
+    fun startTimer(cBack: (time: Long) -> Unit)
+    fun resumeTimer(cBack: (time: Long) -> Unit)
     fun stopTimer()
-
     fun pauseTimer()
 }

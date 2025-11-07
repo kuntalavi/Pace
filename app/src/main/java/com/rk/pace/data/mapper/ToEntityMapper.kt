@@ -8,12 +8,12 @@ import com.rk.pace.domain.model.RunPathPoint
 fun Run.toEntity(): RunEntity {
     return RunEntity(
         runId = runId,
-        startTime = startTime,
-        endTime = endTime,
-        distanceMeters = distanceMeters,
-        durationM = durationM,
-        avgPace = avgPace,
-        maxPace = maxPace
+        timestamp = timestamp,
+        durationInM = durationM,
+        distanceInMeters = distanceMeters,
+        avgSpeedMps = avgSpeedMps,
+        maxSpeedMps = maxSpeedMps,
+        ePath = ePath
     )
 }
 

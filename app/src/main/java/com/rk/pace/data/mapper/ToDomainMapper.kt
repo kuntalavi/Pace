@@ -1,9 +1,23 @@
 package com.rk.pace.data.mapper
 
+import com.rk.pace.data.room.entity.RunEntity
 import com.rk.pace.data.room.entity.RunPathPointEntity
 import com.rk.pace.data.room.entity.RunWithPathEntity
 import com.rk.pace.domain.model.Run
+import com.rk.pace.domain.model.RunWithPath
 import com.rk.pace.domain.model.RunPathPoint
+
+fun RunEntity.toDomain(): Run {
+    return Run(
+        runId = runId,
+        timestamp = timestamp,
+        distanceMeters = distanceInMeters,
+        durationM = durationInM,
+        avgSpeedMps = avgSpeedMps,
+        maxSpeedMps = maxSpeedMps,
+        ePath = ePath
+    )
+}
 
 fun RunPathPointEntity.toDomain(): RunPathPoint {
     return RunPathPoint(
@@ -14,15 +28,9 @@ fun RunPathPointEntity.toDomain(): RunPathPoint {
     )
 }
 
-fun RunWithPathEntity.toDomain(): Run {
-    return Run(
-        runId = run.runId,
-        startTime = run.startTime,
-        endTime = run.endTime,
-        distanceMeters = run.distanceMeters,
-        durationM = run.durationM,
-        avgPace = run.avgPace,
-        maxPace = run.maxPace,
+fun RunWithPathEntity.toDomain(): RunWithPath {
+    return RunWithPath(
+        run = run.toDomain(),
         path = path.map { it.toDomain() }
     )
 }

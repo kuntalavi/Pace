@@ -3,13 +3,15 @@ package com.rk.pace.di
 import android.content.Context
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.rk.pace.background.service.BackgroundTrackerImp
+import com.rk.pace.background.service.RunTrackSMImp
 import com.rk.pace.data.tracking.LocationRequest
 import com.rk.pace.data.tracking.LocationTrackerImp
 import com.rk.pace.data.tracking.TimeTrackerImp
-import com.rk.pace.domain.tracking.BackgroundTracker
+import com.rk.pace.data.tracking.TrackerManagerImp
 import com.rk.pace.domain.tracking.LocationTracker
+import com.rk.pace.domain.tracking.RunTrackSM
 import com.rk.pace.domain.tracking.TimeTracker
+import com.rk.pace.domain.tracking.TrackerManager
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -48,13 +50,19 @@ abstract class AppModule {
 
     @Binds
     @Singleton
-    abstract fun provideBackgroundTracker(
-        backgroundTracker: BackgroundTrackerImp
-    ): BackgroundTracker
+    abstract fun provideRunTrackSM(
+        backgroundTracker: RunTrackSMImp
+    ): RunTrackSM
 
     @Binds
     @Singleton
     abstract fun provideTimeTracker(
         timeTracker: TimeTrackerImp
     ): TimeTracker
+
+    @Binds
+    @Singleton
+    abstract fun provideTrackerManager(
+        trackerManager: TrackerManagerImp
+    ): TrackerManager
 }

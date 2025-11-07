@@ -2,7 +2,7 @@ package com.rk.pace
 
 import android.app.Application
 import com.google.android.gms.maps.MapsInitializer
-import com.rk.pace.background.notification.RunTrackingNotification
+import com.rk.pace.background.notification.RunTrackNotification
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
@@ -10,7 +10,7 @@ import javax.inject.Inject
 class App : Application() {
 
     @Inject
-    lateinit var runTrackingNotification: RunTrackingNotification
+    lateinit var runTrackingNotification: RunTrackNotification
 
     override fun onCreate() {
         super.onCreate()

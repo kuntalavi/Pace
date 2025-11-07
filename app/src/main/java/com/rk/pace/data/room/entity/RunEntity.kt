@@ -9,10 +9,10 @@ import androidx.room.PrimaryKey
 data class RunEntity(
     @PrimaryKey(autoGenerate = true)
     val runId: Long,
-    val startTime: Long,
-    val endTime: Long,
-    val distanceMeters: Float,
-    val durationM: Long,
-    val avgPace: Float,
-    val maxPace: Float
+    val timestamp: Long,
+    val durationInM: Long,
+    val distanceInMeters: Float,
+    val avgSpeedMps: Float,
+    val maxSpeedMps: Float,
+    val ePath: String
 )

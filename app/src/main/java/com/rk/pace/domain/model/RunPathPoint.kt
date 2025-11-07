@@ -1,8 +1,8 @@
 package com.rk.pace.domain.model
 
 data class RunPathPoint(
-    val timestamp: Long = 0L, //
+    val timestamp: Long = 0L,
     val lat: Double,
     val l: Double,
-    val speedMps: Float = 0f //
+    val speedMps: Float = 0f
 )

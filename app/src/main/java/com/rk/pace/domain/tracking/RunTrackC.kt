@@ -1,6 +1,6 @@
 package com.rk.pace.domain.tracking
 
-interface RunTrackSM {
+interface RunTrackC {
     fun startRunTrackS()
     fun stopRunTrackS()
 }

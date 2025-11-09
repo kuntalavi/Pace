@@ -57,8 +57,8 @@ androidx-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmode
 androidx-lifecycle-service = { group = "androidx.lifecycle", name = "lifecycle-service", version.ref = "lifecycleRuntimeKtx" }
 
 google-maps = { module = "com.google.maps.android:maps-compose", version.ref = "maps" }
-play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "servicesM" }
-play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "servicesL" }
+p-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "servicesM" }
+p-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "servicesL" }
 c-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "cCompose" }
 
 [plugins]

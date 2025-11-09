@@ -3,13 +3,13 @@ package com.rk.pace.background.service
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import com.rk.pace.domain.tracking.RunTrackSM
+import com.rk.pace.domain.tracking.RunTrackC
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-class RunTrackSMImp @Inject constructor(
+class RunTrackCImp @Inject constructor(
     @param:ApplicationContext private val context: Context
-) : RunTrackSM {
+) : RunTrackC {
 
     override fun startRunTrackS() {
         Intent(context, RunTrackService::class.java).apply {

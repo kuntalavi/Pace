@@ -1,8 +1,9 @@
 package com.rk.pace.presentation.screens.run
 
+import android.graphics.Bitmap
+import android.net.Uri
 import androidx.lifecycle.ViewModel
-import com.rk.pace.common.ut.PathUt.encodePath
-import com.rk.pace.common.ut.PathUt.toLatL
+import com.rk.pace.data.BitmapH
 import com.rk.pace.di.ApplicationScope
 import com.rk.pace.di.IoDispatcher
 import com.rk.pace.domain.model.Run
@@ -23,6 +24,7 @@ import javax.inject.Inject
 class RunViewModel @Inject constructor(
     private val trackerManager: TrackerManager,
     private val saveRunUseCase: SaveRunUseCase,
+    private val bitmapH: BitmapH,
     @param:ApplicationScope
     private val app: CoroutineScope,
     @param:IoDispatcher
@@ -43,6 +45,10 @@ class RunViewModel @Inject constructor(
         _state.update { it.copy(isMapLoaded = true) }
     }
 
+    private fun setCaptureBitmap(v: Boolean) {
+        _state.update { it.copy(captureBitmap = v) }
+    }
+
     fun startRun() {
         trackerManager.start()
     }
@@ -55,31 +61,32 @@ class RunViewModel @Inject constructor(
         trackerManager.resume()
     }
 
-    fun stopRun() {
-        saveRun(
-            RunWithPath(
-                run = Run(
-                    timestamp = runState.value.timestamp,
-                    durationM = runState.value.durationInM,
-                    distanceMeters = runState.value.distanceInMeters,
-                    avgSpeedMps = 0f,
-                    maxSpeedMps = 0f,
-                    ePath = encodePath(runState.value.segments.toLatL())
-                ),
-                path = runState.value.segments.flatten()
-            )
-        )
-        trackerManager.stop()
-    }
-
-    private fun saveRun(run: RunWithPath) {
+    fun onBitmapReady(bitmap: Bitmap) {
+        setCaptureBitmap(false)
         app.launch(i) {
-            saveRunUseCase(run)
+            val bitmapURI: Uri? = bitmapH.saveBitmap(bitmap, "")
+            if (bitmapURI == null) {
+                println("")
+            }
+            val runState = runState.value
+            saveRunUseCase(
+                RunWithPath(
+                    run = Run(
+                        timestamp = runState.timestamp,
+                        durationM = runState.durationInM,
+                        distanceMeters = runState.distanceInMeters,
+                        avgSpeedMps = 0f,
+                        maxSpeedMps = 0f,
+                        bitmapURI = bitmapURI ?. toString()
+                    ),
+                    path = runState.segments.flatten() // issue
+                )
+            )
+            trackerManager.stop()
         }
     }
-}
 
-// activities
-// services
-// broadcast receivers
-// content providers
+    fun stopRun() {
+        setCaptureBitmap(true)
+    }
+}

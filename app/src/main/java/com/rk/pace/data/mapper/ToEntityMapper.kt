@@ -13,7 +13,7 @@ fun Run.toEntity(): RunEntity {
         distanceInMeters = distanceMeters,
         avgSpeedMps = avgSpeedMps,
         maxSpeedMps = maxSpeedMps,
-        ePath = ePath
+        bitmapURI = bitmapURI
     )
 }
 

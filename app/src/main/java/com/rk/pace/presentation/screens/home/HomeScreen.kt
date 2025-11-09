@@ -27,8 +27,7 @@ fun HomeScreen(
     ) {
         items(runs) { run ->
             RunItem(
-                run = run,
-                eRunPath = ""
+                run = run
             )
         }
     }

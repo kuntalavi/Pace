@@ -88,7 +88,11 @@ fun RunScreen(
                 RunMap(
                     hasLocationPermission = state.hasLocationPermission,
                     segments = runState.segments,
-                    onMapLoaded = { viewModel.onMapLoaded() }
+                    onMapLoaded = { viewModel.onMapLoaded() },
+                    captureBitmap = state.captureBitmap,
+                    onBitmapReady = { bitmap ->
+                        viewModel.onBitmapReady(bitmap)
+                    }
                 )
             }
 
@@ -117,25 +121,25 @@ fun RunScreen(
                         Text("Start", color = Black)
                     }
                 }
+            }
+        }
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopStart) {
+            if (runState.isAct) {
+                LargeFloatingActionButton(
+                    onClick = {
+                        viewModel.stopRun()
+                        Log.d("pathPoints", "Run Path Points ${runState.segments}")
+                    },
+                    containerColor = MaterialTheme.colorScheme.primary
+                ) {
+                    Text(text = "Stop", color = Black)
                 }
             }
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopStart) {
-                if (runState.isAct) {
-                    LargeFloatingActionButton(
-                        onClick = {
-                            viewModel.stopRun()
-                            Log.d("pathPoints", "Run Path Points ${runState.segments}")
-                        },
-                        containerColor = MaterialTheme.colorScheme.primary
-                    ) {
-                        Text(text = "Stop", color = Black)
-                    }
-                }
-            }
-
         }
 
     }
+
+}
 
 @Composable
 private fun ShowMapLoadingProgressIndicator(

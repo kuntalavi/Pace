@@ -1,10 +1,9 @@
 package com.rk.pace.data.tracking
 
-import com.rk.pace.common.ut.DistanceUt
 import com.rk.pace.domain.model.RunPathPoint
 import com.rk.pace.domain.model.RunState
 import com.rk.pace.domain.tracking.LocationTracker
-import com.rk.pace.domain.tracking.RunTrackSM
+import com.rk.pace.domain.tracking.RunTrackC
 import com.rk.pace.domain.tracking.TimeTracker
 import com.rk.pace.domain.tracking.TrackerManager
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,9 +13,9 @@ import javax.inject.Singleton
 
 @Singleton
 class TrackerManagerImp @Inject constructor(
-    private val runTrackSM: RunTrackSM,
-    private val locationTracker: LocationTracker,
-    private val timeTracker: TimeTracker
+    private val runTrackC: RunTrackC,
+    private val locationT: LocationTracker,
+    private val timeT: TimeTracker
 ) : TrackerManager {
 
     private var isAct = false
@@ -40,38 +39,29 @@ class TrackerManagerImp @Inject constructor(
         _runState.update { it.copy(durationInM = time) }
     }
 
-    private val lCback = object : LocationTracker.LocationCback {
+    private val locationCback = object : LocationTracker.LocationCback {
         override fun onLocationUpdate(results: List<RunPathPoint>) {
             if (isAct) {
-                results.forEach { info ->
-                    updatePath(info)
+                results.forEach { point ->
+                    updatePath(point)
                 }
             }
         }
     }
 
-    private fun updatePath(info: RunPathPoint) {
-        cSegment.add(info)
-        _runState.update { runState ->
-            val segments = runState.segments.dropLast(1) + listOf(cSegment.toList())
-            runState.copy(
-                distanceInMeters = runState.distanceInMeters.run {
-                    var distance = this
-                    if (cSegment.size > 1) {
-                        distance += DistanceUt.getDistanceBetweenRunPathPoints(
-                            runPathPoint1 = cSegment[cSegment.size - 1],
-                            runPathPoint2 = cSegment[cSegment.size - 2]
-                        )
-                    }
-                    distance
-                },
-                speedMps = info.speedMps,
+    private fun updatePath(point: RunPathPoint) {
+        cSegment += point
+        _runState.update { state ->
+            val segments = state.segments.dropLast(1) + listOf(cSegment.toList())
+            state.copy(
+                distanceInMeters = 0f,
+                speedMps = point.speedMps,
                 segments = segments
             )
         }
     }
 
-    private fun startRunState() {
+    private fun resetRunState() {
         _runState.update {
             RunState()
         }
@@ -79,49 +69,53 @@ class TrackerManagerImp @Inject constructor(
 
     private fun pauseUpdatePath() {
         if (cSegment.isNotEmpty()) {
-            _runState.update { actRunState ->
-                actRunState.copy(segments = actRunState.segments + listOf(cSegment.toList()))
+            _runState.update { state ->
+                state.copy(
+                    segments = state.segments + listOf(cSegment.toList())
+                )
             }
-            cSegment.clear()
+            cSegment = mutableListOf()
         }
     }
 
     override fun start() {
         if (isAct) return
-        startRunState()
+        cSegment = mutableListOf()
+        resetRunState()
         isAct = true
 
-        runTrackSM.startRunTrackS()
-
-        cSegment = mutableListOf()
-        _runState.update { runState ->
-            runState.copy()
-        }
-
-        timeTracker.startTimer(timeCback)
-        locationTracker.setCback(lCback)
+        runTrackC.startRunTrackS()
+        locationT.setCback(locationCback)
+        timeT.startTimer(timeCback)
     }
 
     override fun pause() {
         if (paused) return
         paused = true
-        timeTracker.pauseTimer()
-        locationTracker.removeCback()
+
         pauseUpdatePath()
+
+        timeT.pauseTimer()
+        locationT.removeCback()
     }
 
     override fun resume() {
         if (!paused) return
         paused = false
-        timeTracker.resumeTimer(timeCback)
-        locationTracker.setCback(lCback)
+
+        locationT.setCback(locationCback)
+        timeT.resumeTimer(timeCback)
     }
 
     override fun stop() {
-        locationTracker.removeCback()
-        timeTracker.stopTimer()
-        runTrackSM.stopRunTrackS()
+        isAct = false
+        paused = false
         pauseUpdatePath()
-        startRunState()
+
+        runTrackC.stopRunTrackS()
+        locationT.removeCback()
+        timeT.stopTimer()
+
+        resetRunState()
     }
 }

@@ -15,7 +15,7 @@ fun RunEntity.toDomain(): Run {
         durationM = durationInM,
         avgSpeedMps = avgSpeedMps,
         maxSpeedMps = maxSpeedMps,
-        ePath = ePath
+        bitmapURI = bitmapURI
     )
 }
 

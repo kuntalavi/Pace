@@ -10,11 +10,11 @@ import javax.inject.Inject
 class App : Application() {
 
     @Inject
-    lateinit var runTrackingNotification: RunTrackNotification
+    lateinit var runTrackNotification: RunTrackNotification
 
     override fun onCreate() {
         super.onCreate()
         MapsInitializer.initialize(this)
-        runTrackingNotification.createNotificationChannel()
+        runTrackNotification.createNotificationChannel()
     }
 }

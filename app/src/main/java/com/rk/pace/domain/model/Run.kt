@@ -7,5 +7,5 @@ data class Run(
     val distanceMeters: Float,
     val avgSpeedMps: Float,
     val maxSpeedMps: Float,
-    val ePath: String
+    val bitmapURI: String?
 )

@@ -2,10 +2,6 @@ package com.rk.pace.presentation.screens.top
 
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.DirectionsRun
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -15,7 +11,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -23,19 +19,20 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.rk.pace.R
 import com.rk.pace.presentation.Route
 import com.rk.pace.presentation.screens.home.HomeScreen
 import com.rk.pace.presentation.screens.you.YouScreen
 
 data class BottomNavItems(
     val route: Route,
-    val icon: ImageVector
+    val icon: Int
 )
 
 val bottomNavItemsList = listOf(
     BottomNavItems(
         route = Route.Top.Home,
-        icon = Icons.Default.Home
+        icon = R.drawable.runs_24px
     ),
 //    BottomNavItems(
 //        route = Route.Root.Run,
@@ -43,7 +40,7 @@ val bottomNavItemsList = listOf(
 //    ),
     BottomNavItems(
         route = Route.Top.You,
-        icon = Icons.Default.Person
+        icon = R.drawable.show_chart_24px
     )
 )
 
@@ -71,7 +68,7 @@ fun TopScreen(
                         },
                         icon = {
                             Icon(
-                                imageVector = item.icon,
+                                painter = painterResource(item.icon),
                                 contentDescription = ""
                             )
                         },
@@ -89,7 +86,7 @@ fun TopScreen(
                     .offset(y = 40.dp)
             ) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.DirectionsRun,
+                    painter = painterResource(R.drawable.run_24px),
                     contentDescription = ""
                 )
             }

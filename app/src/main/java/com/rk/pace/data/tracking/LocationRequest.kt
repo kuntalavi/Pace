@@ -12,7 +12,7 @@ import com.google.android.gms.location.Priority
 import com.google.android.gms.location.SettingsClient
 
 object LocationRequest {
-    private const val LOCATION_UPDATE_INTERVAL = 5000L
+    private const val LOCATION_UPDATE_INTERVAL = 3000L
 
     val locationRequest
         get() = LocationRequest.Builder(

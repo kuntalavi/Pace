@@ -84,8 +84,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.service)
 
     implementation(libs.google.maps)
-    implementation(libs.play.services.maps)
-    implementation(libs.play.services.location)
+    implementation(libs.p.services.maps)
+    implementation(libs.p.services.location)
     implementation(libs.c.compose)
 
     implementation(libs.androidx.core.ktx)

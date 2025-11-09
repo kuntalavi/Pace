@@ -14,5 +14,5 @@ data class RunEntity(
     val distanceInMeters: Float,
     val avgSpeedMps: Float,
     val maxSpeedMps: Float,
-    val ePath: String
+    val bitmapURI: String?
 )

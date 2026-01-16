@@ -12,39 +12,37 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class TimeTrackerImp @Inject constructor(
-    @param:ApplicationScope
-    private val app: CoroutineScope,
-    @param:DefaultDispatcher
-    private val default: CoroutineDispatcher
+    @param:DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
+    @param:ApplicationScope private val scope: CoroutineScope
 ) : TimeTracker {
 
     private var time = 0L
     private var isAct = false
-    private var cBack: ((time: Long) -> Unit)? = null
+    private var callBack: ((time: Long) -> Unit)? = null
     private var job: Job? = null
 
     private fun start() {
         if (job == null)
-            this.job = app.launch(default) {
+            this.job = scope.launch(defaultDispatcher) {
                 while (isAct && this.isActive) {
                     delay(1000)
                     time += 1000
-                    cBack ?. invoke(time)
+                    callBack?.invoke(time)
                 }
             }
     }
 
-    override fun startTimer(cBack: (Long) -> Unit) {
+    override fun startTimer(callBack: (Long) -> Unit) {
         if (time == 0L) {
-            this.cBack = cBack
+            this.callBack = callBack
             isAct = true
             start()
         }
     }
 
-    override fun resumeTimer(cBack: (Long) -> Unit) {
+    override fun resumeTimer(callBack: (Long) -> Unit) {
         if (!isAct) {
-            this.cBack = cBack
+            this.callBack = callBack
             isAct = true
             start()
         }
@@ -57,8 +55,8 @@ class TimeTrackerImp @Inject constructor(
 
     override fun pauseTimer() {
         isAct = false
-        job ?. cancel()
+        job?.cancel()
         job = null
-        cBack = null
+        callBack = null
     }
 }

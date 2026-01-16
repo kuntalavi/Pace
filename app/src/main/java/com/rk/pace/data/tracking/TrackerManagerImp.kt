@@ -1,5 +1,6 @@
 package com.rk.pace.data.tracking
 
+import com.rk.pace.common.ut.DistanceUt.getDistance
 import com.rk.pace.domain.model.RunPathPoint
 import com.rk.pace.domain.model.RunState
 import com.rk.pace.domain.tracking.LocationTracker
@@ -30,16 +31,19 @@ class TrackerManagerImp @Inject constructor(
             field = v
         }
 
-    private var cSegment: MutableList<RunPathPoint> = mutableListOf()
+    private var locationPoint: RunPathPoint? = null
+    private var totalDistance = 0f
+
+    private var currentSegment: MutableList<RunPathPoint> = mutableListOf()
 
     private val _runState = MutableStateFlow(RunState())
     override val runState = _runState
 
-    private val timeCback = { time: Long ->
-        _runState.update { it.copy(durationInM = time) }
+    private val timeCallback = { time: Long ->
+        _runState.update { it.copy(durationMilliseconds = time) }
     }
 
-    private val locationCback = object : LocationTracker.LocationCback {
+    private val locationCallback = object : LocationTracker.LocationCallback {
         override fun onLocationUpdate(results: List<RunPathPoint>) {
             if (isAct) {
                 results.forEach { point ->
@@ -50,14 +54,23 @@ class TrackerManagerImp @Inject constructor(
     }
 
     private fun updatePath(point: RunPathPoint) {
-        cSegment += point
+
+        val newDistance = getDistance(locationPoint, point)
+        totalDistance += newDistance
+
+        locationPoint = point
+        currentSegment += point
+
         _runState.update { state ->
-            val segments = state.segments.dropLast(1) + listOf(cSegment.toList())
+            val segments = state.segments.dropLast(1) + listOf(currentSegment.toList())
+
             state.copy(
-                distanceInMeters = 0f,
+                distanceMeters = totalDistance,
+                avgSpeedMps = totalDistance / (state.durationMilliseconds / 1000L),
                 speedMps = point.speedMps,
                 segments = segments
             )
+
         }
     }
 
@@ -68,25 +81,27 @@ class TrackerManagerImp @Inject constructor(
     }
 
     private fun pauseUpdatePath() {
-        if (cSegment.isNotEmpty()) {
+        if (currentSegment.isNotEmpty()) {
             _runState.update { state ->
                 state.copy(
-                    segments = state.segments + listOf(cSegment.toList())
+                    segments = state.segments + listOf(currentSegment.toList())
                 )
             }
-            cSegment = mutableListOf()
+            currentSegment = mutableListOf()
         }
     }
 
     override fun start() {
         if (isAct) return
-        cSegment = mutableListOf()
+        currentSegment = mutableListOf()
+        locationPoint = null
+        totalDistance = 0f
         resetRunState()
         isAct = true
 
         runTrackC.startRunTrackS()
-        locationT.setCback(locationCback)
-        timeT.startTimer(timeCback)
+        locationT.setCallback(locationCallback)
+        timeT.startTimer(timeCallback)
     }
 
     override fun pause() {
@@ -96,15 +111,17 @@ class TrackerManagerImp @Inject constructor(
         pauseUpdatePath()
 
         timeT.pauseTimer()
-        locationT.removeCback()
+        locationT.removeCallback()
+        locationPoint = null
     }
 
     override fun resume() {
         if (!paused) return
         paused = false
 
-        locationT.setCback(locationCback)
-        timeT.resumeTimer(timeCback)
+        locationT.setCallback(locationCallback)
+        timeT.resumeTimer(timeCallback)
+        locationPoint = null
     }
 
     override fun stop() {
@@ -113,9 +130,11 @@ class TrackerManagerImp @Inject constructor(
         pauseUpdatePath()
 
         runTrackC.stopRunTrackS()
-        locationT.removeCback()
+        locationT.removeCallback()
         timeT.stopTimer()
 
+        locationPoint = null
+        totalDistance = 0f
         resetRunState()
     }
 }

@@ -15,8 +15,8 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {
 
-    @Provides
     @Singleton
+    @Provides
     fun providePaceDatabase(
         @ApplicationContext context: Context
     ): PaceDatabase {
@@ -24,14 +24,24 @@ object DatabaseModule {
             context,
             PaceDatabase::class.java,
             PACE_DB_NAME,
-        ).build()
+        )
+            .fallbackToDestructiveMigration(true)
+            .build()
     }
 
-    @Provides
     @Singleton
+    @Provides
+    fun provideUserDao(database: PaceDatabase) = database.userDao()
+
+    @Singleton
+    @Provides
     fun provideRunDao(database: PaceDatabase) = database.runDao()
 
-    @Provides
     @Singleton
+    @Provides
     fun provideRunPathPointDao(database: PaceDatabase) = database.runPathPointDao()
+
+    @Singleton
+    @Provides
+    fun provideDeleteRunDao(database: PaceDatabase) = database.deleteRunDao()
 }

@@ -2,7 +2,11 @@ package com.rk.pace.auth.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.rk.pace.auth.domain.AuthRepo
+import com.rk.pace.auth.domain.model.AuthResult
+import com.rk.pace.auth.domain.repo.AuthRepo
+import com.rk.pace.auth.domain.use_case.SignInWithEmailUseCase
+import com.rk.pace.auth.domain.use_case.SignOutUseCase
+import com.rk.pace.auth.domain.use_case.SignUpWithEmailUseCase
 import com.rk.pace.domain.repo.RunRepo
 import com.rk.pace.presentation.Route
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,11 +18,22 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val authRepo: AuthRepo,
-    private val runRepo: RunRepo
+    private val runRepo: RunRepo,
+    private val signUpWithEmailUseCase: SignUpWithEmailUseCase,
+    private val signInWithEmailUseCase: SignInWithEmailUseCase,
+    private val signOutUseCase: SignOutUseCase
+//    private val isUserLoggedInUseCase: IsUserLoggedInUseCase,
+//    private val observeAuthStateUseCase: ObserveAuthStateUseCase
 ) : ViewModel() {
 
-    private val _authState = MutableStateFlow<AuthState>(AuthState.Empty)
+    private val _authState = MutableStateFlow<AuthUIState>(AuthUIState.Empty)
     val authState = _authState
+
+//    val authStateFlow = observeAuthStateUseCase().stateIn(
+//        scope = viewModelScope,
+//        started = SharingStarted.WhileSubscribed(5000L),
+//        initialValue = if (isUserLoggedInUseCase()) AuthState.Authenticated else AuthState.Unauthenticated
+//    )
 
     private val _startDestination = MutableStateFlow<Route?>(null)
     val startDestination = _startDestination
@@ -27,11 +42,11 @@ class AuthViewModel @Inject constructor(
         checkAuthStatus()
     }
 
-    private fun checkAuthStatus(){
+    private fun checkAuthStatus() {
         viewModelScope.launch {
-            val user = authRepo.user
+            val currentUserId = authRepo.currentUserId
 
-            if (user != null) {
+            if (currentUserId != null) {
                 _startDestination.update {
                     Route.Root.BotNav
                 }
@@ -46,82 +61,82 @@ class AuthViewModel @Inject constructor(
 
     fun resetState() {
         _authState.update {
-            AuthState.Empty
+            AuthUIState.Empty
         }
     }
 
-    fun signUp(name: String, em: String, password: String) {
+    fun signUp(
+        name: String,
+        username: String,
+        email: String,
+        password: String,
+        photoURI: String? = null
+    ) {
         viewModelScope.launch {
             _authState.update {
-                AuthState.Load
+                AuthUIState.Load
             }
-
-            val result = authRepo.signUp(name, em, password)
-
-            result.onSuccess {
-                _authState.update {
-                    AuthState.Success
+            when (val result = signUpWithEmailUseCase(name, username, email, password, photoURI)) {
+                is AuthResult.Success -> {
+                    _authState.update {
+                        AuthUIState.Success(result.user)
+                    }
                 }
-            }
-            result.onFailure { e ->
-                _authState.update {
-                    AuthState.Error(e.message ?: "")
-                }
-            }
-        }
-    }
 
-    fun signIn(em: String, password: String) {
-        viewModelScope.launch {
-            _authState.update {
-                AuthState.Load
-            }
-
-            val result = authRepo.signIn(em, password)
-
-            result.onSuccess { user ->
-                runRepo.restoreRuns(user.userId)
-                _authState.update {
-                    AuthState.Success
-                }
-            }
-            result.onFailure { e ->
-                _authState.update {
-                    AuthState.Error(e.message ?: "")
+                is AuthResult.Error -> {
+                    _authState.update {
+                        AuthUIState.Error(result.message)
+                    }
                 }
             }
         }
     }
 
-    fun forgetPassword(em: String) {
+    fun signIn(
+        email: String,
+        password: String
+    ) {
         viewModelScope.launch {
-            if (em.isBlank()) {
-                _authState.update {
-                    AuthState.Error("")
-                }
-                return@launch
-            }
             _authState.update {
-                AuthState.Load
+                AuthUIState.Load
             }
-            val result = authRepo.sendPasswordResetEm(em)
-            result.onSuccess {
-                _authState.update {
-                    AuthState.Error("password reset em sent to $em")
+
+            when (val result = signInWithEmailUseCase(email, password)) {
+                is AuthResult.Success -> {
+                    runRepo.restoreRuns(result.user.userId)
+                    _authState.update {
+                        AuthUIState.Success(result.user)
+                    }
+                }
+
+                is AuthResult.Error -> {
+                    _authState.update {
+                        AuthUIState.Error(result.message)
+                    }
                 }
             }
-            result.onFailure { e ->
-                _authState.update {
-                    AuthState.Error(e.message ?: "")
-                }
-            }
+
+        }
+    }
+
+    fun resetPassword(email: String) {
+        viewModelScope.launch {
+            //
         }
     }
 
     fun signOut() {
         viewModelScope.launch {
-            authRepo.signOut()
-            resetState()
+            signOutUseCase().fold(
+                onSuccess = {
+                    resetState()
+                },
+                onFailure = { error ->
+                    _authState.update {
+                        AuthUIState.Error(error.message ?: "")
+                    }
+                }
+            )
         }
     }
 }

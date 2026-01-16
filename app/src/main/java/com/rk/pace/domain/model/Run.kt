@@ -1,11 +1,17 @@
 package com.rk.pace.domain.model
 
+import java.util.UUID
+
 data class Run(
-    val runId: Long = 0,
+    val runId: String = UUID.randomUUID().toString(),
+    val userId: String,
     val timestamp: Long,
-    val durationM: Long,
+    val durationMilliseconds: Long,
     val distanceMeters: Float,
     val avgSpeedMps: Float,
-    val maxSpeedMps: Float,
-    val bitmapURI: String?
+    val encodedPath: List<String>,
+
+    val title: String,
+    val likes: Int,
+    val likedBy: List<String>
 )

@@ -72,9 +72,9 @@ class RunTrackNotification @Inject constructor(
         )
     }
 
-    fun updateNotification(durationInMillis: Long) {
+    fun updateNotification(durationMilliseconds: Long) {
         val notification = baseNotification
-            .setContentText("$durationInMillis")
+            .setContentText("$durationMilliseconds")
             .clearActions()
             .addAction(getNotificationAction())
             .build()

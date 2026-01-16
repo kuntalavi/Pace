@@ -53,7 +53,7 @@ class RunTrackService : LifecycleService() {
                     job = lifecycleScope.launch {
                         trackerManager.runState.collect { runState ->
                             notification.updateNotification(
-                                durationInMillis = runState.durationInM
+                                durationMilliseconds = runState.durationMilliseconds
                             )
                         }
                     }

@@ -1,0 +1,103 @@
+package com.rk.pace.data.remote.source
+
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+import com.rk.pace.data.mapper.toDomain
+import com.rk.pace.data.remote.dto.FollowerDto
+import com.rk.pace.data.remote.dto.RunDto
+import com.rk.pace.domain.model.FeedPost
+import com.rk.pace.domain.model.User
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
+
+class FirebaseFeedDataSource @Inject constructor(
+    private val firestore: FirebaseFirestore,
+    auth: FirebaseAuth,
+    private val firebaseUserDataSource: FirebaseUserDataSource
+) {
+    private val currentUserId = auth.currentUser?.uid ?: ""
+
+    fun getFeed(
+        limit: Long = 20
+    ): Flow<Result<List<FeedPost>>> = flow {
+        try {
+            val allRuns = mutableListOf<RunDto>()
+            val myRunsSnapshot = firestore.collection("runs")
+                .whereEqualTo("userId",currentUserId)
+                .get()
+                .await()
+
+            val myRuns = myRunsSnapshot.documents.mapNotNull { document ->
+                document.toObject(RunDto::class.java)
+            }
+            allRuns.addAll(myRuns)
+
+            val followingIds = getFollowingIds(currentUserId)
+
+            if (followingIds.isNotEmpty()){
+                followingIds.chunked(10).forEach { batch ->
+                    val runsSnapshot = firestore.collection("runs")
+                        .whereIn("userId", batch) //
+                        .orderBy("timestamp", Query.Direction.DESCENDING)
+                        .limit(limit)
+                        .get()
+                        .await()
+
+                    val runs = runsSnapshot.documents.mapNotNull { document ->
+                        document.toObject(RunDto::class.java)
+                    }
+                    allRuns.addAll(runs)
+                }
+            }
+
+            val sortedRuns = allRuns.sortedByDescending { it.timestamp }
+                .take(limit.toInt())
+
+            val feedPosts = sortedRuns.map { runDto ->
+                val user = firebaseUserDataSource.getUserById(runDto.userId)?.toDomain(
+                    photoURI = ""
+                )
+                val isLikedByMe = runDto.likedBy.contains(currentUserId)
+
+                FeedPost(
+                    run = runDto.toDomain(),
+                    user = user ?: User( //
+                        userId = "",
+                        username = "",
+                        name = "",
+                        email = "",
+                        photoURL = "",
+                        photoURI = "",
+                        followers = 0,
+                        following = 0
+                    ),
+                    isLikedByMe = isLikedByMe
+                )
+            }
+            emit(Result.success(feedPosts))
+        } catch (e: Exception) {
+            emit(Result.failure(e))
+        }
+    }.catch { e ->
+        emit(Result.failure(e))
+    }
+
+    private suspend fun getFollowingIds(currentUserId: String): List<String> {
+        return try {
+            val followersSnapshot = firestore.collection("followers")
+                .whereEqualTo("followerId", currentUserId) // followers documents where follower is myself
+                .get()
+                .await()
+
+            followersSnapshot.documents.mapNotNull { document ->
+                document.toObject(FollowerDto::class.java)?.followingId
+            }
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+}

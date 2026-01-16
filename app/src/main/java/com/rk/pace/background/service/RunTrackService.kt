@@ -44,7 +44,7 @@ class RunTrackService : LifecycleService() {
                 if (job == null) {
 //                    job = combine(
 //                        trackerManager.runState,
-//                        trackerManager.durationInM
+//                        trackerManager.durationMilliseconds
 //                    ) { runState, duration ->
 //                        notification.updateNotification(
 //                            durationInMillis = duration

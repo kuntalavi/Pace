@@ -22,7 +22,7 @@ class RunTrackNotification @Inject constructor(
 
     companion object {
         private const val RUN_TRACK_NOTIFICATION_CHANNEL_ID = "r_track_notification"
-        private const val RUN_TRACK_NOTIFICATION_CHANNEL_NAME = "R Track"
+        private const val RUN_TRACK_NOTIFICATION_CHANNEL_NAME = "Run Track"
         const val RUN_TRACK_NOTIFICATION_ID = 3
     }
 
@@ -33,7 +33,7 @@ class RunTrackNotification @Inject constructor(
         addNextIntentWithParentStack(
             Intent(
                 Intent.ACTION_VIEW,
-                Route.Root.Run.runUriPattern.toUri(),
+                Route.ActiveRun.Run.uri.toUri(),
                 context,
                 MainActivity::class.java
             )

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
@@ -22,25 +21,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.rk.pace.auth.presentation.AuthState
+import com.rk.pace.auth.presentation.AuthUIState
 import com.rk.pace.auth.presentation.AuthViewModel
-import com.rk.pace.auth.presentation.components.BottomSwitchText
-import com.rk.pace.auth.presentation.components.CustomSignButton
-import com.rk.pace.auth.presentation.components.Header
-import com.rk.pace.auth.presentation.components.InputText
-import com.rk.pace.auth.presentation.components.SoSignButton
+import com.rk.pace.presentation.components.CustomButton
+import com.rk.pace.presentation.components.CustomInputBox
 
 @Composable
 fun SignUpScreen(
     viewModel: AuthViewModel = hiltViewModel(),
-    goToSignIn: () -> Unit,
     onSignUpSuccess: () -> Unit
 ) {
     var name by remember { mutableStateOf("") }
-    var em by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var cPassword by remember { mutableStateOf("") }
 
@@ -52,11 +47,11 @@ fun SignUpScreen(
     }
 
     LaunchedEffect(key1 = authState) {
-        if (authState is AuthState.Success) {
+        if (authState is AuthUIState.Success) {
             onSignUpSuccess()
         }
-        if (authState is AuthState.Error) {
-            snackbarHostState.showSnackbar((authState as AuthState.Error).message)
+        if (authState is AuthUIState.Error) {
+            snackbarHostState.showSnackbar((authState as AuthUIState.Error).message)
         }
     }
 
@@ -79,77 +74,61 @@ fun SignUpScreen(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.Start
         ) {
-            Header(
-                text = "Create Your Account",
-                i = null
-            )
-            Spacer(modifier = Modifier.height(32.dp))
-            InputText(
-                v = name,
-                onVChange = { v ->
+            CustomInputBox(
+                value = name,
+                onValueChange = { v ->
                     name = v
                 },
-                l = "Name",
-                placeh = "Enter Full Name",
-                i = null
+                placeholder = "Enter Full Name",
+//                icon = "Name"
             )
             Spacer(modifier = Modifier.height(24.dp))
-            InputText(
-                v = em,
-                onVChange = { v ->
-                    em = v
+            CustomInputBox(
+                value = username,
+                onValueChange = { v ->
+                    username = v
                 },
-                l = "Em",
-                placeh = "your@em.com",
-                keyboardType = KeyboardType.Email,
-                i = null
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-            InputText(
-                v = password,
-                onVChange = { v ->
-                    password = v
-                },
-                l = "Password",
-                placeh = "password",
-                isPassword = true,
-                i = null
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-            InputText(
-                v = cPassword,
-                onVChange = { v ->
-                    cPassword = v
-                },
-                l = "Confirm Password",
-                placeh = "confirm password",
-                isPassword = true,
-                i = null
+                placeholder = "Enter Username",
+//                icon = "Name"
             )
             Spacer(modifier = Modifier.height(32.dp))
-            CustomSignButton(
-                text = "Sign Up",
-                onC = {
-                    if (password == cPassword && password.isNotEmpty()) {
-                        viewModel.signUp(name, em, password)
-                    } else{
-                        viewModel.resetState()
-                    }
+            CustomInputBox(
+                value = email,
+                onValueChange = { v ->
+                    email = v
                 },
-                isLoading = authState is AuthState.Load
+                placeholder = "your@em.com",
+//                icon = "Em",
+//                keyboardType = KeyboardType.Email
             )
-            HorizontalDivider()
-            SoSignButton(
-                text = "GOOGLE",
-                onC = {
-
+            Spacer(modifier = Modifier.height(24.dp))
+            CustomInputBox(
+                value = password,
+                onValueChange = { v ->
+                    password = v
+                },
+                placeholder = "password",
+//                icon = "Password",
+                isPassword = true
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            CustomInputBox(
+                value = cPassword,
+                onValueChange = { v ->
+                    cPassword = v
+                },
+                placeholder = "confirm password",
+//                icon = "Confirm Password",
+                isPassword = true
+            )
+            Spacer(modifier = Modifier.height(32.dp))
+            CustomButton(
+                text = "Sign Up",
+                onClick = {
+                    if (password == cPassword) {
+                        viewModel.signUp(name, username, email, password)
+                    }
                 }
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            BottomSwitchText(
-                text = "Already have an account?",
-                actionText = "Log In",
-                onActionC = goToSignIn
             )
         }
     }

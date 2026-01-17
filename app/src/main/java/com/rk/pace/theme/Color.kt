@@ -1,9 +1,10 @@
-package com.rk.pace.presentation.theme
+package com.rk.pace.theme
 
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
 val White = Color(0xFFFFFFFF)
-val Black = Color(0xFF000000)
+val Black: Color = Color(0xFF000000)
 val Red40 = Color(0xFFE53935)
 
 val Emerald60 = Color(0xFF2EC735)

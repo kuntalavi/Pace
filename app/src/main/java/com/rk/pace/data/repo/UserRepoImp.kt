@@ -7,8 +7,10 @@ import com.rk.pace.data.mapper.toEntity
 import com.rk.pace.data.remote.source.FirebaseUserDataSource
 import com.rk.pace.data.room.dao.UserDao
 import com.rk.pace.data.ut.InternalStorageHelper
+import com.rk.pace.di.IoDispatcher
 import com.rk.pace.domain.model.User
 import com.rk.pace.domain.repo.UserRepo
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -18,11 +20,12 @@ import javax.inject.Inject
 class UserRepoImp @Inject constructor(
     private val internalStorageHelper: InternalStorageHelper,
     private val firebaseUserDataSource: FirebaseUserDataSource,
-    private val userDao: UserDao
+    private val userDao: UserDao,
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : UserRepo {
 
     override suspend fun getUserProfile(userId: String): Result<User> =
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val userDto = firebaseUserDataSource.getUserById(userId)
 
             if (userDto != null) {
@@ -32,7 +35,7 @@ class UserRepoImp @Inject constructor(
             }
         }
 
-    override suspend fun updateProfile(user: User) {
+    override suspend fun updateProfile(user: User)  = withContext(ioDispatcher){
         val userEntity = user.toEntity()
         userDao.updateUser(userEntity)
 
@@ -40,9 +43,10 @@ class UserRepoImp @Inject constructor(
         firebaseUserDataSource.updateUserProfile(
             user.toDto(), user.photoURI
         )
+        return@withContext
     }
 
-    override suspend fun getMyProfile(): Result<User> = withContext(Dispatchers.IO) {
+    override suspend fun getMyProfile(): Result<User> = withContext(ioDispatcher) {
         try {
             val userEntity = userDao.getUser()
 
@@ -57,9 +61,9 @@ class UserRepoImp @Inject constructor(
             if (userDto != null) {
                 var photoURI: String? = null
                 if (userDto.photoURL != null) {
-                    val localPath = internalStorageHelper.downloadImageToInternalStorage(
+                    val localPath = internalStorageHelper.downloadSupabaseImageToInternalStorage(
                         userDto.photoURL,
-                        "profile_${System.currentTimeMillis()}.jpg"
+                        userDto.userId
                     )
                     if (localPath != null) {
                         photoURI = Uri.fromFile(File(localPath)).toString()

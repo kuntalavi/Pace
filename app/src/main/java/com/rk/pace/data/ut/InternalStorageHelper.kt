@@ -3,13 +3,9 @@ package com.rk.pace.data.ut
 import android.content.Context
 import android.net.Uri
 import android.util.Log
-import com.google.firebase.auth.FirebaseAuth
+import com.rk.pace.di.IoDispatcher
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.user.UserSession
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
@@ -20,98 +16,119 @@ import javax.inject.Inject
 
 class InternalStorageHelper @Inject constructor(
     @param:ApplicationContext private val context: Context,
-    private val supabase: SupabaseClient,
-    private val auth: FirebaseAuth
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
-    companion object {
-        private const val BUCKET_NAME = "user_dp"
-    }
+//    companion object {
+//        private const val BUCKET_NAME = "user_dp"
+//    }
 
-    suspend fun syncFirebaseSession(): Boolean = withContext(Dispatchers.IO) {
-        try {
-            val user = auth.currentUser ?: return@withContext false
-
-            val result = user.getIdToken(true).await()
-            val token = result.token ?: return@withContext false
-
-            val session = UserSession(
-                accessToken = token,
-                refreshToken = "",
-                expiresIn = 3600,
-                tokenType = "Bearer",
-                user = null
-            )
-            supabase.auth.importSession(session)
-            Log.d("Supabase", "Session Synced for ${user.uid}")
-            true
-        } catch (e: Exception) {
-            Log.e("Supabase", "Sync failed: ${e.message}")
-            false
-        }
-//        val firebaseUser = auth.currentUser ?: return
-//        firebaseUser.getIdToken(true).addOnSuccessListener { result ->
-//            val firebaseToken = result.token
+//    suspend fun syncFirebaseAuthToSupabase(user: FirebaseUser): Boolean =
+//        withContext(ioDispatcher) {
+//            try {
+//                val result = user.getIdToken(true).await()
+//                val token = result.token ?: return@withContext false
 //
-//            if (firebaseToken != null) {
-//                CoroutineScope(Dispatchers.IO).launch {
-//                    try {
-//                        val session = UserSession(
-//                            accessToken = firebaseToken,
-//                            refreshToken = "",
-//                            expiresIn = 3600,
-//                            tokenType = "Bearer",
-//                            user = null
-//                        )
-//                        supabase.auth.importSession(session)
-////                         supabase.auth.signInWith(IDToken) {
-////                             idToken = firebaseToken
-////                             provider = IDToken.pr
-////                         }
-////                        println("Supabase is now synced with User: ${firebaseUser.uid}")
-//                    } catch (e: Exception) {
-//                        e.printStackTrace()
-//                    }
-//                }
+//                val session = UserSession(
+//                    accessToken = token,
+//                    refreshToken = "",
+//                    expiresIn = 3600,
+//                    tokenType = "Bearer",
+//                    user = null
+//                )
+//                supabase.auth.importSession(session)
+//                Log.d("Supabase", "Session Synced for ${user.uid}")
+//                true
+//            } catch (e: Exception) {
+//                Log.e("Supabase", "Sync failed: ${e.message}")
+//                false
 //            }
 //        }
-    }
 
-    suspend fun saveGalleryImageToInternalStorage(contentUri: Uri, fileName: String): String? {
-        return withContext(Dispatchers.IO) {
+    // user_dp/uuid/image
+
+    suspend fun saveGalleryImageToInternalStorage(contentUri: Uri, userId: String): String? {
+        return withContext(ioDispatcher) {
             try {
+                val directory = File(context.filesDir, userId)
+
+                if (!directory.exists()){
+                    directory.mkdirs()
+                } else {
+                    directory.listFiles()?.forEach { file ->
+                        file.delete()
+                    }
+                }
+
+                val newFileName = "${System.currentTimeMillis()}.png"
+                val newFile = File(directory, newFileName)
+
                 val inputStream: InputStream? = context.contentResolver.openInputStream(contentUri)
 
                 if (inputStream == null) {
-                    Log.e("InternalStorageHelper", "Could not open stream for URI: $contentUri")
+                    Log.e("DP", "savingGalleryImageToInternalStorage: Could not open stream for selected URI: $contentUri")
                     return@withContext null
                 }
 
-                val file = File(context.filesDir, fileName)
-                val outputStream = FileOutputStream(file)
+//                val file = File(context.filesDir, fileName)
+//
+//                if (file.exists()){
+//                    file.delete()
+//                }
+//
+//                file.parentFile?.let {
+//                    if (!it.exists()){
+//                        val created = it.mkdirs()
+//                        Log.d("DP", "Creating directory ${it.absolutePath}: $created")
+//                    }
+//                }
+                val outputStream = FileOutputStream(newFile)
 
                 inputStream.use { input ->
                     outputStream.use { output ->
                         input.copyTo(output)
                     }
                 }
-                file.absolutePath
+                newFile.absolutePath
             } catch (e: Exception) {
-                Log.e("InternalStorageHelper", "Failed to save gallery image: ${e.message}")
+                Log.e("DP", "Failed to save gallery image: ${e.message}")
                 e.printStackTrace()
                 null
             }
         }
     }
 
-    suspend fun downloadImageToInternalStorage(remoteURL: String, fileName: String): String? {
-        return withContext(Dispatchers.IO) {
+    suspend fun downloadSupabaseImageToInternalStorage(
+        supabaseURL: String,
+        userId: String
+    ): String? {
+        return withContext(ioDispatcher) {
             try {
-                val file = File(context.filesDir, fileName)
-                val bytes = URL(remoteURL).readBytes()
+                val directory = File(context.filesDir, userId)
 
-                file.writeBytes(bytes)
-                Log.d("Supabase", "File saved locally at: ${file.absolutePath}")
-                file.absolutePath
+                if (!directory.exists()){
+                    directory.mkdirs()
+                }else{
+                    directory.listFiles()?.forEach { file ->
+                        file.delete()
+                    }
+                }
+
+                val newFileName = "${System.currentTimeMillis()}.png"
+                val newFile = File(directory, newFileName)
+//                val file = File(context.filesDir, fileName)
+//
+//                file.parentFile?.mkdirs()
+//
+//                if (file.exists()) {
+//                    file.delete()
+//                    Log.d("Supabase", "Deleted old file: ${file.absolutePath}")
+//                }
+
+                val bytes = URL(supabaseURL).readBytes()
+
+                newFile.writeBytes(bytes)
+                Log.d("Supabase", "File saved locally at: ${newFile.absolutePath}")
+                newFile.absolutePath
             } catch (e: Exception) {
                 Log.e("Supabase", "Download Failed: ${e.message}")
                 e.printStackTrace()
@@ -119,6 +136,7 @@ class InternalStorageHelper @Inject constructor(
             }
         }
     }
+
 }
 
 //

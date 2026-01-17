@@ -3,7 +3,7 @@ package com.rk.pace.data.room.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "d_runs")
+@Entity(tableName = "delete_runs")
 data class DeleteRunEntity(
     @PrimaryKey(autoGenerate = false)
     val runId: String,

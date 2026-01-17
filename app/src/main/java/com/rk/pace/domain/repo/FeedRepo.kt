@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface FeedRepo {
 
-    fun getSocialFeed(): Flow<Result<List<FeedPost>>>
-//    fun pullToRefresh()
+    fun getFeed(): Flow<Result<List<FeedPost>>>
     fun searchUser(username: String): Flow<List<User>>
 }

@@ -1,7 +1,6 @@
 package com.rk.pace.data.remote.source
 
 import android.content.Context
-import android.util.Log
 import androidx.core.net.toUri
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -14,9 +13,9 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class FirebaseUserDataSource @Inject constructor(
+    @param:ApplicationContext private val context: Context,
     firestore: FirebaseFirestore,
     private val supabase: SupabaseClient,
-    @param:ApplicationContext private val context: Context,
     private val auth: FirebaseAuth
 ) {
     companion object {
@@ -43,19 +42,27 @@ class FirebaseUserDataSource @Inject constructor(
             var updatedPhotoURL = userDto.photoURL
 
             if (photoURI != null) {
-                val fileName = "${userDto.userId}/dp.jpg"
+                val fileName = "${System.currentTimeMillis()}.png"
+                val filePath = "${userDto.userId}/$fileName"
                 val bucket = supabase.storage.from(BUCKET_NAME)
 
                 val bytes = context.contentResolver.openInputStream(photoURI.toUri())?.use {
                     it.readBytes()
                 } ?: throw Exception("Failed to read image file")
 
-                bucket.upload(fileName, bytes) {
-                    upsert = true
+                bucket.upload(filePath, bytes)
+
+                val files = bucket.list(userDto.userId)
+
+                val toDelete = files
+                    .filter { it.name != fileName }
+                    .map { "${userDto.userId}/${it.name}" }
+
+                if (toDelete.isNotEmpty()) {
+                    bucket.delete(toDelete)
                 }
 
-                updatedPhotoURL = bucket.publicUrl(fileName)
-                Log.d("SupabaseDataSource", "Image uploaded: $updatedPhotoURL")
+                updatedPhotoURL = bucket.publicUrl(filePath)
             }
 
             val newUserDto = userDto.copy(photoURL = updatedPhotoURL)
@@ -66,7 +73,6 @@ class FirebaseUserDataSource @Inject constructor(
 
             true
         } catch (e: Exception) {
-            Log.e("SupabaseDataSource", "Error updating user profile: ${e.message}", e)
             false
         }
     }

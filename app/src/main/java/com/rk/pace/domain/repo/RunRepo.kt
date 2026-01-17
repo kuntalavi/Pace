@@ -6,11 +6,16 @@ import kotlinx.coroutines.flow.Flow
 
 interface RunRepo {
 
-    suspend fun insertRun(run: RunWithPath): Long
+    suspend fun insertRun(run: RunWithPath)
 
     suspend fun removeRun(run: Run)
 
     fun getARuns(): Flow<List<Run>>
 
-    suspend fun getRunById(runId: Long): RunWithPath?
+    fun getARunsWithPath(): Flow<List<RunWithPath>>
+
+    suspend fun getRunWithPathByRunId(runId: String): RunWithPath?
+
+    suspend fun restoreRuns(userId: String)
+
 }

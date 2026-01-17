@@ -1,5 +1,7 @@
 package com.rk.pace.auth.presentation
 
+import android.content.Context
+import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rk.pace.auth.domain.model.AuthResult
@@ -7,9 +9,11 @@ import com.rk.pace.auth.domain.repo.AuthRepo
 import com.rk.pace.auth.domain.use_case.SignInWithEmailUseCase
 import com.rk.pace.auth.domain.use_case.SignOutUseCase
 import com.rk.pace.auth.domain.use_case.SignUpWithEmailUseCase
+import com.rk.pace.common.extension.restartApp
 import com.rk.pace.domain.repo.RunRepo
 import com.rk.pace.presentation.Route
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -17,6 +21,7 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
+    @param:ApplicationContext private val context: Context,
     private val authRepo: AuthRepo,
     private val runRepo: RunRepo,
     private val signUpWithEmailUseCase: SignUpWithEmailUseCase,
@@ -130,6 +135,7 @@ class AuthViewModel @Inject constructor(
             signOutUseCase().fold(
                 onSuccess = {
                     resetState()
+                    restartApp(context)
                 },
                 onFailure = { error ->
                     _authState.update {

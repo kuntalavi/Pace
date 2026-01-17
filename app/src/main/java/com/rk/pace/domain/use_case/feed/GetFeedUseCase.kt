@@ -9,6 +9,6 @@ class GetFeedUseCase @Inject constructor(
     private val repo: FeedRepo
 ) {
     operator fun invoke(): Flow<Result<List<FeedPost>>> {
-        return repo.getSocialFeed()
+        return repo.getFeed()
     }
 }

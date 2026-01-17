@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1096527549997",
+    "project_id": "pace-jaat",
+    "storage_bucket": "pace-jaat.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1096527549997:android:f6deba8930bcda5d6c8aa4",
+        "android_client_info": {
+          "package_name": "com.rk.pace"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1096527549997-ufhgcs1pvemk3mbsg2mg9nr4j17o1m9p.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rk.pace",
+            "certificate_hash": "c912074c689adcab5b5e9723b478e2b509ec30da"
+          }
+        },
+        {
+          "client_id": "1096527549997-ot00uc13e9adhu1atk4glsjbodq4q7ej.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDxVlK7RmNSsX7LLHYWrbAGSaCGjvFBb6Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1096527549997-ot00uc13e9adhu1atk4glsjbodq4q7ej.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

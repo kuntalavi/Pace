@@ -10,7 +10,7 @@ import javax.inject.Inject
 class FeedRepoImp @Inject constructor(
     private val firebaseFeedDataSource: FirebaseFeedDataSource
 ): FeedRepo {
-    override fun getSocialFeed(): Flow<Result<List<FeedPost>>> {
+    override fun getFeed(): Flow<Result<List<FeedPost>>> {
         return firebaseFeedDataSource.getFeed()
     }
 

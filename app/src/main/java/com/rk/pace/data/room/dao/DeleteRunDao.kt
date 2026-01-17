@@ -12,7 +12,7 @@ interface DeleteRunDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertDeleteRun(dRun: DeleteRunEntity)
 
-    @Query("SELECT * FROM d_runs")
+    @Query("SELECT * FROM delete_runs")
     suspend fun getAllDeleteRuns(): List<DeleteRunEntity>
 
     @Delete

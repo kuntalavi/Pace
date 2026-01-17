@@ -3,8 +3,7 @@ package com.rk.pace.di
 import android.content.Context
 import androidx.work.WorkManager
 import com.rk.pace.data.ut.InternalStorageHelper
-import com.rk.pace.di.FirebaseModule.provideFirebaseAuth
-import com.rk.pace.di.FirebaseModule.provideSupabaseClient
+import com.rk.pace.di.CoroutineDispatcherModule.provideIoDispatcher
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,6 +27,6 @@ object AppModule {
     @Provides
     fun provideInternalStorageHelper(
         @ApplicationContext context: Context
-    ) = InternalStorageHelper(context, provideSupabaseClient(), provideFirebaseAuth())
+    ) = InternalStorageHelper(context, provideIoDispatcher())
 
 }

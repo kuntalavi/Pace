@@ -2,7 +2,6 @@ package com.rk.pace.di
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,16 +30,10 @@ object FirebaseModule {
 
     @Singleton
     @Provides
-    fun provideFirebaseStorage(): FirebaseStorage {
-        return FirebaseStorage.getInstance()
-    }
-
-    @Singleton
-    @Provides
     fun provideSupabaseClient(): SupabaseClient {
         return createSupabaseClient(
             supabaseUrl = "https://zfuhafacgugwikcwffzx.supabase.co",
-            supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpmdWhhZmFjZ3Vnd2lrY3dmZnp4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg0ODc4NjcsImV4cCI6MjA4NDA2Mzg2N30.444DTqxZHIDRZavGtOSVsBwH844dMTk0NSByOtsgFo0"
+            supabaseKey = "sb_publishable_Strsozv454C_ohdmh0aw5A_yeFneM_z"
         ) {
             install(Auth)
             install(Storage)

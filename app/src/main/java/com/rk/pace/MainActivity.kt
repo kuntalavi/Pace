@@ -5,22 +5,42 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.core.app.ActivityCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import com.rk.pace.auth.presentation.AuthScreen
+import com.rk.pace.auth.presentation.AuthViewModel
 import com.rk.pace.common.extension.hasPostNotificationPermission
+import com.rk.pace.presentation.BotNavScreen
 import com.rk.pace.presentation.Route
-import com.rk.pace.presentation.screens.run.RunScreen
-import com.rk.pace.presentation.screens.top.TopScreen
-import com.rk.pace.presentation.theme.PaceTheme
+import com.rk.pace.presentation.screens.active_run.RunScreen
+import com.rk.pace.presentation.screens.active_run.ActiveRunViewModel
+import com.rk.pace.presentation.screens.active_run.SaveRunScreen
+import com.rk.pace.presentation.screens.run_stats.RunStatsScreen
+import com.rk.pace.theme.PaceTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    private val authViewModel: AuthViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        installSplashScreen().setKeepOnScreenCondition {
+            authViewModel.startDestination.value == null
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (!this.hasPostNotificationPermission()) {
@@ -34,30 +54,85 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            PaceTheme {
-                PaceApp()
+//            val authState by authViewModel.authStateFlow.collectAsState()
+//            installSplashScreen().setKeepOnScreenCondition {
+//                authState == AuthState.Load
+//            }
+            val startDestination by authViewModel.startDestination.collectAsState()
+            if (startDestination != null) {
+                PaceTheme {
+                    PaceApp(startDestination!!)
+                }
             }
         }
     }
 }
 
 @Composable
-fun PaceApp() {
+fun PaceApp(
+    startDestination: Route
+) {
     val navController = rememberNavController()
 
     NavHost(
         navController = navController,
-        startDestination = Route.Root.Top
+        startDestination = startDestination
     ) {
-        composable<Route.Root.Top> {
-            TopScreen(
+
+        composable<Route.Root.Auth> {
+            AuthScreen(
                 navController = navController
             )
         }
-        composable<Route.Root.Run>(
-            deepLinks = Route.Root.Run.deepLinks
+        composable<Route.Root.BotNav> {
+            BotNavScreen(
+                navController = navController
+            )
+        }
+        navigation<Route.Root.ActiveRun>(
+            startDestination = Route.ActiveRun.Run
         ) {
-            RunScreen(
+            composable<Route.ActiveRun.Run>(
+                deepLinks = Route.ActiveRun.Run.deepL
+            ) { backStackEntry ->
+                val entry = remember(backStackEntry) {
+                    navController.getBackStackEntry(Route.Root.ActiveRun)
+                }
+                val viewModel: ActiveRunViewModel =
+                    hiltViewModel(entry)
+                RunScreen(
+                    viewModel = viewModel,
+                    goBack = { navController.popBackStack() },
+                    goToSaveRun = {
+                        navController.navigate(
+                            Route.ActiveRun.SaveRun
+                        )
+                    }
+                )
+            }
+            composable<Route.ActiveRun.SaveRun> { backStackEntry ->
+                val entry = remember(backStackEntry) {
+                    navController.getBackStackEntry(Route.Root.ActiveRun)
+                }
+                val viewModel: ActiveRunViewModel =
+                    hiltViewModel(entry)
+                SaveRunScreen(
+                    viewModel = viewModel,
+                    goBack = {
+                        navController.navigate(Route.Root.BotNav) {
+                            popUpTo(Route.Root.ActiveRun) {
+                                inclusive = true
+                                saveState = false
+                            }
+                        }
+                    }
+                )
+            }
+        }
+        composable<Route.Root.RunStats> { backStackEntry ->
+            val args = backStackEntry.toRoute<Route.Root.RunStats>()
+            RunStatsScreen(
+                runId = args.runId,
                 goBack = { navController.popBackStack() }
             )
         }
@@ -163,7 +238,7 @@ fun PaceApp() {
 //- Basic GPS tracking service
 //- Start/Stop/Pause run
 //- Distance calculation
-//- Simple list of runs
+//- Simple list of home
 //
 //### **Week 2: Maps & Visualization**
 //- Google Maps integration

@@ -13,8 +13,9 @@ import com.rk.pace.data.mapper.toEntity
 import com.rk.pace.data.remote.dto.UserDto
 import com.rk.pace.data.room.dao.UserDao
 import com.rk.pace.data.ut.InternalStorageHelper
+import com.rk.pace.di.IoDispatcher
 import com.rk.pace.domain.model.User
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -26,7 +27,8 @@ constructor(
     private val auth: FirebaseAuth,
     firestore: FirebaseFirestore,
     private val userDao: UserDao,
-    private val internalStorageHelper: InternalStorageHelper
+    private val internalStorageHelper: InternalStorageHelper,
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : AuthRepo {
 
     private val usersCollection = firestore.collection("users")
@@ -53,7 +55,7 @@ constructor(
         email: String,
         password: String,
         photoURI: String?
-    ): AuthResult = withContext(Dispatchers.IO) {
+    ): AuthResult = withContext(ioDispatcher) {
         try {
             val usernameExists = checkUsernameExists(username)
             if (usernameExists) {
@@ -91,26 +93,24 @@ constructor(
     override suspend fun signInWithEmail(
         email: String,
         password: String
-    ): AuthResult = withContext(Dispatchers.IO) {
+    ): AuthResult = withContext(ioDispatcher) {
         try {
             val authResult = auth.signInWithEmailAndPassword(email, password).await()
             val firebaseUser = authResult.user
             if (firebaseUser != null) {
-                internalStorageHelper.syncFirebaseSession()
-
                 val userDto = usersCollection.document(firebaseUser.uid)
                     .get()
                     .await()
                     .toObject(UserDto::class.java)
 
                 if (userDto != null) {
-                    // photo URL -> download Image -> save photoURi to Room
                     var photoURI: String? = null
                     if (userDto.photoURL != null) {
-                        val localPath = internalStorageHelper.downloadImageToInternalStorage(
-                            userDto.photoURL,
-                            "profile_${System.currentTimeMillis()}.jpg"
-                        )
+                        val localPath =
+                            internalStorageHelper.downloadSupabaseImageToInternalStorage(
+                                userDto.photoURL,
+                                userDto.userId
+                            )
                         if (localPath != null) {
                             photoURI = Uri.fromFile(File(localPath)).toString()
                         }
@@ -133,17 +133,16 @@ constructor(
         }
     }
 
-    override suspend fun signOut(): Result<Unit> = withContext(Dispatchers.IO) {
+    override suspend fun signOut(): Result<Unit> = withContext(ioDispatcher) {
         try {
             auth.signOut()
-            userDao.deleteUser()
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
-    override suspend fun resetPassword(email: String): Result<Unit> = withContext(Dispatchers.IO) {
+    override suspend fun resetPassword(email: String): Result<Unit> = withContext(ioDispatcher) {
         try {
             auth.sendPasswordResetEmail(email).await()
             Result.success(Unit)

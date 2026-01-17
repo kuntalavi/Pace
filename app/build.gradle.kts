@@ -7,6 +7,8 @@ plugins {
     alias(libs.plugins.kserialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.firebase.crashlytics)
 }
 
 val properties = Properties()
@@ -23,7 +25,7 @@ android {
         minSdk = 24
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0"
+        versionName = "0.1.0-alpha"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -31,6 +33,12 @@ android {
             "String",
             "GOOGLE_MAPS_API_KEY",
             "\"${properties.getProperty("GOOGLE_MAPS_API_KEY")}\""
+        )
+
+        buildConfigField(
+            "String",
+            "MAPBOX_ACCESS_TOKEN",
+            "\"${properties.getProperty("MAPBOX_ACCESS_TOKEN")}\""
         )
 
         manifestPlaceholders[
@@ -64,7 +72,24 @@ android {
 
 dependencies {
 
+    implementation(libs.coil.network.okhttp)
+
+    implementation(platform(libs.bom))
+    implementation(libs.storage.kt)
+    implementation(libs.auth.kt)
+    implementation(libs.ktor.client.android)
+
+    implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.material.icons.extended)
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.analytics)
+
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.hilt.work)
 
     ksp(libs.hilt)
     implementation(libs.hilt.android)
@@ -86,7 +111,7 @@ dependencies {
     implementation(libs.google.maps)
     implementation(libs.p.services.maps)
     implementation(libs.p.services.location)
-    implementation(libs.c.compose)
+    implementation(libs.coil.compose)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

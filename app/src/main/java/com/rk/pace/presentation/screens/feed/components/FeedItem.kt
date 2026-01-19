@@ -1,5 +1,11 @@
 package com.rk.pace.presentation.screens.feed.components
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,9 +19,11 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -27,14 +35,39 @@ import com.rk.pace.domain.model.FeedPost
 import com.rk.pace.presentation.components.ProfileImage
 import com.rk.pace.presentation.components.ProfileImageSize
 import com.rk.pace.presentation.components.StatItem
+import com.rk.pace.theme.Black
+import com.rk.pace.theme.Gray
 import com.rk.pace.theme.like
 import com.rk.pace.theme.unlike
 
 @Composable
 fun FeedItem(
     post: FeedPost,
+    toggleLike: () -> Unit
 //    goToRunStats: (runId: String) -> Unit
 ) {
+
+    val transition = updateTransition(
+        targetState = post.isLikedByMe
+    )
+    val heartScale by transition.animateFloat(
+        transitionSpec = {
+            if (targetState) {
+                spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessLow
+                )
+            } else {
+                snap()
+            }
+        }
+    ) { state ->
+        if (state) 1.3f else 1.0f
+    }
+    val heartColor by animateColorAsState(
+        targetValue = if (post.isLikedByMe) Black else Gray,
+        label = "Color"
+    )
 
     Card(
         modifier = Modifier
@@ -103,19 +136,39 @@ fun FeedItem(
             )
             Spacer(modifier = Modifier.height(10.dp))
             Row(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                if (post.isLikedByMe) {
-                    IconButton(
+                IconButton(
+                    onClick = { toggleLike() }
+                ) {
+                    Icon(
+                        imageVector = if (post.isLikedByMe) like else unlike,
+                        contentDescription = "",
+                        tint = heartColor,
+                        modifier = Modifier.scale(heartScale)
+                    )
+//                    if (post.isLikedByMe) {
+//                        Icon(imageVector = like, contentDescription = "", tint = Color.Red)
+//                    } else {
+//                        Icon(imageVector = unlike, contentDescription = "")
+//                    }
+                }
+                if (post.run.likes > 0) {
+                    TextButton(
                         onClick = {}
                     ) {
-                        Icon(imageVector = like, contentDescription = "", tint = Color.Red)
-                    }
-                } else {
-                    IconButton(
-                        onClick = {}
-                    ) {
-                        Icon(imageVector = unlike, contentDescription = "")
+                        if (post.run.likes == 1) {
+                            Text(
+                                text = "${post.run.likes} LIKE",
+                                letterSpacing = 1.sp
+                            )
+                        } else {
+                            Text(
+                                text = "${post.run.likes} LIKES",
+                                letterSpacing = 1.sp
+                            )
+                        }
                     }
                 }
             }

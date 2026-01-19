@@ -27,8 +27,8 @@ fun FeedScreen(
 ) {
     val state by viewmodel.state.collectAsStateWithLifecycle()
 
-    when  {
-        state.isInitialLoad-> {
+    when {
+        state.isInitialLoad -> {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -36,6 +36,7 @@ fun FeedScreen(
                 CircularProgressIndicator()
             }
         }
+
         state.error != null -> {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(text = "Failed to load state ${state.error}")
@@ -58,7 +59,12 @@ fun FeedScreen(
                     contentPadding = PaddingValues(20.dp)
                 ) {
                     items(state.posts) { post ->
-                        FeedItem(post = post)
+                        FeedItem(
+                            post = post,
+                            toggleLike = {
+                                viewmodel.toggleLike(post)
+                            }
+                        )
                     }
                 }
             }

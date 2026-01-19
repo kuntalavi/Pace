@@ -2,8 +2,10 @@ package com.rk.pace.presentation.screens.feed
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.rk.pace.auth.domain.use_case.GetCurrentUserIdUseCase
+import com.rk.pace.domain.model.FeedPost
 import com.rk.pace.domain.use_case.feed.GetFeedUseCase
-import com.rk.pace.domain.use_case.run.GetARunsUseCase
+import com.rk.pace.domain.use_case.feed.ToggleLikePostUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -12,8 +14,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FeedViewModel @Inject constructor(
-    private val getRunsUseCase: GetARunsUseCase,
-    private val getFeedUseCase: GetFeedUseCase
+    private val getFeedUseCase: GetFeedUseCase,
+    private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase,
+    private val toggleLikePostUseCase: ToggleLikePostUseCase
 ) : ViewModel() {
 
     private val _state: MutableStateFlow<FeedState> = MutableStateFlow(FeedState())
@@ -80,6 +83,34 @@ class FeedViewModel @Inject constructor(
                     }
                 )
             }
+        }
+    }
+
+    fun toggleLike(post: FeedPost) {
+        val currentUserId = getCurrentUserIdUseCase() ?: return
+        _state.update { state ->
+            state.copy(
+                posts = state.posts.map { p ->
+                    if (post.run.runId == p.run.runId) {
+                        p.copy(
+                            isLikedByMe = !post.isLikedByMe,
+                            run = p.run.copy(
+                                likes = if (post.isLikedByMe) {
+                                    p.run.likes - 1
+                                } else p.run.likes + 1,
+                                likedBy = if (post.isLikedByMe) {
+                                    p.run.likedBy.filter { it != currentUserId }
+                                } else p.run.likedBy + currentUserId
+                            )
+                        )
+                    } else {
+                        p
+                    }
+                }
+            )
+        }
+        viewModelScope.launch {
+            toggleLikePostUseCase(post.run.runId, currentUserId, post.isLikedByMe)
         }
     }
 }

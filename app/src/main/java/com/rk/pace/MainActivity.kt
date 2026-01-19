@@ -26,6 +26,7 @@ import com.rk.pace.presentation.Route
 import com.rk.pace.presentation.screens.active_run.RunScreen
 import com.rk.pace.presentation.screens.active_run.ActiveRunViewModel
 import com.rk.pace.presentation.screens.active_run.SaveRunScreen
+import com.rk.pace.presentation.screens.search.SearchScreen
 import com.rk.pace.presentation.screens.run_stats.RunStatsScreen
 import com.rk.pace.theme.PaceTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -136,6 +137,11 @@ fun PaceApp(
                 goBack = { navController.popBackStack() }
             )
         }
+        composable<Route.Root.Search> {
+            SearchScreen(
+                goBack = { navController.popBackStack() }
+            )
+        }
     }
 }
 
@@ -143,7 +149,7 @@ fun PaceApp(
 
 // 1. GPS & Location Services
 //- FusedLocationProviderClient
-//- Foreground Service with notification
+//- Foreground Service with notifications
 //- Location permissions (runtime + background)
 //- Battery optimization handling
 //

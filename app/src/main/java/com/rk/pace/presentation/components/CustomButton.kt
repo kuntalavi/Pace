@@ -1,5 +1,6 @@
 package com.rk.pace.presentation.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,13 +22,13 @@ import com.rk.pace.theme.Black
 @Composable
 fun CustomButton(
     onClick: () -> Unit,
-    text: String,
-    theme: String = "Black"
+    text: String
 ) {
     Box(
         modifier = Modifier
             .padding(vertical = 10.dp)
             .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.primary)
             .height(56.dp)
             .border(
                 width = 1.dp,
@@ -46,7 +48,7 @@ fun CustomButton(
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 letterSpacing = 1.sp,
-                color = Black //
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
     }

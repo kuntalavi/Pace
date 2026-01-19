@@ -5,31 +5,64 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Emerald60,
-    secondary = Teal40,
-    tertiary = Lime50,
+    primary = Color(0xFFc6c6c6),
+    secondary = Color(0xFFc6c6c6),
+    tertiary = Color(0xFFc6c6c6),
+    error = Color(0xFFffb4ab),
 
-    onPrimary = Black,
-    onSecondary = Black,
-    onTertiary = Black,
-    background = Neutral10,
-    surface = Neutral20,
-    error = Red40
+    onPrimary = Color(0xFF303030),
+    onSecondary = Color(0xFF303030),
+    onTertiary = Color(0xFF303030),
+    onError = Color(0xFF690005),
+
+    primaryContainer = Black,
+    secondaryContainer = Color(0xFF474747),
+    tertiaryContainer = Black,
+    errorContainer = Color(0xFF93000a),
+
+    onPrimaryContainer = Color(0xFF757575),
+    onSecondaryContainer = Color(0xFFb5b5b5),
+    onTertiaryContainer = Color(0xFF757575),
+    onErrorContainer = Color(0xFFffdad6),
+
+    surface = Color(0xFF131313),
+    onSurface = Color(0xFFe2e2e2),
+    inverseSurface = Color(0xFFe2e2e2),
+    inverseOnSurface = Color(0xFF303030),
+    inversePrimary = Color(0xFF5e5e5e),
+    scrim = Black,
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Emerald80,
-    secondary = Teal80,
-    tertiary = Lime70,
+    primary = Black,
+    secondary = Color(0xFF5e5e5e),
+    tertiary = Black,
+    error = Color(0xFFba1a1a),
 
     onPrimary = White,
     onSecondary = White,
     onTertiary = White,
-    background = Neutral99,
-    surface = Neutral95,
-    error = Red40
+    onError = White,
+
+    primaryContainer = Color(0xFF1b1b1b),
+    secondaryContainer = Color(0xFFe2e2e2),
+    tertiaryContainer = Color(0xFF1b1b1b),
+    errorContainer = Color(0xFFffdad6),
+
+    onPrimaryContainer = Color(0xFF848484),
+    onSecondaryContainer = Color(0xFF646464),
+    onTertiaryContainer = Color(0xFF848484),
+    onErrorContainer = Color(0xFF93000a),
+
+    surface = Color(0xFFf9f9f9),
+    onSurface = Color(0xFF1b1b1b),
+    inverseSurface = Color(0xFF303030),
+    inverseOnSurface = Color(0xFFf1f1f1),
+    inversePrimary = Color(0xFFc6c6c6),
+    scrim = Black,
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),

@@ -11,8 +11,8 @@ import com.rk.pace.di.IoDispatcher
 import com.rk.pace.domain.model.User
 import com.rk.pace.domain.repo.UserRepo
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
@@ -35,7 +35,7 @@ class UserRepoImp @Inject constructor(
             }
         }
 
-    override suspend fun updateProfile(user: User)  = withContext(ioDispatcher){
+    override suspend fun updateProfile(user: User) = withContext(ioDispatcher) {
         val userEntity = user.toEntity()
         userDao.updateUser(userEntity)
 
@@ -80,6 +80,12 @@ class UserRepoImp @Inject constructor(
 
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    override fun searchUser(query: String): Flow<List<User>> {
+        return firebaseUserDataSource.searchUser(query).map { dtos ->
+            dtos.map { it.toDomain(photoURI = "") }
         }
     }
 

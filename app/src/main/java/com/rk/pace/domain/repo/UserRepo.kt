@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface UserRepo {
 
+    fun searchUser(query: String): Flow<List<User>>
     suspend fun getUserProfile(userId: String): Result<User>
     suspend fun updateProfile(user: User)
     suspend fun getMyProfile(): Result<User>

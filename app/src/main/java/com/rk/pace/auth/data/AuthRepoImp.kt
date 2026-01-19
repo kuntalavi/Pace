@@ -36,12 +36,13 @@ constructor(
     private suspend fun checkUsernameExists(username: String): Boolean {
         return try {
             val querySnapshot = usersCollection
-                .whereEqualTo("username", username.lowercase())
+                .whereEqualTo("query", username.lowercase())
                 .get()
                 .await()
 
             !querySnapshot.isEmpty
         } catch (e: Exception) {
+            e.printStackTrace()
             false
         }
     }
@@ -147,7 +148,7 @@ constructor(
             auth.sendPasswordResetEmail(email).await()
             Result.success(Unit)
         } catch (e: FirebaseAuthInvalidUserException) {
-            Result.failure(Exception("No Account Found With This Email"))
+            Result.failure(e)
         } catch (e: Exception) {
             Result.failure(e)
         }

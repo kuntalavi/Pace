@@ -9,6 +9,9 @@ import com.rk.pace.data.remote.dto.UserDto
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.storage.storage
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -26,6 +29,24 @@ class FirebaseUserDataSource @Inject constructor(
 
     fun getCurrentUserId(): String? = auth.currentUser?.uid
 
+    fun searchUser(query: String): Flow<List<UserDto>> = callbackFlow {
+        val normalizedQuery = query.trim().lowercase()
+
+        val subscription = usersCollection.orderBy("username")
+            .startAt(normalizedQuery)
+            .endAt(normalizedQuery + "\uf8ff")
+            .limit(10)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+                val usersDto = snapshot?.toObjects(UserDto::class.java) ?: emptyList()
+                trySend(usersDto)
+            }
+        awaitClose { subscription.remove() }
+    }
+
     suspend fun getUserById(userId: String): UserDto? {
         return try {
             usersCollection.document(userId)
@@ -33,6 +54,7 @@ class FirebaseUserDataSource @Inject constructor(
                 .await()
                 .toObject(UserDto::class.java)
         } catch (e: Exception) {
+            e.printStackTrace()
             null
         }
     }
@@ -73,6 +95,7 @@ class FirebaseUserDataSource @Inject constructor(
 
             true
         } catch (e: Exception) {
+            e.printStackTrace()
             false
         }
     }
@@ -84,6 +107,7 @@ class FirebaseUserDataSource @Inject constructor(
                 .await()
             true
         } catch (e: Exception) {
+            e.printStackTrace()
             false
         }
     }

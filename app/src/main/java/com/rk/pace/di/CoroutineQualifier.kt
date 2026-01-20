@@ -20,4 +20,8 @@ annotation class MainImmediateDispatcher
 
 @Retention(AnnotationRetention.RUNTIME)
 @Qualifier
-annotation class ApplicationScope
+annotation class ApplicationDefaultCoroutineScope
+
+@Retention(AnnotationRetention.RUNTIME)
+@Qualifier
+annotation class ApplicationIoCoroutineScope

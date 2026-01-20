@@ -1,6 +1,6 @@
 package com.rk.pace.data.tracking
 
-import com.rk.pace.di.ApplicationScope
+import com.rk.pace.di.ApplicationDefaultCoroutineScope
 import com.rk.pace.di.DefaultDispatcher
 import com.rk.pace.domain.tracking.TimeTracker
 import kotlinx.coroutines.CoroutineDispatcher
@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 class TimeTrackerImp @Inject constructor(
     @param:DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
-    @param:ApplicationScope private val scope: CoroutineScope
+    @param:ApplicationDefaultCoroutineScope private val scope: CoroutineScope
 ) : TimeTracker {
 
     private var time = 0L

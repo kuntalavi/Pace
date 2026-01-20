@@ -31,10 +31,17 @@ object CoroutineDispatcherModule {
     fun provideMainImmediateDispatcher(): CoroutineDispatcher = Dispatchers.Main.immediate
 
     @Singleton
-    @ApplicationScope
+    @ApplicationDefaultCoroutineScope
     @Provides
-    fun provideCoroutineScope(
+    fun provideDefaultCoroutineScope(
         @DefaultDispatcher defaultDispatcher: CoroutineDispatcher
     ): CoroutineScope = CoroutineScope(SupervisorJob() + defaultDispatcher)
+
+    @Singleton
+    @ApplicationIoCoroutineScope
+    @Provides
+    fun provideIoCoroutineScope(
+        @IoDispatcher ioDispatcher: CoroutineDispatcher
+    ): CoroutineScope = CoroutineScope(SupervisorJob() + ioDispatcher)
 
 }

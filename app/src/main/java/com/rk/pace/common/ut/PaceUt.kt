@@ -11,7 +11,7 @@ object PaceUt {
         val minutes = paceM.toInt()
         val seconds = ((paceM - minutes) * 60).toInt()
 
-        return String.format(Locale.US, "%d:%02d /km", minutes, seconds)
+        return String.format(Locale.getDefault(), "%d:%02d /Km", minutes, seconds)
     }
 
 }

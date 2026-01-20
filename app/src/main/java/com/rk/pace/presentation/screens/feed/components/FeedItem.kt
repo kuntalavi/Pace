@@ -49,6 +49,7 @@ import com.rk.pace.theme.unlike
 fun FeedItem(
     post: FeedPost,
     toggleLike: () -> Unit,
+    onLikesClick: () -> Unit,
     goToRunStats: (runId: String) -> Unit
 ) {
 
@@ -191,7 +192,7 @@ fun FeedItem(
                 if (post.run.likes > 0) {
                     TextButton(
                         onClick = {
-
+                            onLikesClick()
                         }
                     ) {
                         if (post.run.likes == 1) {

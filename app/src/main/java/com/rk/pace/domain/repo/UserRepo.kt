@@ -10,4 +10,5 @@ interface UserRepo {
     suspend fun updateProfile(user: User)
     suspend fun getMyProfile(): Result<User>
     suspend fun observeUserProfile(userId: String): Flow<Result<User>>
+    suspend fun getLikedByUsersByUsersIds(usersIds: List<String>): Result<List<User>>
 }

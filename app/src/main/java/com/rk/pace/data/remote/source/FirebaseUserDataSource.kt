@@ -3,6 +3,7 @@ package com.rk.pace.data.remote.source
 import android.content.Context
 import androidx.core.net.toUri
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.rk.pace.data.remote.dto.UserDto
@@ -45,6 +46,29 @@ class FirebaseUserDataSource @Inject constructor(
                 trySend(usersDto)
             }
         awaitClose { subscription.remove() }
+    }
+
+    suspend fun getUsersByIds(userIds: List<String>): List<UserDto> {
+        val chunks = userIds.chunked(30)
+        val allUsers = mutableListOf<UserDto>()
+
+        return try {
+            for (chunk in chunks) {
+                val snapshot = usersCollection
+                    .whereIn(FieldPath.documentId(), chunk)
+                    .get()
+                    .await()
+
+                val usersDto = snapshot.documents.mapNotNull { document ->
+                    document.toObject(UserDto::class.java)
+                }
+                allUsers.addAll(usersDto)
+            }
+            allUsers
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
+        }
     }
 
     suspend fun getUserById(userId: String): UserDto? {

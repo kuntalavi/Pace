@@ -124,7 +124,7 @@ fun SearchScreen(
                     }
                 } else {
                     LazyColumn(
-                        contentPadding = PaddingValues(16.dp),
+                        contentPadding = PaddingValues(15.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         items(state.results) { user ->

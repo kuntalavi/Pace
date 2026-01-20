@@ -6,6 +6,7 @@ import com.rk.pace.auth.domain.use_case.GetCurrentUserIdUseCase
 import com.rk.pace.domain.model.FeedPost
 import com.rk.pace.domain.use_case.feed.GetFeedUseCase
 import com.rk.pace.domain.use_case.feed.ToggleLikePostUseCase
+import com.rk.pace.domain.use_case.user.GetLikedByUsersUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -16,7 +17,8 @@ import javax.inject.Inject
 class FeedViewModel @Inject constructor(
     private val getFeedUseCase: GetFeedUseCase,
     private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase,
-    private val toggleLikePostUseCase: ToggleLikePostUseCase
+    private val toggleLikePostUseCase: ToggleLikePostUseCase,
+    private val getLikedByUsersUseCase: GetLikedByUsersUseCase
 ) : ViewModel() {
 
     private val _state: MutableStateFlow<FeedState> = MutableStateFlow(FeedState())
@@ -111,6 +113,41 @@ class FeedViewModel @Inject constructor(
         }
         viewModelScope.launch {
             toggleLikePostUseCase(post.run.runId, currentUserId, post.isLikedByMe)
+        }
+    }
+
+    fun clearLikedByUsers(){
+        _state.update { state ->
+            state.copy(
+                likedByUsers = emptyList()
+            )
+        }
+    }
+
+    fun getLikedByUsers(likedByUserId: List<String>){
+        _state.update {
+            it.copy(
+                isLikedByUsersLoading = true
+            )
+        }
+        viewModelScope.launch {
+            getLikedByUsersUseCase(likedByUserId).fold(
+                onSuccess = { users ->
+                    _state.update { state ->
+                        state.copy(
+                            isLikedByUsersLoading = false,
+                            likedByUsers = users
+                        )
+                    }
+                },
+                onFailure = {
+                    _state.update {
+                        it.copy(
+                            isLikedByUsersLoading = false
+                        )
+                    }
+                }
+            )
         }
     }
 }

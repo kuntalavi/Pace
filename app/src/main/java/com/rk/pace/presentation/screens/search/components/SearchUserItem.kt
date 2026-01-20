@@ -4,7 +4,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -26,8 +25,7 @@ fun UserItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() }
-            .padding(8.dp),
+            .clickable { onClick() },
         verticalAlignment = Alignment.CenterVertically
     ) {
         ProfileImage(
@@ -36,7 +34,7 @@ fun UserItem(
         )
         Spacer(modifier = Modifier.width(16.dp))
         Text(
-            text = user.name,
+            text = user.name.uppercase(),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface,
             letterSpacing = 1.sp

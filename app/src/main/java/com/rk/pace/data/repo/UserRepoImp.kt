@@ -35,6 +35,14 @@ class UserRepoImp @Inject constructor(
             }
         }
 
+    override suspend fun getLikedByUsersByUsersIds(usersIds: List<String>): Result<List<User>> =
+        withContext(ioDispatcher) {
+            val usersDto = firebaseUserDataSource.getUsersByIds(userIds = usersIds)
+
+            val users = usersDto.map { it.toDomain(photoURI = "") }
+            Result.success(users)
+        }
+
     override suspend fun updateProfile(user: User) = withContext(ioDispatcher) {
         val userEntity = user.toEntity()
         userDao.updateUser(userEntity)

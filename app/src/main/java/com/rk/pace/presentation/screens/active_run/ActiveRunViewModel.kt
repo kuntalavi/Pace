@@ -1,8 +1,7 @@
 package com.rk.pace.presentation.screens.active_run
 
-import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
-import com.rk.pace.auth.domain.repo.AuthRepo
+import com.rk.pace.auth.domain.use_case.GetCurrentUserIdUseCase
 import com.rk.pace.common.ut.MapUt
 import com.rk.pace.common.ut.PathUt.toList
 import com.rk.pace.domain.model.Run
@@ -15,7 +14,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -24,26 +23,25 @@ import javax.inject.Inject
 class ActiveRunViewModel @Inject constructor(
     private val trackerManager: TrackerManager,
     private val saveRunUseCase: SaveRunUseCase,
-    private val authRepo: AuthRepo
+    private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase
 ) : ViewModel() {
-
-    private val _state = MutableStateFlow(RunScreenState())
-    val state: StateFlow<RunScreenState> = _state
-
     private val _runState: MutableStateFlow<RunState> = trackerManager.runState
-    val runState = _runState
+    val runState = _runState.asStateFlow()
 
-    private val _saved = MutableStateFlow(false)
-    val saved = _saved
+    val gpsStrength = trackerManager.gpsStrength
+
+    private val _state: MutableStateFlow<RunUiState> = MutableStateFlow(RunUiState())
+    val state = _state.asStateFlow()
 
     val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    fun onMapLoaded() {
-        _state.update { it.copy(isMapLoaded = true) }
-    }
-
-    private fun setCaptureBitmap(v: Boolean) {
-        _state.update { it.copy(captureBitmap = v) }
+    fun onTitleChange(t: String) {
+        if (state.value.isSav) return
+        _state.update {
+            it.copy(
+                title = t
+            )
+        }
     }
 
     fun startRun() {
@@ -58,12 +56,18 @@ class ActiveRunViewModel @Inject constructor(
         trackerManager.resume()
     }
 
-    fun onBitmapReady(bitmap: Bitmap) {
-        setCaptureBitmap(false)
+    fun saveRun() {
+        if (state.value.isSav) return
+        _state.update {
+            it.copy(
+                isSav = true
+            )
+        }
         scope.launch {
-            val currentUserId = authRepo.currentUserId ?: return@launch
+            val currentUserId = getCurrentUserIdUseCase() ?: return@launch
             val runState = runState.value
             val encodedPath = MapUt.encodeSegments(runState.segments)
+            val path = runState.segments.toList()
             val run = Run(
                 userId = currentUserId,
                 timestamp = runState.timestamp,
@@ -71,35 +75,27 @@ class ActiveRunViewModel @Inject constructor(
                 distanceMeters = runState.distanceMeters,
                 avgSpeedMps = runState.avgSpeedMps,
                 encodedPath = encodedPath,
-                title = "",
+                title = state.value.title,
                 likes = 0,
                 likedBy = emptyList()
             )
             saveRunUseCase(
                 RunWithPath(
                     run = run,
-                    path = runState.segments.toList() //
+                    path = path //
                 )
             )
-            trackerManager.stop()
-            _saved.update {
-                true
+            stopRun()
+            _state.update {
+                it.copy(
+                    isSaved = true,
+                    isSav = false,
+                )
             }
-        }
-    }
-
-    fun saveRun() {
-        setCaptureBitmap(true)
-    }
-
-    fun resetSaveState() {
-        _saved.update {
-            false
         }
     }
 
     fun stopRun() {
         trackerManager.stop()
     }
-
 }

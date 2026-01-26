@@ -2,39 +2,37 @@ package com.rk.pace.presentation.screens.active_run.components
 
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.rk.pace.common.extension.formatDistance
 import com.rk.pace.common.extension.formatTime
 import com.rk.pace.common.ut.PaceUt.getPace
 import com.rk.pace.domain.model.RunState
-import com.rk.pace.presentation.components.ButtonBox
+import com.rk.pace.domain.tracking.GpsStrength
+import com.rk.pace.presentation.components.PaceButton
 import com.rk.pace.presentation.components.StatItem
-import com.rk.pace.theme.White
 import kotlinx.coroutines.delay
 
 data class StatPage(
     val title: String,
-    val v: String
+    val value: String
 )
 
 @Composable
-fun StatsBottomSheet(
+fun RunBottomSheet(
+    gpsStrength: GpsStrength,
     runState: RunState,
+    isMapLoaded: Boolean,
     start: () -> Unit,
     pause: () -> Unit,
     resume: () -> Unit,
@@ -42,9 +40,9 @@ fun StatsBottomSheet(
 ) {
 
     val stats = listOf(
-        StatPage("DISTANCE (km)", runState.distanceMeters.formatDistance()),
-        StatPage("T", runState.durationMilliseconds.formatTime()),
-        StatPage("AVG PACE (m/km)", getPace(runState.avgSpeedMps))
+        StatPage("DISTANCE", runState.distanceMeters.formatDistance()),
+        StatPage("DURATION", runState.durationMilliseconds.formatTime()),
+        StatPage("AVG PACE", getPace(runState.avgSpeedMps))
     )
 
     val pagerState = rememberPagerState(pageCount = { stats.size })
@@ -64,68 +62,80 @@ fun StatsBottomSheet(
     }
 
     Column(
-        Modifier
-            .fillMaxWidth()
-            .heightIn(min = 200.dp)
-            .background(White)
-            .padding(14.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceAround
     ) {
 
+        GpsStrengthIndicator(
+            strength = gpsStrength
+        )
 
         HorizontalPager(
-            state = pagerState,
             modifier = Modifier
-                .fillMaxWidth()
-//                .height(130.dp)
+                .fillMaxWidth(),
+            state = pagerState,
+            verticalAlignment = Alignment.CenterVertically
         ) { page ->
             val stat = stats[page]
-            StatItem(
-                title = stat.title,
-                value = stat.v
-            )
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                StatItem(
+                    title = stat.title,
+                    value = stat.value
+                )
+            }
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
-
         if (!runState.isAct) {
-            ButtonBox(
-                modifier = Modifier.fillMaxWidth(),
+            PaceButton(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                text = "START RUN",
                 onClick = {
                     start()
                 },
-                text = "START RUN"
+                filled = true,
+                enabled = isMapLoaded
             )
         }
         if (runState.isAct && !runState.paused) {
-            ButtonBox(
-                modifier = Modifier.fillMaxWidth(),
+            PaceButton(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                text = "PAUSE",
                 onClick = {
                     pause()
                 },
-                text = "PAUSE"
+                filled = true
             )
         }
         if (runState.isAct && runState.paused) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
-                ButtonBox(
+                PaceButton(
                     modifier = Modifier.fillMaxWidth(.4f),
+                    text = "RESUME",
                     onClick = {
                         resume()
                     },
-                    text = "RESUME"
+                    filled = true
                 )
-                ButtonBox(
+                PaceButton(
                     modifier = Modifier.fillMaxWidth(.6f),
+                    text = "STOP",
                     onClick = {
                         stop()
                     },
-                    text = "STOP"
+                    filled = true
                 )
             }
         }
+
     }
 }

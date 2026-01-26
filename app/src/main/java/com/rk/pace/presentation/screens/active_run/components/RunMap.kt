@@ -1,12 +1,12 @@
 package com.rk.pace.presentation.screens.active_run.components
 
 import android.annotation.SuppressLint
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -24,6 +24,7 @@ import com.rk.pace.R
 import com.rk.pace.common.extension.hasLocationPermission
 import com.rk.pace.common.ut.PathUt.toLatL
 import com.rk.pace.domain.model.RunPathPoint
+import com.rk.pace.theme.Red
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
@@ -33,11 +34,12 @@ import kotlinx.coroutines.tasks.await
 fun RunMap(
     modifier: Modifier,
     segments: List<List<RunPathPoint>>,
-    onMapLoaded: () -> Unit,
-    isMapLoaded: Boolean
-//    captureBitmap: Boolean,
-//    onBitmapReady: (Bitmap) -> Unit
+    bottomPaddingDp: Dp,
+    onMapLoadedCallback: () -> Unit
 ) {
+
+    val density = LocalDensity.current
+    val bottomPaddingPx = with(density) { bottomPaddingDp.toPx() }.toInt()
 
     val cameraPositionState = rememberCameraPositionState()
     val context = LocalContext.current
@@ -45,20 +47,15 @@ fun RunMap(
 
     val fusedLocationProvider = LocationServices.getFusedLocationProviderClient(context)
 
-    LaunchedEffect(key1 = isMapLoaded) {
-        if (isMapLoaded) {
-            val location = LatLng(0.0, 0.0)
-            fusedLocationProvider.getCurrentLocation(
-                Priority.PRIORITY_BALANCED_POWER_ACCURACY,
+    fun moveToUserLocation() {
+        scope.launch {
+            if (!context.hasLocationPermission()) return@launch
+            val location = fusedLocationProvider.getCurrentLocation(
+                Priority.PRIORITY_HIGH_ACCURACY,
                 null
-            ).addOnSuccessListener { location ->
-                location?.let {
-                    location.latitude = it.latitude
-                    location.longitude = it.longitude
-                }
-            }.await()
+            ).await()
 
-            scope.launch {
+            location?.let {
                 cameraPositionState.animate(
                     update = CameraUpdateFactory.newLatLngZoom(
                         LatLng(
@@ -71,27 +68,6 @@ fun RunMap(
             }
         }
     }
-//
-//    LaunchedEffect(key1 = Unit) {
-//        fusedLocationProvider.getCurrentLocation(
-//            Priority.PRIORITY_LOW_POWER,
-//            null
-//        ).addOnSuccessListener { location ->
-//            location?.let {
-//                scope.launch {
-//                    cameraPositionState.animate(
-//                        update = CameraUpdateFactory.newLatLngZoom(
-//                            LatLng(
-//                                it.latitude,
-//                                it.longitude
-//                            ),
-//                            15f
-//                        )
-//                    )
-//                }
-//            }
-//        }
-//    }
 
     GoogleMap(
         modifier = modifier,
@@ -106,9 +82,23 @@ fun RunMap(
                 R.raw.map
             )
         ),
-        onMapLoaded = onMapLoaded
+        onMapLoaded = {
+            moveToUserLocation()
+            onMapLoadedCallback()
+        }
     ) {
 
+        // bottom sheet and top p
+        MapEffect(key1 = bottomPaddingPx) { map ->
+            map.setPadding(
+                0,
+                100,
+                0,
+                bottomPaddingPx
+            )
+        }
+
+        // follow active run path when active
         MapEffect(key1 = segments) {
             cameraPositionState.animate(
                 update = CameraUpdateFactory.newLatLngZoom(
@@ -121,37 +111,13 @@ fun RunMap(
             )
         }
 
-//        MapEffect(key1 = captureBitmap) { map ->
-//            if (captureBitmap) {
-//                if (segments.isNotEmpty()) {
-//                    val bounds = getBounds(segments)
-//                    map.animateCamera(
-//                        CameraUpdateFactory.newLatLngBounds(
-//                            bounds,
-//                            100
-//                        ),
-//                        object: GoogleMap.CancelableCallback {
-//                            override fun onCancel() {
-//                            }
-//                            override fun onFinish() {
-//                                map.snapshot { bitmap ->
-//                                    bitmap?.let {
-//                                        onBitmapReady(it)
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    )
-//                }
-//            }
-//        }
-
+        // p
         segments.forEach { segment ->
             val segment = segment.toLatL()
             if (segment.size > 1) {
                 Polyline(
                     points = segment,
-                    color = MaterialTheme.colorScheme.primary
+                    color = Red
                 )
             }
         }

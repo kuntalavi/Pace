@@ -1,14 +1,15 @@
 package com.rk.pace.data.mapper
 
 import com.rk.pace.data.remote.dto.RunDto
+import com.rk.pace.data.remote.dto.RunPathPointDto
 import com.rk.pace.data.remote.dto.UserDto
 import com.rk.pace.data.room.entity.RunEntity
 import com.rk.pace.data.room.entity.RunPathPointEntity
 import com.rk.pace.data.room.entity.RunWithPathEntity
 import com.rk.pace.data.room.entity.UserEntity
 import com.rk.pace.domain.model.Run
-import com.rk.pace.domain.model.RunWithPath
 import com.rk.pace.domain.model.RunPathPoint
+import com.rk.pace.domain.model.RunWithPath
 import com.rk.pace.domain.model.User
 
 fun RunEntity.toDomain(): Run {
@@ -40,6 +41,16 @@ fun RunWithPathEntity.toDomain(): RunWithPath {
     return RunWithPath(
         run = run.toDomain(),
         path = path.map { it.toDomain() }
+    )
+}
+
+fun RunPathPointDto.toDomain(): RunPathPoint {
+    return RunPathPoint(
+        timestamp = timestamp,
+        lat = lat,
+        long = long,
+        speedMps = speedMps,
+        isPausePoint = isPausePoint
     )
 }
 
@@ -81,5 +92,12 @@ fun RunDto.toDomain(): Run {
         title = title,
         likes = likes, //
         likedBy = likedBy //
+    )
+}
+
+fun RunDto.toRunWithPathDomain(): RunWithPath {
+    return RunWithPath(
+        run = this.toDomain(),
+        path = pathPoints.map { it.toDomain() }
     )
 }

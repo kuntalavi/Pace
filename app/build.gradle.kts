@@ -25,7 +25,7 @@ android {
         minSdk = 24
         targetSdk = 36
         versionCode = 1
-        versionName = "0.1.0-alpha"
+        versionName = "0.2.0-alpha"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -72,6 +72,7 @@ android {
 
 dependencies {
 
+    implementation(libs.vico.compose.m3)
     implementation(libs.coil.network.okhttp)
 
     implementation(platform(libs.bom))

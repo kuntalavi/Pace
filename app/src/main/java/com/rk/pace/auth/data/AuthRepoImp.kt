@@ -31,6 +31,9 @@ constructor(
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : AuthRepo {
 
+    override val currentUserId: String?
+        get() = auth.currentUser?.uid
+
     private val usersCollection = firestore.collection("users")
 
     private suspend fun checkUsernameExists(username: String): Boolean {
@@ -46,9 +49,6 @@ constructor(
             false
         }
     }
-
-    override val currentUserId: String?
-        get() = auth.currentUser?.uid
 
     override suspend fun signUpWithEmail(
         name: String,
@@ -161,110 +161,5 @@ constructor(
     override fun observeAuthState(): Flow<AuthState> {
         TODO("Not yet implemented")
     }
-//    override val authState: Flow<MyProfile?> = callbackFlow {
-//        val listener = FirebaseAuth.AuthStateListener { auth ->
-//            val user = auth.currentUser?.let {
-//                MyProfile(
-//                    userId = it.uid,
-//                    name = it.displayName ?: "",
-//                    photoURI = it.photoUrl?.toString(),
-//                    email = it.email ?: ""
-//                )
-//            }
-//            trySend(user)
-//        }
-//        auth.addAuthStateListener(listener)
-//        awaitClose { auth.removeAuthStateListener(listener) }
-//    }
-//
-//    override suspend fun signIn(
-//        em: String,
-//        password: String
-//    ): Result<MyProfile> {
-//        return try {
-//            val result = auth.signInWithEmailAndPassword(em, password).await()
-//            val user = result.user ?: throw Exception("Auth F")
-//
-//            val userRoom = userDao.getUser()
-//
-//            if (userRoom == null) {
-//                val snapshot = firestore.collection("users").document(user.uid).get().await()
-//
-//                if (snapshot.exists()) {
-//                    val name = snapshot.getString("name") ?: "MyProfile"
-//                    val photoUrl = snapshot.getString("photoUrl")
-//
-//                    userDao.insertUser(
-//                        UserEntity(
-//                            userId = user.uid,
-//                            name = name,
-//                            photoURI = photoUrl,
-//                            email = em
-//                        )
-//                    )
-//                }
-//            }
-//
-//            Result.success(
-//                MyProfile(
-//                    user.uid,
-//                    user.displayName ?: "",
-//                    user.photoUrl?.toString(),
-//                    email = user.email ?: ""
-//                )
-//            )
-//        } catch (e: Exception) {
-//            Result.failure(e)
-//        }
-//    }
-//
-//    override suspend fun signUp(
-//        name: String,
-//        em: String,
-//        password: String,
-//        photoURL: String?
-//    ): Result<MyProfile> {
-//        return try {
-//
-//            val result = auth.createUserWithEmailAndPassword(em, password).await()
-//            val user = result.user ?: throw Exception("Auth F")
-//
-//            val userDto = UserDto(
-//                userId = user.uid,
-//                name = name,
-//                photoURL = photoURL,
-//                email = em
-//            )
-//            firestore.collection("users").document(user.uid).set(userDto).await()
-//
-//            userDao.insertUser(
-//                UserEntity(
-//                    userId = user.uid,
-//                    name = name,
-//                    photoURI = photoURL,
-//                    email = em
-//                )
-//            )
-//
-//            Result.success(
-//                MyProfile(
-//                    userId = user.uid,
-//                    name = name,
-//                    photoURI = photoURL,
-//                    email = em
-//                )
-//            )
-//        } catch (e: Exception) {
-//            Result.failure(e)
-//        }
-//    }
-//
-//    override suspend fun sendPasswordResetEm(em: String): Result<Unit> {
-//        return try {
-//            auth.sendPasswordResetEmail(em).await()
-//            Result.success(Unit)
-//        } catch (e: Exception) {
-//            Result.failure(e)
-//        }
-//    }
+
 }

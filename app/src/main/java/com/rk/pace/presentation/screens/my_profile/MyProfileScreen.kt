@@ -31,8 +31,8 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.rk.pace.auth.presentation.AuthViewModel
 import com.rk.pace.presentation.components.PaceButton
-import com.rk.pace.presentation.components.ProfileImage
-import com.rk.pace.presentation.components.ProfileImageSize
+import com.rk.pace.presentation.components.UserImage
+import com.rk.pace.presentation.components.UserImageSize
 import com.rk.pace.theme.edit
 
 @Composable
@@ -70,9 +70,9 @@ fun UserScreen(
                         .verticalScroll(rememberScrollState())
                 ) {
 
-                    ProfileImage(
+                    UserImage(
                         imageUrl = state.user.photoURI,
-                        size = ProfileImageSize.XLarge
+                        size = UserImageSize.XLarge
                     )
 
                     Spacer(modifier = Modifier.height(10.dp))

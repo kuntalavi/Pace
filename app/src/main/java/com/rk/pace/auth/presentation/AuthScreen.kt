@@ -19,7 +19,7 @@ fun AuthScreen(
 ) {
     val authNavController = rememberNavController()
 
-    Scaffold() {
+    Scaffold {
         NavHost(
             navController = authNavController,
             startDestination = Route.Auth.Welcome,

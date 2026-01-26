@@ -1,8 +1,10 @@
 package com.rk.pace.auth.presentation.screens
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -19,14 +21,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.rk.pace.auth.presentation.AuthUIState
 import com.rk.pace.auth.presentation.AuthViewModel
-import com.rk.pace.presentation.components.CustomButton
-import com.rk.pace.presentation.components.CustomInputBox
+import com.rk.pace.presentation.components.PaceButton
+import com.rk.pace.presentation.components.PaceInputBox
 
 @Composable
 fun SignUpScreen(
@@ -70,65 +71,93 @@ fun SignUpScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it)
-                .padding(horizontal = 24.dp)
+                .padding(horizontal = 20.dp)
                 .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.Start
+            verticalArrangement = Arrangement.Center
         ) {
-            CustomInputBox(
+            PaceInputBox(
                 value = name,
-                onValueChange = { v ->
-                    name = v
+                onValueChange = { value ->
+                    name = value
                 },
                 placeholder = "Enter Full Name",
-//                icon = "Name"
             )
-            Spacer(modifier = Modifier.height(24.dp))
-            CustomInputBox(
+
+            Spacer(
+                modifier = Modifier
+                    .height(20.dp)
+            )
+
+            PaceInputBox(
                 value = username,
-                onValueChange = { v ->
-                    username = v
+                onValueChange = { value ->
+                    username = value
                 },
-                placeholder = "Enter Username",
-//                icon = "Name"
+                placeholder = "username",
             )
-            Spacer(modifier = Modifier.height(32.dp))
-            CustomInputBox(
+
+            Spacer(
+                modifier = Modifier
+                    .height(20.dp)
+            )
+
+            PaceInputBox(
                 value = email,
-                onValueChange = { v ->
-                    email = v
+                onValueChange = { value ->
+                    email = value
                 },
                 placeholder = "your@em.com",
-//                icon = "Em",
-//                keyboardType = KeyboardType.Email
             )
-            Spacer(modifier = Modifier.height(24.dp))
-            CustomInputBox(
+
+            Spacer(
+                modifier = Modifier
+                    .height(24.dp)
+            )
+
+            PaceInputBox(
                 value = password,
-                onValueChange = { v ->
-                    password = v
+                onValueChange = { value ->
+                    password = value
                 },
                 placeholder = "password",
-//                icon = "Password",
                 isPassword = true
             )
-            Spacer(modifier = Modifier.height(24.dp))
-            CustomInputBox(
+
+            Spacer(
+                modifier = Modifier
+                    .height(20.dp)
+            )
+
+            PaceInputBox(
                 value = cPassword,
-                onValueChange = { v ->
-                    cPassword = v
+                onValueChange = { value ->
+                    cPassword = value
                 },
                 placeholder = "confirm password",
-//                icon = "Confirm Password",
                 isPassword = true
             )
-            Spacer(modifier = Modifier.height(32.dp))
-            CustomButton(
+
+            Spacer(
+                modifier = Modifier
+                    .height(20.dp)
+            )
+
+            PaceButton(
+                modifier = Modifier
+                    .fillMaxWidth(.3f),
                 text = "Sign Up",
                 onClick = {
                     if (password == cPassword) {
-                        viewModel.signUp(name, username, email, password)
+                        viewModel.signUp(
+                            name,
+                            username,
+                            email,
+                            password
+                        )
                     }
-                }
+                },
+                load = authState is AuthUIState.Load,
+                filled = true
             )
         }
     }

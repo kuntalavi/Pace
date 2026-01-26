@@ -31,9 +31,14 @@ class UserRepoImp @Inject constructor(
             if (userDto != null) {
                 Result.success(userDto.toDomain(photoURI = "")) //
             } else {
-                Result.failure(Exception("MyProfile Not Found"))
+                Result.failure(Exception("User Not Found"))
             }
         }
+
+    override suspend fun updateUserProfile(user: User) = withContext(ioDispatcher) {
+        firebaseUserDataSource.updateUserProfile(user.toDto(), photoURI = "")
+        return@withContext
+    }
 
     override suspend fun getLikedByUsersByUsersIds(usersIds: List<String>): Result<List<User>> =
         withContext(ioDispatcher) {
@@ -43,7 +48,7 @@ class UserRepoImp @Inject constructor(
             Result.success(users)
         }
 
-    override suspend fun updateProfile(user: User) = withContext(ioDispatcher) {
+    override suspend fun updateMyProfile(user: User) = withContext(ioDispatcher) {
         val userEntity = user.toEntity()
         userDao.updateUser(userEntity)
 
@@ -51,6 +56,12 @@ class UserRepoImp @Inject constructor(
         firebaseUserDataSource.updateUserProfile(
             user.toDto(), user.photoURI
         )
+        return@withContext
+    }
+
+    override suspend fun updateLocalUser(user: User) = withContext(ioDispatcher) {
+        val userEntity = user.toEntity()
+        userDao.updateUser(userEntity)
         return@withContext
     }
 
@@ -90,6 +101,26 @@ class UserRepoImp @Inject constructor(
             Result.failure(e)
         }
     }
+
+    override suspend fun incrementFollowerCount(userId: String, amount: Long) =
+        withContext(ioDispatcher) {
+            firebaseUserDataSource.incrementFollowerCount(userId, amount)
+        }
+
+    override suspend fun incrementFollowingCount(userId: String, amount: Long) =
+        withContext(ioDispatcher) {
+            firebaseUserDataSource.incrementFollowingCount(userId, amount)
+        }
+
+    override suspend fun decrementFollowerCount(userId: String, amount: Long) =
+        withContext(ioDispatcher) {
+            firebaseUserDataSource.decrementFollowerCount(userId, amount)
+        }
+
+    override suspend fun decrementFollowingCount(userId: String, amount: Long) =
+        withContext(ioDispatcher) {
+            firebaseUserDataSource.decrementFollowingCount(userId, amount)
+        }
 
     override fun searchUser(query: String): Flow<List<User>> {
         return firebaseUserDataSource.searchUser(query).map { dtos ->

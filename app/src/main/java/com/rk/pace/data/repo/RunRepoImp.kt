@@ -1,6 +1,5 @@
 package com.rk.pace.data.repo
 
-import android.util.Log
 import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
@@ -10,7 +9,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.rk.pace.background.SyncRunWorker
 import com.rk.pace.data.mapper.toDomain
 import com.rk.pace.data.mapper.toEntity
+import com.rk.pace.data.mapper.toRunWithPathDomain
 import com.rk.pace.data.remote.dto.RunDto
+import com.rk.pace.data.remote.source.FirebaseRunDataSource
 import com.rk.pace.data.room.dao.DeleteRunDao
 import com.rk.pace.data.room.dao.RunDao
 import com.rk.pace.data.room.dao.RunPathPointDao
@@ -26,11 +27,12 @@ import javax.inject.Inject
 class RunRepoImp @Inject constructor(
     private val runDao: RunDao,
     private val runPathPointDao: RunPathPointDao,
-    private val dRunDao: DeleteRunDao,
+    private val deleteRunDao: DeleteRunDao,
     private val firestore: FirebaseFirestore,
+    private val firebaseRunDataSource: FirebaseRunDataSource,
     private val workManager: WorkManager
 ) : RunRepo {
-    override suspend fun insertRun(run: RunWithPath) {
+    override suspend fun saveRun(run: RunWithPath) {
 
         runDao.insertRun(run.run.toEntity())
 
@@ -38,7 +40,6 @@ class RunRepoImp @Inject constructor(
             it.toEntity(run.run.runId)
         }
         runPathPointDao.insertRunPath(runPath)
-
 
         val constraints = Constraints.Builder()
             .setRequiresBatteryNotLow(true)
@@ -60,7 +61,7 @@ class RunRepoImp @Inject constructor(
     override suspend fun removeRun(run: Run) {
         runDao.deleteRun(run.toEntity())
 
-        dRunDao.insertDeleteRun(
+        deleteRunDao.insertDeleteRun(
             DeleteRunEntity(
                 runId = run.runId,
                 userId = run.userId
@@ -77,12 +78,21 @@ class RunRepoImp @Inject constructor(
 
 
         workManager.enqueue(syncRequest)
+
     }
 
     override fun getARuns(): Flow<List<Run>> {
         return runDao.getAllRuns().map { it ->
             it.map { it.toDomain() }
         }
+    }
+
+    override suspend fun getUserRuns(userId: String): List<Run> {
+        val runDtos = firebaseRunDataSource.getUserRuns(userId)
+        val runs = runDtos.map { runDto ->
+            runDto.toDomain()
+        }
+        return runs
     }
 
     override fun getARunsWithPath(): Flow<List<RunWithPath>> {
@@ -92,7 +102,15 @@ class RunRepoImp @Inject constructor(
     }
 
     override suspend fun getRunWithPathByRunId(runId: String): RunWithPath? {
-        return runDao.getRunWithPathByRunId(runId)?.toDomain()
+        val runEntity = runDao.getRunWithPathByRunId(runId)
+        if (runEntity != null) {
+            return runEntity.toDomain()
+        }
+        val runDto = firebaseRunDataSource.getRunDtoByRunId(runId)
+        if (runDto != null) {
+            return runDto.toRunWithPathDomain()
+        }
+        return null
     }
 
     override suspend fun restoreRuns(userId: String) {

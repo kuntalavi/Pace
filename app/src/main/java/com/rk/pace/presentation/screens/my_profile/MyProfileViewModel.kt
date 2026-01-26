@@ -1,15 +1,17 @@
 package com.rk.pace.presentation.screens.my_profile
 
 import android.net.Uri
-import android.util.Log
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rk.pace.data.ut.InternalStorageHelper
 import com.rk.pace.domain.model.User
 import com.rk.pace.domain.use_case.user.GetMyProfileUseCase
-import com.rk.pace.domain.use_case.user.UpdateProfileUseCase
+import com.rk.pace.domain.use_case.user.UpdateMyProfileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
@@ -19,52 +21,81 @@ import javax.inject.Inject
 class MyProfileViewModel @Inject constructor(
     private val internalStorageHelper: InternalStorageHelper,
     private val getMyProfileUseCase: GetMyProfileUseCase,
-    private val updateProfileUseCase: UpdateProfileUseCase
+    private val updateProfileUseCase: UpdateMyProfileUseCase
 ) : ViewModel() {
 
-    private val _user: MutableStateFlow<MyProfileState> = MutableStateFlow(MyProfileState.Load)
-    val user = _user
+    private val _state: MutableStateFlow<MyProfileState> = MutableStateFlow(MyProfileState.Load)
+    val state = _state
+
+    private val _saveEvent = Channel<SaveUserEvent>()
+    val saveEvent = _saveEvent.receiveAsFlow()
 
     init {
         getMyProfile()
     }
 
-    fun onImageSelected(uri: Uri, user: User) {
+    fun onUserDataChange(newUserData: User) {
+        _state.update {
+            MyProfileState.Success(newUserData)
+        }
+    }
+
+    fun updateProfile(photoURI: String = "", user: User) {
+
+        // validation
+
         viewModelScope.launch {
-            val fileName = "${user.userId}/image.png"
-            val localPath = internalStorageHelper.saveGalleryImageToInternalStorage(uri, user.userId)
 
-            if (localPath != null) {
-                // Convert path to file URI for Room/UI
-                val fileUri = Uri.fromFile(File(localPath)).toString()
+            _saveEvent.send(SaveUserEvent.Savg)
 
-                // Now update your User state/Room DB with this 'fileUri'
-                updateProfile(user.copy(photoURI = fileUri))
+            try {
+                var fileURI = user.photoURI
+                if (photoURI.isNotEmpty()) {
+
+                    val localPath =
+                        internalStorageHelper.saveGalleryImageToInternalStorage(
+                            photoURI.toUri(),
+                            user.userId
+                        )
+
+                    if (localPath != null) {
+                        fileURI = Uri.fromFile(File(localPath)).toString()
+                    } else {
+                        _saveEvent.send(SaveUserEvent.Error(""))
+                        return@launch
+                    }
+
+                }
+
+                val updatedUser = user.copy(photoURI = fileURI)
+                updateProfileUseCase(updatedUser)
+
+                _saveEvent.send(SaveUserEvent.Success)
+
+                _state.update {
+                    MyProfileState.Success(updatedUser)
+                }
+            } catch (e: Exception) {
+                _saveEvent.send(SaveUserEvent.Error(e.message ?: "error"))
             }
         }
     }
 
-    fun updateProfile(user: User) {
+    fun getMyProfile() {
         viewModelScope.launch {
-            updateProfileUseCase(user)
-            getMyProfile()
-        }
-    }
-
-    private fun getMyProfile() {
-        viewModelScope.launch() {
-            _user.update {
-                MyProfileState.Load
+            if (_state.value !is MyProfileState.Success) {
+                _state.update {
+                    MyProfileState.Load
+                }
             }
             getMyProfileUseCase().fold(
                 onSuccess = { user ->
-                    _user.update {
+                    _state.update {
                         MyProfileState.Success(user)
                     }
-                    Log.d("imageURI", user.photoURI ?: "")
                 },
                 onFailure = { error ->
-                    _user.update {
+                    _state.update {
                         MyProfileState.Error(error.message ?: "error")
                     }
                 }

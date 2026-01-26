@@ -18,15 +18,30 @@ sealed interface Route {
         data object ActiveRun : Root
 
         @Serializable
-        data object Search: Root
+        data object Search : Root
 
         @Serializable
         data class UserProfile(
             val userId: String
-        ): Root
+        ) : Root
+
+        @Serializable
+        data object EditProfile : Root
+
+        @Serializable
+        data class History(
+            val userId: String
+        ) : Root
+
+        @Serializable
+        data class Connections(
+            val userId: String,
+            val tab: Int
+        ) : Root
 
         @Serializable
         data class RunStats(
+            val userId: String,
             val runId: String
         ) : Route
 
@@ -34,7 +49,7 @@ sealed interface Route {
 
     sealed interface Auth : Route {
         @Serializable
-        data object Welcome: Auth
+        data object Welcome : Auth
 
         @Serializable
         data object SignIn : Auth
@@ -48,7 +63,7 @@ sealed interface Route {
         data object Feed : BotNav
 
         @Serializable
-        data object Stats: BotNav
+        data object Stats : BotNav
 
         @Serializable
         data object MyProfile : BotNav
@@ -95,7 +110,7 @@ sealed interface Route {
 //}
 
 /*
-bottom nav screens => home , user and in middle a large fab for start run screen
+bottom nav screens => home , state and in middle a large fab for start run screen
 full screens => run screen and run stats screen and auth screens
  */
 

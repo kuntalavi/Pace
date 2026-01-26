@@ -13,21 +13,21 @@ val feed: ImageVector
     @Composable
     get() = ImageVector.vectorResource(R.drawable.feed_24px)
 
-//val pause: ImageVector
-//    @Composable
-//    get() = ImageVector.vectorResource(R.drawable.pause_24px)
-//
-//val stop: ImageVector
-//    @Composable
-//    get() = ImageVector.vectorResource(R.drawable.stop_24px)
+val pause: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(R.drawable.pause_24px)
+
+val stop: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(R.drawable.stop_24px)
 
 val back: ImageVector
     @Composable
     get() = ImageVector.vectorResource(R.drawable.back_24px)
 
-//val p: ImageVector
-//    @Composable
-//    get() = ImageVector.vectorResource(R.drawable.p_24px)
+val play: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(R.drawable.p_24px)
 
 val share: ImageVector
     @Composable
@@ -57,21 +57,25 @@ val notifications: ImageVector
     @Composable
     get() = ImageVector.vectorResource(R.drawable.notifications_24px)
 
-//val search: ImageVector
-//    @Composable
-//    get() = ImageVector.vectorResource(R.drawable.search_24px)
+val search: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(R.drawable.search_24px)
 
 val close: ImageVector
     @Composable
     get() = ImageVector.vectorResource(R.drawable.close_24px)
 
-//val more: ImageVector
-//    @Composable
-//    get() = ImageVector.vectorResource(R.drawable.more_24px)
-//
-//val expand: ImageVector
-//    @Composable
-//    get() = ImageVector.vectorResource(R.drawable.expand_24px)
+val save: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(R.drawable.save_24px)
+
+val edit: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(R.drawable.edit_24px)
+
+val arrow: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(R.drawable.arrow_24px)
 
 val user: ImageVector
     @Composable

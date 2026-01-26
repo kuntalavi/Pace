@@ -7,3 +7,5 @@ val Black = Color(0xFF000000)
 
 val Red = Color.Red
 val Gray = Color.Gray
+val Green = Color.Green
+val Amber = Color(0xFFFFC107)

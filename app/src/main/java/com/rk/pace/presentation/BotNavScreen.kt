@@ -29,14 +29,13 @@ import com.rk.pace.presentation.screens.my_profile.UserScreen
 import com.rk.pace.presentation.screens.stats.StatsScreen
 import com.rk.pace.theme.add_people
 import com.rk.pace.theme.feed
-import com.rk.pace.theme.notifications
 import com.rk.pace.theme.run
 import com.rk.pace.theme.stats
 import com.rk.pace.theme.user
 
 data class BotNav(
     val route: Route,
-    val i: ImageVector
+    val icon: ImageVector
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,25 +50,25 @@ fun BotNavScreen(
     val botNavList = listOf(
         BotNav(
             route = Route.BotNav.Feed,
-            i = feed
+            icon = feed
         ),
         BotNav(
             route = Route.ActiveRun.Run,
-            i = run
+            icon = run
         ),
         BotNav(
             route = Route.BotNav.Stats,
-            i = stats
+            icon = stats
         ),
         BotNav(
             route = Route.BotNav.MyProfile,
-            i = user
+            icon = user
         )
     )
 
     val title = when {
         currentDestination?.hasRoute(Route.BotNav.Feed::class) == true -> "FEED"
-        currentDestination?.hasRoute(Route.BotNav.Stats::class) == true -> "STATS"
+        currentDestination?.hasRoute(Route.BotNav.Stats::class) == true -> "HISTORY"
         currentDestination?.hasRoute(Route.BotNav.MyProfile::class) == true -> "PROFILE"
         else -> ""
     }
@@ -77,17 +76,19 @@ fun BotNavScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                modifier = Modifier.padding(horizontal = 15.dp),
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background
                 ),
                 title = {
                     Text(
                         text = title,
+                        modifier = Modifier
+                            .padding(start = 5.dp),
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 5.sp
                     )
                 },
+                navigationIcon = { },
                 actions = {
                     if (currentDestination?.hasRoute(Route.BotNav.Feed::class) == true) {
                         IconButton(
@@ -100,16 +101,16 @@ fun BotNavScreen(
                                 contentDescription = ""
                             )
                         }
-                        IconButton(
-                            onClick = {
-
-                            } // go to notifications screen
-                        ) {
-                            Icon(
-                                imageVector = notifications,
-                                contentDescription = ""
-                            )
-                        }
+//                        IconButton(
+//                            onClick = {
+//
+//                            } // go to notifications screen
+//                        ) {
+//                            Icon(
+//                                imageVector = notifications,
+//                                contentDescription = ""
+//                            )
+//                        }
                     }
                 }
             )
@@ -133,7 +134,7 @@ fun BotNavScreen(
                         },
                         icon = {
                             Icon(
-                                imageVector = it.i,
+                                imageVector = it.icon,
                                 contentDescription = ""
                             )
                         },
@@ -150,23 +151,56 @@ fun BotNavScreen(
         ) {
             composable<Route.BotNav.Feed> {
                 FeedScreen(
-                    goToRunStatsScreen = { runId ->
+                    onRunClick = { userId, runId ->
                         navController.navigate(
                             Route.Root.RunStats(
-                                runId = runId
+                                userId,
+                                runId
+                            )
+                        )
+                    },
+                    onUserClick = { userId ->
+                        navController.navigate(
+                            Route.Root.UserProfile(
+                                userId
                             )
                         )
                     }
                 )
             }
             composable<Route.BotNav.Stats> {
-                StatsScreen()
+                StatsScreen(
+                    goToRunStats = { userId, runId ->
+                        navController.navigate(
+                            Route.Root.RunStats(
+                                userId,
+                                runId
+                            )
+                        )
+                    }
+                )
             }
             composable<Route.BotNav.MyProfile> {
                 UserScreen(
-//                    onSignOut = {
-//                        navController.navigate(Route.Root.Auth)
-//                    }
+                    onEditClick = {
+                        navController.navigate(Route.Root.EditProfile)
+                    },
+                    onFollowersClick = { userId, tab ->
+                        navController.navigate(
+                            Route.Root.Connections(
+                                userId = userId,
+                                tab = tab
+                            )
+                        )
+                    },
+                    onFollowingClick = { userId, tab ->
+                        navController.navigate(
+                            Route.Root.Connections(
+                                userId = userId,
+                                tab = tab
+                            )
+                        )
+                    }
                 )
             }
         }

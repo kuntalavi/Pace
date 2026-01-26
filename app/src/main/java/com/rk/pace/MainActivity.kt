@@ -17,17 +17,19 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
 import com.rk.pace.auth.presentation.AuthScreen
 import com.rk.pace.auth.presentation.AuthViewModel
 import com.rk.pace.common.extension.hasPostNotificationPermission
 import com.rk.pace.presentation.BotNavScreen
 import com.rk.pace.presentation.Route
-import com.rk.pace.presentation.screens.active_run.RunScreen
 import com.rk.pace.presentation.screens.active_run.ActiveRunViewModel
+import com.rk.pace.presentation.screens.active_run.RunScreen
 import com.rk.pace.presentation.screens.active_run.SaveRunScreen
-import com.rk.pace.presentation.screens.search.SearchScreen
+import com.rk.pace.presentation.screens.connections.ConnectionsScreen
+import com.rk.pace.presentation.screens.my_profile.EditProfileScreen
 import com.rk.pace.presentation.screens.run_stats.RunStatsScreen
+import com.rk.pace.presentation.screens.search.SearchScreen
+import com.rk.pace.presentation.screens.user_profile.UserProfileScreen
 import com.rk.pace.theme.PaceTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -120,7 +122,9 @@ fun PaceApp(
                 SaveRunScreen(
                     viewModel = viewModel,
                     goBack = {
-                        navController.navigate(Route.Root.BotNav) {
+                        navController.navigate(
+                            Route.Root.BotNav
+                        ) {
                             popUpTo(Route.Root.ActiveRun) {
                                 inclusive = true
                                 saveState = false
@@ -130,16 +134,67 @@ fun PaceApp(
                 )
             }
         }
-        composable<Route.Root.RunStats> { backStackEntry ->
-            val args = backStackEntry.toRoute<Route.Root.RunStats>()
+        composable<Route.Root.RunStats> {
             RunStatsScreen(
-                runId = args.runId,
                 goBack = { navController.popBackStack() }
             )
         }
         composable<Route.Root.Search> {
             SearchScreen(
+                onUserClick = { userId ->
+                    navController.navigate(
+                        Route.Root.UserProfile(userId)
+                    )
+                },
                 goBack = { navController.popBackStack() }
+            )
+        }
+        composable<Route.Root.EditProfile> {
+            EditProfileScreen(
+                goBack = { navController.popBackStack() }
+            )
+        }
+        composable<Route.Root.UserProfile> {
+            UserProfileScreen(
+                onRunClick = { userId, runId ->
+                    navController.navigate(
+                        Route.Root.RunStats(
+                            userId,
+                            runId
+                        )
+                    )
+                },
+                onFollowersClick = { userId, tab ->
+                    navController.navigate(
+                        Route.Root.Connections(
+                            userId = userId,
+                            tab = tab
+                        )
+                    )
+                },
+                onFollowingClick = { userId, tab ->
+                    navController.navigate(
+                        Route.Root.Connections(
+                            userId = userId,
+                            tab = tab
+                        )
+                    )
+                },
+                goBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable<Route.Root.Connections> {
+            ConnectionsScreen(
+                goBack = {
+                    navController.popBackStack()
+                },
+                onUserClick = { userId ->
+                    navController.navigate(
+                        Route.Root.UserProfile(userId)
+                    )
+                }
             )
         }
     }
@@ -230,8 +285,8 @@ fun PaceApp(
 //**Unique Features to Stand Out:**
 //1. **Shoe mileage tracking** - Most apps don't have this
 //2. **Route comparison** - Compare different attempts on same route
-//3. **Weather integration** - Log weather conditions per run
-//4. **Photo markers** - Add photos at specific points during run
+//3. **Weather integration** - Log weather conditions per state
+//4. **Photo markers** - Add photos at specific points during state
 //5. **Audio coaching** - "1km completed, pace 5:30/km"
 //6. **Offline-first** - Works without internet, syncs later
 //
@@ -242,7 +297,7 @@ fun PaceApp(
 //### **Week 1: Core Tracking**
 //- Database schema + Room setup
 //- Basic GPS tracking service
-//- Start/Stop/Pause run
+//- Start/Stop/Pause state
 //- Distance calculation
 //- Simple list of home
 //
@@ -276,7 +331,7 @@ fun PaceApp(
 //## **Resume Bullet Points Examples:**
 //```
 //✅ "Built GPS-based running tracker with real-time location
-//tracking, processing 1000+ location points per run"
+//tracking, processing 1000+ location points per state"
 //
 //✅ "Implemented complex Room database with 8 tables and multiple
 //relationships, optimized queries reduced load time by 60%"

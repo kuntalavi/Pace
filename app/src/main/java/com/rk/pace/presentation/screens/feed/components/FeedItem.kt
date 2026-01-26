@@ -39,8 +39,8 @@ import com.rk.pace.common.extension.formatTime
 import com.rk.pace.common.ut.PaceUt.getPace
 import com.rk.pace.common.ut.TimestampUt.getDate
 import com.rk.pace.domain.model.FeedPost
-import com.rk.pace.presentation.components.ProfileImage
-import com.rk.pace.presentation.components.ProfileImageSize
+import com.rk.pace.presentation.components.UserImage
+import com.rk.pace.presentation.components.UserImageSize
 import com.rk.pace.presentation.components.StatItem
 import com.rk.pace.theme.like
 import com.rk.pace.theme.unlike
@@ -99,9 +99,9 @@ fun FeedItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
-                ProfileImage(
+                UserImage(
                     imageUrl = post.user.photoURL,
-                    size = ProfileImageSize.Medium,
+                    size = UserImageSize.Medium,
                     onClick = {
                         onUserClick()
                     }

@@ -1,6 +1,5 @@
 package com.rk.pace.presentation.components
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -21,20 +20,20 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.rk.pace.theme.user
 
-sealed class ProfileImageSize(
+sealed class UserImageSize(
     val size: Dp,
     val borderWidth: Dp
 ) {
-    data object Small : ProfileImageSize(32.dp, 1.dp)
-    data object Medium : ProfileImageSize(48.dp, 1.5.dp)
-    data object Large : ProfileImageSize(96.dp, 2.dp)
-    data object XLarge : ProfileImageSize(140.dp, 3.dp)
+    data object Small : UserImageSize(32.dp, 1.dp)
+    data object Medium : UserImageSize(48.dp, 1.5.dp)
+    data object Large : UserImageSize(96.dp, 2.dp)
+    data object XLarge : UserImageSize(140.dp, 3.dp)
 }
 
 @Composable
-fun ProfileImage(
+fun UserImage(
     imageUrl: String?,
-    size: ProfileImageSize,
+    size: UserImageSize,
     modifier: Modifier = Modifier,
     showBorder: Boolean = false,
     borderColor: Color = MaterialTheme.colorScheme.primary,
@@ -62,7 +61,6 @@ fun ProfileImage(
         contentAlignment = Alignment.Center
     ) {
         if (imageUrl != null) {
-            Log.d("imageURI", imageUrl)
             AsyncImage(
                 model = imageUrl,
                 contentDescription = "",

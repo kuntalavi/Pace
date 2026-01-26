@@ -13,8 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rk.pace.domain.model.User
-import com.rk.pace.presentation.components.ProfileImage
-import com.rk.pace.presentation.components.ProfileImageSize
+import com.rk.pace.presentation.components.UserImage
+import com.rk.pace.presentation.components.UserImageSize
 
 @Composable
 fun UserItem(
@@ -27,9 +27,9 @@ fun UserItem(
             .clickable { onClick() },
         verticalAlignment = Alignment.CenterVertically
     ) {
-        ProfileImage(
+        UserImage(
             imageUrl = user.photoURL,
-            size = ProfileImageSize.Medium
+            size = UserImageSize.Medium
         )
         Spacer(modifier = Modifier.width(16.dp))
         Text(

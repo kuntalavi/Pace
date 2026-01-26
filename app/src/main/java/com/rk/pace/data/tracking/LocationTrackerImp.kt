@@ -29,7 +29,8 @@ class LocationTrackerImp @Inject constructor(
                         timestamp = it.time,
                         lat = it.latitude,
                         long = it.longitude,
-                        speedMps = it.speed
+                        speedMps = it.speed,
+                        accuracy = it.accuracy
                     )
                 }
             )

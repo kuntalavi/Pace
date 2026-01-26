@@ -3,11 +3,13 @@ package com.rk.pace.data.tracking
 import com.rk.pace.common.ut.DistanceUt.getDistance
 import com.rk.pace.domain.model.RunPathPoint
 import com.rk.pace.domain.model.RunState
+import com.rk.pace.domain.tracking.GpsStrength
 import com.rk.pace.domain.tracking.LocationTracker
 import com.rk.pace.domain.tracking.RunTrackC
 import com.rk.pace.domain.tracking.TimeTracker
 import com.rk.pace.domain.tracking.TrackerManager
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -43,12 +45,29 @@ class TrackerManagerImp @Inject constructor(
         _runState.update { it.copy(durationMilliseconds = time) }
     }
 
+    private val _gpsStrength = MutableStateFlow(GpsStrength.NONE)
+
+    override val gpsStrength: StateFlow<GpsStrength> = _gpsStrength
+
     private val locationCallback = object : LocationTracker.LocationCallback {
         override fun onLocationUpdate(results: List<RunPathPoint>) {
+            results.lastOrNull()?.let { point ->
+                updateGpsStrength(point.accuracy)
+            }
             if (isAct) {
                 results.forEach { point ->
                     updatePath(point)
                 }
+            }
+        }
+    }
+
+    private fun updateGpsStrength(accuracy: Float) {
+        _gpsStrength.update {
+            when {
+                accuracy <= 10f -> GpsStrength.STRONG
+                accuracy <= 20f -> GpsStrength.MODERATE
+                else -> GpsStrength.WEAK
             }
         }
     }
@@ -136,5 +155,8 @@ class TrackerManagerImp @Inject constructor(
         locationPoint = null
         totalDistance = 0f
         resetRunState()
+        _gpsStrength.update {
+            GpsStrength.NONE
+        }
     }
 }

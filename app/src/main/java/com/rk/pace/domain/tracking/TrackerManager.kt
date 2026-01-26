@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 interface TrackerManager {
 
     val runState: MutableStateFlow<RunState>
+    val gpsStrength: StateFlow<GpsStrength>
 
     fun start()
     fun pause()

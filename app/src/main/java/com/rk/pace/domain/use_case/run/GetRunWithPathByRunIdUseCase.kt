@@ -4,7 +4,7 @@ import com.rk.pace.domain.model.RunWithPath
 import com.rk.pace.domain.repo.RunRepo
 import javax.inject.Inject
 
-class GetRunWithPathByUseCase @Inject constructor(
+class GetRunWithPathByRunIdUseCase @Inject constructor(
     private val runRepo: RunRepo
 ) {
     suspend operator fun invoke(runId: String): RunWithPath? = runRepo.getRunWithPathByRunId(runId)

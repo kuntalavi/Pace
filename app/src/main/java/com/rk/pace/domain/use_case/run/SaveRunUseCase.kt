@@ -8,6 +8,6 @@ class SaveRunUseCase @Inject constructor(
     private val runRepo: RunRepo
 ) {
     suspend operator fun invoke(run: RunWithPath) {
-        runRepo.insertRun(run)
+        runRepo.saveRun(run)
     }
 }

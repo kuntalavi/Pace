@@ -36,8 +36,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rk.pace.common.extension.formatDistance
 import com.rk.pace.common.extension.formatTime
-import com.rk.pace.common.extension.toDate
 import com.rk.pace.common.ut.PaceUt.getPace
+import com.rk.pace.common.ut.TimestampUt.getDate
 import com.rk.pace.domain.model.FeedPost
 import com.rk.pace.presentation.components.ProfileImage
 import com.rk.pace.presentation.components.ProfileImageSize
@@ -50,7 +50,8 @@ fun FeedItem(
     post: FeedPost,
     toggleLike: () -> Unit,
     onLikesClick: () -> Unit,
-    goToRunStats: (runId: String) -> Unit
+    onUserClick: () -> Unit,
+    onRunClick: () -> Unit
 ) {
 
     val transition = updateTransition(
@@ -78,7 +79,9 @@ fun FeedItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { goToRunStats(post.run.runId) },
+            .clickable {
+                onRunClick()
+            },
         shape = RoundedCornerShape(0.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.background
@@ -87,22 +90,30 @@ fun FeedItem(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(15.dp)
+                .padding(20.dp)
         ) {
 
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
                 ProfileImage(
                     imageUrl = post.user.photoURL,
-                    size = ProfileImageSize.Medium
+                    size = ProfileImageSize.Medium,
+                    onClick = {
+                        onUserClick()
+                    }
                 )
 
                 Spacer(modifier = Modifier.width(10.dp))
 
-                Column {
+                Column(
+                    modifier = Modifier.clickable {
+                        onUserClick()
+                    }
+                ) {
 
                     Text(
                         text = post.user.name.uppercase(),
@@ -117,7 +128,7 @@ fun FeedItem(
                     )
 
                     Text(
-                        text = post.run.timestamp.toDate(),
+                        text = getDate(post.run.timestamp),
                         textAlign = TextAlign.Center,
                         fontSize = 8.sp,
                         letterSpacing = 1.sp,

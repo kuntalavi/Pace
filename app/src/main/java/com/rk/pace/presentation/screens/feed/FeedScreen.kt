@@ -26,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -37,7 +38,8 @@ import com.rk.pace.presentation.screens.search.components.UserItem
 @Composable
 fun FeedScreen(
     viewmodel: FeedViewModel = hiltViewModel(),
-    goToRunStatsScreen: (runId: String) -> Unit
+    onRunClick: (userId: String, runId: String) -> Unit,
+    onUserClick: (userId: String) -> Unit
 ) {
     val state by viewmodel.state.collectAsStateWithLifecycle()
 
@@ -76,7 +78,12 @@ fun FeedScreen(
                         .fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(15.dp),
                 ) {
-                    items(state.posts) { post ->
+                    items(
+                        items = state.posts,
+                        key = { post ->
+                            post.run.runId
+                        }
+                    ) { post ->
                         FeedItem(
                             post = post,
                             toggleLike = {
@@ -87,7 +94,17 @@ fun FeedScreen(
                                 viewmodel.getLikedByUsers(post.run.likedBy)
                                 showBottomSheet = true
                             },
-                            goToRunStats = goToRunStatsScreen
+                            onUserClick = {
+                                onUserClick(
+                                    post.user.userId
+                                )
+                            },
+                            onRunClick = {
+                                onRunClick(
+                                    post.user.userId,
+                                    post.run.runId
+                                )
+                            }
                         )
                         HorizontalDivider()
                     }
@@ -96,12 +113,13 @@ fun FeedScreen(
             if (showBottomSheet) {
                 ModalBottomSheet(
                     sheetState = sheetState,
+                    sheetMaxWidth = Dp.Unspecified,
                     onDismissRequest = {
                         viewmodel.clearLikedByUsers()
                         showBottomSheet = false
                     },
                     shape = RoundedCornerShape(0.dp),
-                    dragHandle = { }
+                    dragHandle = null
                 ) {
                     if (state.isLikedByUsersLoading) {
                         Box(
@@ -130,11 +148,19 @@ fun FeedScreen(
                                     )
                                 }
                             }
-                            items(state.likedByUsers) { user ->
+                            items(
+                                items = state.likedByUsers,
+                                key = { user ->
+                                    user.userId
+                                }
+                            ) { user ->
                                 UserItem(
                                     user = user,
                                     onClick = {
-
+                                        showBottomSheet = false
+                                        onUserClick(
+                                            user.userId
+                                        )
                                     }
                                 )
                             }

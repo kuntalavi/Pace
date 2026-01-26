@@ -42,14 +42,6 @@ class RunTrackService : LifecycleService() {
                 Log.d("RunTrackingService", "onStartCommand called with action: ${intent.action}")
 
                 if (job == null) {
-//                    job = combine(
-//                        trackerManager.runState,
-//                        trackerManager.durationMilliseconds
-//                    ) { runState, duration ->
-//                        notification.updateNotification(
-//                            durationInMillis = duration
-//                        )
-//                    }.launchIn(lifecycleScope)
                     job = lifecycleScope.launch {
                         trackerManager.runState.collect { runState ->
                             notification.updateNotification(

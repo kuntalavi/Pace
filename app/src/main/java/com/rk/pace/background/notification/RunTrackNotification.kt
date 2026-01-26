@@ -52,6 +52,7 @@ class RunTrackNotification @Inject constructor(
             .setContentTitle("Time")
             .setContentText("00:00:00")
             .setContentIntent(intentToRunScreen)
+            .setSilent(true)
 
     private fun getNotificationAction(): NotificationCompat.Action {
         return NotificationCompat.Action(
@@ -67,7 +68,6 @@ class RunTrackNotification @Inject constructor(
                     action = RunTrackService.ACTION_PAUSE_SERVICE
                 },
                 PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-
             )
         )
     }

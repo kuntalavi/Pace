@@ -3,40 +3,53 @@ package com.rk.pace.presentation.screens.run_stats
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.rk.pace.auth.domain.use_case.GetCurrentUserIdUseCase
 import com.rk.pace.di.ApplicationIoCoroutineScope
 import com.rk.pace.domain.model.Run
-import com.rk.pace.domain.model.RunWithPath
 import com.rk.pace.domain.use_case.run.DeleteRunUseCase
-import com.rk.pace.domain.use_case.run.GetRunWithPathByUseCase
+import com.rk.pace.domain.use_case.run.GetRunWithPathByRunIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class RunStatsViewModel @Inject constructor(
-    private val getRunByUseCase: GetRunWithPathByUseCase,
+    private val getRunWithPathByRunIdUseCase: GetRunWithPathByRunIdUseCase,
     private val deleteRunUseCase: DeleteRunUseCase,
+    getCurrentUserUseCase: GetCurrentUserIdUseCase,
     @param:ApplicationIoCoroutineScope private val scope: CoroutineScope,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _run: MutableStateFlow<RunWithPath?> = MutableStateFlow(null)
-    val run = _run
+    val userId: String = savedStateHandle["userId"] ?: ""
+    val runId: String = savedStateHandle["runId"] ?: ""
+
+    private val _isCurrentUser: MutableStateFlow<Boolean> =
+        MutableStateFlow(
+            getCurrentUserUseCase() == userId
+        )
+    val isCurrentUser = _isCurrentUser.asStateFlow()
+
+    private val _state: MutableStateFlow<RunStatsState> = MutableStateFlow(RunStatsState.Load())
+    val state = _state.asStateFlow()
 
     init {
-        val runId: String =
-            checkNotNull(savedStateHandle["runId"])
         getRun(runId)
     }
 
     private fun getRun(runId: String) {
+        if (runId.isEmpty()) return
+        _state.update {
+            RunStatsState.Load()
+        }
         viewModelScope.launch {
-            val run = getRunByUseCase(runId) ?: return@launch
-            _run.update {
-                run
+            val runWithPath = getRunWithPathByRunIdUseCase(runId) ?: return@launch
+            _state.update {
+                RunStatsState.Success(runWithPath)
             }
         }
     }

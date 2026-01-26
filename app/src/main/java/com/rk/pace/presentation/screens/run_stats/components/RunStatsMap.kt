@@ -1,41 +1,49 @@
 package com.rk.pace.presentation.screens.run_stats.components
 
-import android.graphics.Bitmap
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapEffect
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.rk.pace.R
 import com.rk.pace.common.ut.PathUt.toLatL
 import com.rk.pace.domain.model.RunPathPoint
 import com.rk.pace.presentation.screens.active_run.components.getBounds
+import com.rk.pace.theme.Red
 import kotlinx.coroutines.launch
 
+@OptIn(MapsComposeExperimentalApi::class)
 @Composable
 fun RunStatsMap(
+    modifier: Modifier = Modifier,
     segments: List<List<RunPathPoint>>,
-    captureBitmap: Boolean,
-    onBitmapReady: (Bitmap) -> Unit
+    bottomPaddingDp: Dp,
+    onMapLoadedCallback: () -> Unit
 ) {
+
+    val density = LocalDensity.current
+    val bottomPaddingPx = with(density) { bottomPaddingDp.toPx() }.toInt()
+
     val cameraPositionState = rememberCameraPositionState()
     val coroutineScope = rememberCoroutineScope()
 
     val context = LocalContext.current
 
     fun moveToRun() {
-        if (segments.isEmpty()) return
+        val hasPoints = segments.any {
+            it.isNotEmpty()
+        }
+        if (!hasPoints) return
         val bounds = getBounds(segments)
         coroutineScope.launch {
             cameraPositionState.animate(
@@ -48,9 +56,7 @@ fun RunStatsMap(
     }
 
     GoogleMap(
-        modifier = Modifier
-            .fillMaxWidth()
-            .size(200.dp),
+        modifier = modifier,
         cameraPositionState = cameraPositionState,
         uiSettings = MapUiSettings(
             zoomControlsEnabled = false
@@ -62,38 +68,18 @@ fun RunStatsMap(
             )
         ),
         onMapLoaded = {
+            onMapLoadedCallback()
             moveToRun()
         }
     ) {
 
-        MapEffect(key1 = captureBitmap) { map ->
-            if (captureBitmap) {
-                if (segments.isNotEmpty()) {
-//                    val bounds = getBounds(segments)
-//                    map.animateCamera(
-//                        CameraUpdateFactory.newLatLngBounds(
-//                            bounds,
-//                            100
-//                        ),
-//                        object: GoogleMap.CancelableCallback {
-//                            override fun onCancel() {
-//                            }
-//                            override fun onFinish() {
-//                                map.snapshot { bitmap ->
-//                                    bitmap?.let {
-//                                        onBitmapReady(it)
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    )
-                    map.snapshot { bitmap ->
-                        bitmap?.let {
-                            onBitmapReady(it)
-                        }
-                    }
-                }
-            }
+        MapEffect(bottomPaddingPx) { map ->
+            map.setPadding(
+                0,
+                0,
+                0,
+                bottomPaddingPx
+            )
         }
 
         segments.forEach { segment ->
@@ -101,7 +87,7 @@ fun RunStatsMap(
             if (segment.size > 1) {
                 Polyline(
                     points = segment,
-                    color = MaterialTheme.colorScheme.primary
+                    color = Red
                 )
             }
         }

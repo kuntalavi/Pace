@@ -20,20 +20,20 @@ object PathUt {
 
     fun List<List<RunPathPoint>>.toList(): List<RunPathPoint> {
         val list = mutableListOf<RunPathPoint>()
+
         this.forEachIndexed { index, segment ->
-            segment.forEach {
-                list.add(it)
-            }
-            if (index != this.lastIndex) {
-                list.add(
-                    RunPathPoint(
-                        lat = segment.last().lat,
-                        long = segment.last().long,
-                        timestamp = segment.last().timestamp,
-                        speedMps = segment.last().speedMps,
-                        isPausePoint = true
+            segment.forEachIndexed { i, point ->
+                if (i == segment.lastIndex && index != lastIndex) {
+                    list.add(
+                        point.copy(
+                            isPausePoint = true
+                        )
                     )
-                )
+                } else {
+                    list.add(
+                        point
+                    )
+                }
             }
         }
         return list
@@ -41,19 +41,27 @@ object PathUt {
 
     fun List<RunPathPoint>.toSegments(): List<List<RunPathPoint>> {
         val segments = mutableListOf<MutableList<RunPathPoint>>()
-        var cSegment = mutableListOf<RunPathPoint>()
+        var current = mutableListOf<RunPathPoint>()
+
         this.forEach { point ->
+            current.add(
+                point.copy(
+                    isPausePoint = false
+                )
+            )
+
             if (point.isPausePoint) {
-                if (cSegment.isNotEmpty()) {
-                    segments.add(cSegment)
-                    cSegment = mutableListOf()
-                }
-            } else {
-                cSegment.add(point)
+                segments.add(
+                    current
+                )
+                current = mutableListOf()
             }
         }
-        if (cSegment.isNotEmpty()) {
-            segments.add(cSegment)
+
+        if (current.isNotEmpty()) {
+            segments.add(
+                current
+            )
         }
         return segments
     }

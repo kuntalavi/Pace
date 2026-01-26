@@ -1,7 +1,5 @@
 package com.rk.pace.common.extension
 
-import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 
 fun Float.formatDistance(): String {
@@ -27,10 +25,4 @@ fun Long.formatTime(): String {
     } else {
         String.format(Locale.getDefault(), "00:%02d", secs)
     }
-}
-
-fun Long.toDate(): String {
-    val date = Date(this)
-    val formatter = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
-    return formatter.format(date)
 }

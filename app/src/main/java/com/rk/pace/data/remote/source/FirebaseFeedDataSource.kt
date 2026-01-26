@@ -34,7 +34,7 @@ class FirebaseFeedDataSource @Inject constructor(
             }
             feedR.addAll(currentUserRuns)
 
-            val followingIds = getFollowingIds(currentUserId)
+            val followingIds = getFollowingUserIds(currentUserId)
 
             if (followingIds.isNotEmpty()){
                 followingIds.chunked(10).forEach { batch ->
@@ -84,12 +84,12 @@ class FirebaseFeedDataSource @Inject constructor(
         emit(Result.failure(e))
     }
 
-    private suspend fun getFollowingIds(currentUserId: String?): List<String> {
+    private suspend fun getFollowingUserIds(userId: String?): List<String> {
         return try {
-            if (currentUserId == null) return emptyList()
+            if (userId == null) return emptyList()
 
             val followersSnapshot = firestore.collection("followers")
-                .whereEqualTo("followerId", currentUserId) // followers documents where follower is myself
+                .whereEqualTo("followerId", userId) // followers documents where follower is myself
                 .get()
                 .await()
 
@@ -97,6 +97,7 @@ class FirebaseFeedDataSource @Inject constructor(
                 document.toObject(FollowerDto::class.java)?.followingId
             }
         } catch (e: Exception) {
+            e.printStackTrace()
             emptyList()
         }
     }

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.core.net.toUri
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldPath
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.rk.pace.data.remote.dto.UserDto
@@ -29,6 +30,50 @@ class FirebaseUserDataSource @Inject constructor(
     private val usersCollection = firestore.collection("users")
 
     fun getCurrentUserId(): String? = auth.currentUser?.uid
+
+    suspend fun incrementFollowerCount(userId: String, amount: Long = 1) {
+        try {
+            usersCollection
+                .document(userId)
+                .update("followers", FieldValue.increment(amount))
+                .await()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    suspend fun decrementFollowerCount(userId: String, amount: Long = 1) {
+        try {
+            usersCollection
+                .document(userId)
+                .update("followers", FieldValue.increment(-amount))
+                .await()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    suspend fun incrementFollowingCount(userId: String, amount: Long = 1) {
+        try {
+            usersCollection
+                .document(userId)
+                .update("following", FieldValue.increment(amount))
+                .await()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    suspend fun decrementFollowingCount(userId: String, amount: Long = 1) {
+        try {
+            usersCollection
+                .document(userId)
+                .update("following", FieldValue.increment(-amount))
+                .await()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 
     fun searchUser(query: String): Flow<List<UserDto>> = callbackFlow {
         val normalizedQuery = query.trim().lowercase()
@@ -117,18 +162,6 @@ class FirebaseUserDataSource @Inject constructor(
                 .set(newUserDto, SetOptions.merge())
                 .await()
 
-            true
-        } catch (e: Exception) {
-            e.printStackTrace()
-            false
-        }
-    }
-
-    suspend fun createUserProfile(userDto: UserDto): Boolean {
-        return try {
-            usersCollection.document(userDto.userId)
-                .set(userDto)
-                .await()
             true
         } catch (e: Exception) {
             e.printStackTrace()

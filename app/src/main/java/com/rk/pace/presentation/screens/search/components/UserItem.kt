@@ -21,7 +21,6 @@ fun UserItem(
     user: User,
     onClick: () -> Unit
 ) {
-
     Row(
         modifier = Modifier
             .fillMaxWidth()

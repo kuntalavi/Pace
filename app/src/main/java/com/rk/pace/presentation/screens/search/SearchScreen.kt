@@ -24,6 +24,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,27 +39,38 @@ import com.rk.pace.theme.close
 @Composable
 fun SearchScreen(
     viewModel: SearchViewModel = hiltViewModel(),
-    goBack: () -> Unit
+    onUserClick: (String) -> Unit,
+    goBack: () -> Unit,
 ) {
 
     val state by viewModel.state.collectAsStateWithLifecycle()
     var expanded by rememberSaveable { mutableStateOf(false) }
 
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
+
     Scaffold(
         topBar = {
             SearchBar(
+                colors = SearchBarDefaults.colors(
+                    dividerColor = MaterialTheme.colorScheme.background
+                ),
                 inputField = {
                     SearchBarDefaults.InputField(
                         query = state.query,
                         onQueryChange = {
                             viewModel.onQueryChange(it)
                         },
-                        onSearch = {},
+                        onSearch = {
+                            keyboardController?.hide()
+                        },
                         expanded = expanded,
-                        onExpandedChange = { expanded = it },
+                        onExpandedChange = { isExpanded ->
+                            expanded = isExpanded
+                        },
                         placeholder = {
                             if (expanded) {
-                                Text(text = "username")
+                                Text(text = "search people by username")
                             } else {
                                 Text(text = "Search")
                             }
@@ -94,9 +107,9 @@ fun SearchScreen(
                     )
                 },
                 expanded = expanded,
-                onExpandedChange = {
-                    expanded = it
-                    if (!it) {
+                onExpandedChange = { isExpanded ->
+                    expanded = isExpanded
+                    if (!isExpanded) {
                         viewModel.onClearQuery()
                     }
                 },
@@ -115,7 +128,7 @@ fun SearchScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "No Results For ${state.query}",
+                            text = "No users found for ${state.query} username",
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 1.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -125,13 +138,20 @@ fun SearchScreen(
                 } else {
                     LazyColumn(
                         contentPadding = PaddingValues(15.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        items(state.results) { user ->
+                        items(
+                            items = state.results,
+                            key = { user ->
+                                user.userId
+                            }
+                        ) { user ->
                             UserItem(
                                 user = user,
                                 onClick = {
-
+                                    keyboardController?.hide()
+                                    focusManager.clearFocus()
+                                    onUserClick(user.userId)
                                 }
                             )
                         }
@@ -148,8 +168,9 @@ fun SearchScreen(
         ) {
             Text(
                 text = "Search for friends to track runs together!",
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             )
         }
     }

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -31,7 +32,7 @@ fun GpsStrengthIndicator(
 ) {
 
     val color = when (strength) {
-        GpsStrength.NONE -> Amber
+        GpsStrength.NONE -> Gray
         GpsStrength.WEAK -> Red
         GpsStrength.MODERATE -> Amber
         GpsStrength.STRONG -> Green
@@ -42,8 +43,10 @@ fun GpsStrengthIndicator(
         verticalAlignment = Alignment.Bottom,
         horizontalArrangement = Arrangement.spacedBy(2.dp)
     ) {
+
         Text(
             text = "GPS",
+            modifier = Modifier.offset(y = 4.dp),
             style = MaterialTheme.typography.titleMedium.copy(
                 letterSpacing = 2.sp,
                 fontWeight = FontWeight.Bold,
@@ -53,25 +56,28 @@ fun GpsStrengthIndicator(
 
         Spacer(
             modifier = Modifier
-                .width(4.dp)
+                .width(2.dp)
         )
 
         SignalBar(
             active = strength != GpsStrength.NONE,
-            height = 8.dp,
+            height = 6.dp,
             activeC = color
         )
+
         SignalBar(
             active = strength == GpsStrength.MODERATE || strength == GpsStrength.STRONG,
-            height = 12.dp,
+            height = 10.dp,
             activeC = color
         )
+
         SignalBar(
             active = strength == GpsStrength.STRONG,
-            height = 16.dp,
+            height = 14.dp,
             activeC = color
         )
     }
+
 }
 
 @Composable

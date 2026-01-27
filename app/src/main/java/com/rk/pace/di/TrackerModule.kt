@@ -18,6 +18,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Singleton
 
 @Module
@@ -37,10 +38,12 @@ abstract class TrackerModule {
         @Provides
         fun provideLocationTracker(
             @ApplicationContext context: Context,
+            @ApplicationDefaultCoroutineScope scope: CoroutineScope,
             fusedLocationProviderClient: FusedLocationProviderClient
         ): LocationTracker {
             return LocationTrackerImp(
                 context = context,
+                scope = scope,
                 fusedLocationProviderClient = fusedLocationProviderClient,
                 locationRequest = LocationRequest.locationRequest.build()
             )
@@ -65,4 +68,5 @@ abstract class TrackerModule {
     abstract fun provideTrackerManager(
         trackerManager: TrackerManagerImp
     ): TrackerManager
+
 }

@@ -6,4 +6,5 @@ interface TimeTracker {
     fun resumeTimer(callBack: (time: Long) -> Unit)
     fun stopTimer()
     fun pauseTimer()
+
 }

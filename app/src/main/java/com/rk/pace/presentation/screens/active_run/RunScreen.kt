@@ -45,6 +45,7 @@ fun RunScreen(
     val context = LocalContext.current
 
     val runState by viewModel.runState.collectAsStateWithLifecycle()
+    val location by viewModel.location.collectAsStateWithLifecycle()
     val gpsStrength by viewModel.gpsStrength.collectAsStateWithLifecycle()
     var isMapLoaded by remember { mutableStateOf(false) }
 
@@ -114,6 +115,9 @@ fun RunScreen(
                 modifier = Modifier
                     .fillMaxSize(),
                 segments = runState.segments,
+                currentLocation = location,
+                isAct = runState.isAct,
+                paused = runState.paused,
                 bottomPaddingDp = 300.dp,
                 onMapLoadedCallback = {
                     isMapLoaded = true

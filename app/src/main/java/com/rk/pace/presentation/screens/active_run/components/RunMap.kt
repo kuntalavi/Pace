@@ -2,13 +2,10 @@ package com.rk.pace.presentation.screens.active_run.components
 
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
@@ -25,8 +22,6 @@ import com.rk.pace.common.extension.hasLocationPermission
 import com.rk.pace.common.ut.PathUt.toLatL
 import com.rk.pace.domain.model.RunPathPoint
 import com.rk.pace.theme.Red
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 @SuppressLint("MissingPermission")
 @OptIn(MapsComposeExperimentalApi::class)
@@ -34,6 +29,9 @@ import kotlinx.coroutines.tasks.await
 fun RunMap(
     modifier: Modifier,
     segments: List<List<RunPathPoint>>,
+    currentLocation: RunPathPoint,
+    isAct: Boolean,
+    paused: Boolean,
     bottomPaddingDp: Dp,
     onMapLoadedCallback: () -> Unit
 ) {
@@ -43,31 +41,6 @@ fun RunMap(
 
     val cameraPositionState = rememberCameraPositionState()
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-
-    val fusedLocationProvider = LocationServices.getFusedLocationProviderClient(context)
-
-    fun moveToUserLocation() {
-        scope.launch {
-            if (!context.hasLocationPermission()) return@launch
-            val location = fusedLocationProvider.getCurrentLocation(
-                Priority.PRIORITY_HIGH_ACCURACY,
-                null
-            ).await()
-
-            location?.let {
-                cameraPositionState.animate(
-                    update = CameraUpdateFactory.newLatLngZoom(
-                        LatLng(
-                            location.latitude,
-                            location.longitude
-                        ),
-                        15f
-                    )
-                )
-            }
-        }
-    }
 
     GoogleMap(
         modifier = modifier,
@@ -83,7 +56,6 @@ fun RunMap(
             )
         ),
         onMapLoaded = {
-            moveToUserLocation()
             onMapLoadedCallback()
         }
     ) {
@@ -98,17 +70,43 @@ fun RunMap(
             )
         }
 
+        // follow user location when !active
+        MapEffect(
+            key1 = currentLocation,
+            key2 = isAct,
+            key3 = paused
+        ) {
+            if (!isAct || paused) {
+                if (currentLocation.lat != 0.0) {
+                    cameraPositionState.animate(
+                        update = CameraUpdateFactory.newLatLngZoom(
+                            LatLng(
+                                currentLocation.lat,
+                                currentLocation.long
+                            ),
+                            18f
+                        )
+                    )
+                }
+            }
+        }
+
         // follow active run path when active
         MapEffect(key1 = segments) {
-            cameraPositionState.animate(
-                update = CameraUpdateFactory.newLatLngZoom(
-                    LatLng(
-                        segments.lastOrNull()?.lastOrNull()?.lat ?: 0.0,
-                        segments.lastOrNull()?.lastOrNull()?.long ?: 0.0
-                    ),
-                    18f
-                )
-            )
+            if (isAct && !paused) {
+                val lastPoint = segments.lastOrNull()?.lastOrNull()
+                if (lastPoint != null) {
+                    cameraPositionState.animate(
+                        update = CameraUpdateFactory.newLatLngZoom(
+                            LatLng(
+                                lastPoint.lat,
+                                lastPoint.long
+                            ),
+                            18f
+                        )
+                    )
+                }
+            }
         }
 
         // p

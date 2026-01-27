@@ -1,14 +1,10 @@
 package com.rk.pace.domain.tracking
 
 import com.rk.pace.domain.model.RunPathPoint
+import kotlinx.coroutines.flow.Flow
 
 interface LocationTracker {
 
-    fun setCallback(locationCallback: LocationCallback)
+    val locationFlow: Flow<RunPathPoint>
 
-    fun removeCallback()
-
-    interface LocationCallback {
-        fun onLocationUpdate(results: List<RunPathPoint>)
-    }
 }

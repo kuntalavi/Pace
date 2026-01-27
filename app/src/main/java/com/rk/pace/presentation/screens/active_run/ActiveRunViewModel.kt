@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.rk.pace.auth.domain.use_case.GetCurrentUserIdUseCase
 import com.rk.pace.common.ut.MapUt
 import com.rk.pace.common.ut.PathUt.toList
+import com.rk.pace.di.ApplicationIoCoroutineScope
 import com.rk.pace.domain.model.Run
 import com.rk.pace.domain.model.RunState
 import com.rk.pace.domain.model.RunWithPath
@@ -11,8 +12,6 @@ import com.rk.pace.domain.tracking.TrackerManager
 import com.rk.pace.domain.use_case.run.SaveRunUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -21,6 +20,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ActiveRunViewModel @Inject constructor(
+    @param:ApplicationIoCoroutineScope private val scope: CoroutineScope,
     private val trackerManager: TrackerManager,
     private val saveRunUseCase: SaveRunUseCase,
     private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase
@@ -28,12 +28,11 @@ class ActiveRunViewModel @Inject constructor(
     private val _runState: MutableStateFlow<RunState> = trackerManager.runState
     val runState = _runState.asStateFlow()
 
+    val location = trackerManager.location
     val gpsStrength = trackerManager.gpsStrength
 
     private val _state: MutableStateFlow<RunUiState> = MutableStateFlow(RunUiState())
     val state = _state.asStateFlow()
-
-    val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     fun onTitleChange(t: String) {
         if (state.value.isSav) return

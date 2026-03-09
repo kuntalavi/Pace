@@ -80,3 +80,7 @@ val arrow: ImageVector
 val user: ImageVector
     @Composable
     get() = ImageVector.vectorResource(R.drawable.user_24px)
+
+val gps_off: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(R.drawable.gps_off_24px)

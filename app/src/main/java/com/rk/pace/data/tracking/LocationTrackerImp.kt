@@ -8,7 +8,7 @@ import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
-import com.rk.pace.common.extension.hasForegroundLocationPermission
+import com.rk.pace.common.extension.hasPreciseForegroundLocationPermission
 import com.rk.pace.di.ApplicationDefaultCoroutineScope
 import com.rk.pace.domain.model.RunPathPoint
 import com.rk.pace.domain.tracking.LocationTracker
@@ -55,7 +55,7 @@ class LocationTrackerImp @Inject constructor(
 
         }
 
-        if (context.hasForegroundLocationPermission()) {
+        if (context.hasPreciseForegroundLocationPermission()) {
             fusedLocationProviderClient.requestLocationUpdates(
                 locationRequest, callback, Looper.getMainLooper()
             )

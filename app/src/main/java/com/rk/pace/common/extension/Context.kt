@@ -35,6 +35,14 @@ fun Activity.openAppSettings() {
     startActivity(intent)
 }
 
+fun Activity.openGpsSettings(){
+    val intent = Intent(
+        Settings.ACTION_LOCATION_SOURCE_SETTINGS
+    )
+
+    startActivity(intent)
+}
+
 fun Context.hasPermission(permission: String) =
     ContextCompat.checkSelfPermission(
         this,
@@ -48,7 +56,7 @@ fun Context.hasPostNotificationPermission() =
         Manifest.permission.POST_NOTIFICATIONS
     ) == PackageManager.PERMISSION_GRANTED
 
-fun Context.hasForegroundLocationPermission() =
+fun Context.hasPreciseForegroundLocationPermission() =
     (
             ContextCompat.checkSelfPermission(
                 this,

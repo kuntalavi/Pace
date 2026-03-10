@@ -61,17 +61,29 @@ com.rk.pace
 - A Google Maps API Key (Add it to `local.properties`)
 
 ### Installation
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/kuntalavi/pace.git
-   ```
-2. Open the project in Android Studio.
-3. Add your API Keys in `local.properties`:
-   ```properties
-   GOOGLE_MAPS_API_KEY=YOUR_KEY_HERE
-   MAPBOX_ACCESS_TOKEN=YOUR_ACCESS_TOKEN
-   ```
-4. Sync Gradle and run the app on an emulator or physical device.
+1. **Clone the Repository**
+```bash
+git clone https://github.com/kuntalavi/Pace.git
+```
+
+2.  **API Keys Configuration**
+* Add your API Keys in local.properties:
+```bash
+GOOGLE_MAPS_API_KEY=YOUR_API_KEY
+MAPBOX_ACCESS_TOKEN=YOUR_API_KEY
+```
+
+3. **Firebase Configuration**
+* Create a project in the [Firebase Console](https://console.firebase.google.com/)
+* Download the `google-services.json` file
+* Place the file in the `app/` directory of the project
+
+4. **Build & Run**
+* Open the project in Android Studio
+* Sync Gradle files
+* Select your target device/emulator
+* Click Run ▶️
+
 
 ---
 

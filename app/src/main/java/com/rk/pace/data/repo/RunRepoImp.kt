@@ -124,12 +124,12 @@ class RunRepoImp @Inject constructor(
 
             remoteRuns.forEach { runDto ->
 
-                val runEntity = runDto.toEntity() // WORK
-                val runPathPointEntities = runDto.pathPoints.map {
+                val runEntity = runDto.toEntity()
+                val runPathPointEntity = runDto.pathPoints.map {
                     it.toEntity(runId = runDto.runId)
                 }
 
-                runDao.saveRestoredRun(runEntity, runPathPointEntities)
+                runDao.saveRestoredRun(runEntity, runPathPointEntity)
             }
         } catch (e: Exception) {
             e.printStackTrace()

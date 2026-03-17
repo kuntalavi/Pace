@@ -5,6 +5,6 @@ data class RunPathPoint(
     val lat: Double,
     val long: Double,
     val speedMps: Float = 0f,
-    val isPausePoint: Boolean = false,
+    val pausePoint: Boolean = false,
     val accuracy: Float = 0f
 )

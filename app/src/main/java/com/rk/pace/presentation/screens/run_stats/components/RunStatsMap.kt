@@ -66,7 +66,7 @@ fun RunStatsMap(
         properties = MapProperties(
             mapStyleOptions = MapStyleOptions.loadRawResourceStyle(
                 context,
-                if (darkTheme) R.raw.map else R.raw.map_light
+                if (darkTheme) R.raw.map_dark else R.raw.map
             )
         ),
         onMapLoaded = {

@@ -25,5 +25,5 @@ data class RunPathPointEntity(
     val lat: Double,
     val long: Double,
     val speedMps: Float,
-    val isPausePoint: Boolean
+    val pausePoint: Boolean
 )

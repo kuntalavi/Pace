@@ -28,6 +28,4 @@ data class RunEntity(
     val encodedPath: List<String>,
     val synced: Boolean = false,
     val title: String = ""
-
-    // likes and likedBy missing here reason is
 )

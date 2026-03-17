@@ -4,10 +4,12 @@ import android.content.Context
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.rk.pace.background.service.RunTrackServiceControllerImp
+import com.rk.pace.data.tracking.GpsStatusTrackerImp
 import com.rk.pace.data.tracking.LocationRequest
 import com.rk.pace.data.tracking.LocationTrackerImp
 import com.rk.pace.data.tracking.TimeTrackerImp
 import com.rk.pace.data.tracking.TrackerManagerImp
+import com.rk.pace.domain.tracking.GpsStatusTracker
 import com.rk.pace.domain.tracking.LocationTracker
 import com.rk.pace.domain.tracking.RunTrackServiceController
 import com.rk.pace.domain.tracking.TimeTracker
@@ -50,6 +52,12 @@ abstract class TrackerModule {
         }
 
     }
+
+    @Binds
+    @Singleton
+    abstract fun provideGpsStatusTracker(
+        gpsStatusTrackerImp: GpsStatusTrackerImp
+    ): GpsStatusTracker
 
     @Binds
     @Singleton

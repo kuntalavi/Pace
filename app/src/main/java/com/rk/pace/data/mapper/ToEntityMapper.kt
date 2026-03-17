@@ -29,7 +29,7 @@ fun RunPathPoint.toEntity(runId: String): RunPathPointEntity {
         lat = lat,
         long = long,
         speedMps = speedMps,
-        isPausePoint = isPausePoint
+        pausePoint = pausePoint
     )
 }
 
@@ -66,6 +66,6 @@ fun RunPathPointDto.toEntity(runId: String): RunPathPointEntity {
         lat = this.lat,
         long = this.long,
         speedMps = this.speedMps,
-        isPausePoint = this.isPausePoint
+        pausePoint = this.pausePoint
     )
 }

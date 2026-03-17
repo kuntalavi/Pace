@@ -33,14 +33,16 @@ fun RunPathPointEntity.toDomain(): RunPathPoint {
         lat = lat,
         long = long,
         speedMps = speedMps,
-        isPausePoint = isPausePoint
+        pausePoint = pausePoint
     )
 }
 
 fun RunWithPathEntity.toDomain(): RunWithPath {
     return RunWithPath(
         run = run.toDomain(),
-        path = path.map { it.toDomain() }
+        path = path
+            .sortedBy { it.timestamp }
+            .map { it.toDomain() }
     )
 }
 
@@ -50,7 +52,7 @@ fun RunPathPointDto.toDomain(): RunPathPoint {
         lat = lat,
         long = long,
         speedMps = speedMps,
-        isPausePoint = isPausePoint
+        pausePoint = pausePoint
     )
 }
 

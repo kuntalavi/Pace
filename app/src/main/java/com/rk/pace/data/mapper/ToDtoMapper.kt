@@ -22,7 +22,7 @@ fun RunWithPathEntity.toDto(): RunDto {
                 lat = point.lat,
                 long = point.long,
                 speedMps = point.speedMps,
-                isPausePoint = point.isPausePoint
+                pausePoint = point.pausePoint
             )
         }
     )

@@ -24,7 +24,6 @@ import com.rk.pace.data.room.entity.UserEntity
 )
 @TypeConverters(Converters::class)
 abstract class PaceDatabase : RoomDatabase() {
-
     abstract fun userDao(): UserDao
     abstract fun runDao(): RunDao
     abstract fun runPathPointDao(): RunPathPointDao

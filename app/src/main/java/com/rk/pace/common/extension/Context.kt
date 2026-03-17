@@ -1,7 +1,6 @@
 package com.rk.pace.common.extension
 
 import android.Manifest
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -22,25 +21,15 @@ fun Context.restartApp() {
     this.startActivity(intent)
 }
 
-fun Activity.openAppSettings() {
-    val intent = Intent(
+fun Context.openAppSettings(): Intent {
+    return Intent(
         Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
         Uri.fromParts(
             "package",
-            packageName,
+            this.packageName,
             null
         )
     )
-
-    startActivity(intent)
-}
-
-fun Activity.openGpsSettings(){
-    val intent = Intent(
-        Settings.ACTION_LOCATION_SOURCE_SETTINGS
-    )
-
-    startActivity(intent)
 }
 
 fun Context.hasPermission(permission: String) =

@@ -26,18 +26,10 @@ class AuthViewModel @Inject constructor(
     private val signUpWithEmailUseCase: SignUpWithEmailUseCase,
     private val signInWithEmailUseCase: SignInWithEmailUseCase,
     private val signOutUseCase: SignOutUseCase
-//    private val isUserLoggedInUseCase: IsUserLoggedInUseCase,
-//    private val observeAuthStateUseCase: ObserveAuthStateUseCase
 ) : ViewModel() {
 
     private val _authState = MutableStateFlow<AuthUIState>(AuthUIState.Empty)
     val authState = _authState
-
-//    val authStateFlow = observeAuthStateUseCase().stateIn(
-//        scope = viewModelScope,
-//        started = SharingStarted.WhileSubscribed(5000L),
-//        initialValue = if (isUserLoggedInUseCase()) AuthState.Authenticated else AuthState.Unauthenticated
-//    )
 
     private val _startDestination = MutableStateFlow<Route?>(null)
     val startDestination = _startDestination

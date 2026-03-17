@@ -32,10 +32,9 @@ fun GpsStrengthIndicator(
 ) {
 
     val color = when (strength) {
-        GpsStrength.NONE -> Gray
-        GpsStrength.WEAK -> Red
         GpsStrength.MODERATE -> Amber
         GpsStrength.STRONG -> Green
+        else -> Red
     }
 
     Row(
@@ -50,7 +49,7 @@ fun GpsStrengthIndicator(
             style = MaterialTheme.typography.titleMedium.copy(
                 letterSpacing = 2.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                color = color
             )
         )
 

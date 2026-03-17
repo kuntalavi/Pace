@@ -16,6 +16,10 @@ import com.rk.pace.presentation.screens.my_profile.EditProfileScreen
 import com.rk.pace.presentation.screens.run_stats.RunStatsScreen
 import com.rk.pace.presentation.screens.search.SearchScreen
 import com.rk.pace.presentation.screens.user_profile.UserProfileScreen
+import com.rk.pace.presentation.ut.defaultEnterTransition
+import com.rk.pace.presentation.ut.defaultExitTransition
+import com.rk.pace.presentation.ut.defaultPopEnterTransition
+import com.rk.pace.presentation.ut.defaultPopExitTransition
 
 @Composable
 fun NavGraph(
@@ -25,7 +29,11 @@ fun NavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = startDestination,
+        enterTransition = { defaultEnterTransition() },
+        exitTransition = { defaultExitTransition() },
+        popEnterTransition = { defaultPopEnterTransition() },
+        popExitTransition = { defaultPopExitTransition() }
     ) {
 
         composable<Route.Root.Auth> {

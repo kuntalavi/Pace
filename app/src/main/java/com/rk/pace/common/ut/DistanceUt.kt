@@ -1,22 +1,37 @@
 package com.rk.pace.common.ut
 
-import android.location.Location
+import com.rk.pace.common.Constants.EARTH_RADIUS_METERS
 import com.rk.pace.domain.model.RunPathPoint
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 object DistanceUt {
 
+    /**
+    * Haversine Formula
+    * Returns Distance Between Two Points In Meters
+    */
     fun getDistance(
         point1: RunPathPoint?,
         point2: RunPathPoint
     ): Float {
+
         if (point1 == null) return 0f
-        val result = FloatArray(1)
-        Location.distanceBetween(
-            point1.lat, point1.long,
-            point2.lat, point2.long,
-            result
-        )
-        return if (result[0] > 1f) result[0] else 0f
+
+        val lat1 = Math.toRadians(point1.lat)
+        val lat2 = Math.toRadians(point2.lat)
+        val deltaLat = Math.toRadians(point2.lat - point1.lat)
+        val deltaLong = Math.toRadians(point2.long - point1.long)
+
+        val a = sin(deltaLat / 2) * sin(deltaLat / 2) +
+                cos(lat1) * cos(lat2) *
+                sin(deltaLong / 2) * sin(deltaLong / 2)
+
+        val c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+        return (EARTH_RADIUS_METERS * c).toFloat()
     }
 
 }

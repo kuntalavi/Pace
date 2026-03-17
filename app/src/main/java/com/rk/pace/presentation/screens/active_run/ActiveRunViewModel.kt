@@ -52,7 +52,7 @@ class ActiveRunViewModel @Inject constructor(
     val gpsEnabled = gpsStatusTracker.isGpsEnabled.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
-        false
+        null
     )
     val runState = trackerManager.runState
     val location = trackerManager.location
@@ -65,19 +65,19 @@ class ActiveRunViewModel @Inject constructor(
     }
 
     private fun observeGps() {
-        gpsEnabled
-            .onEach { isEnabled ->
-                val currentState = _screenState.value
-                val run = runState.value
+        gpsEnabled.onEach { gpsEnabled ->
+            if (gpsEnabled == null) return@onEach
+            val currentState = _screenState.value
+            val run = runState.value
 
-                if (!isEnabled && run.isAct && !run.paused) {
-                    trackerManager.pause()
-                    _screenState.update { RunScreenState.GpsDisabledMidRun }
+            if (!gpsEnabled && run.isAct && !run.paused) {
+                trackerManager.pause()
+                _screenState.update { RunScreenState.GpsDisabledMidRun }
 
-                } else if (isEnabled && currentState == RunScreenState.GpsDisabledMidRun) {
-                    _screenState.update { RunScreenState.Ready }
-                }
+            } else if (gpsEnabled && currentState == RunScreenState.GpsDisabledMidRun) {
+                _screenState.update { RunScreenState.Ready }
             }
+        }
             .launchIn(viewModelScope)
     }
 

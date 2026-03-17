@@ -26,12 +26,14 @@ object PathUt {
                 if (i == segment.lastIndex && index != lastIndex) {
                     list.add(
                         point.copy(
-                            isPausePoint = true
+                            pausePoint = true
                         )
                     )
                 } else {
                     list.add(
-                        point
+                        point.copy(
+                            pausePoint = false
+                        )
                     )
                 }
             }
@@ -44,13 +46,9 @@ object PathUt {
         var current = mutableListOf<RunPathPoint>()
 
         this.forEach { point ->
-            current.add(
-                point.copy(
-                    isPausePoint = false
-                )
-            )
+            current.add(point)
 
-            if (point.isPausePoint) {
+            if (point.pausePoint) {
                 segments.add(
                     current
                 )

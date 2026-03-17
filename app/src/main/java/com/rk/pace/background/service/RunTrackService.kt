@@ -1,7 +1,6 @@
 package com.rk.pace.background.service
 
 import android.content.Intent
-import android.util.Log
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.rk.pace.background.notification.RunTrackNotification
@@ -34,12 +33,11 @@ class RunTrackService : LifecycleService() {
             ACTION_RESUME_SERVICE -> trackerManager.resume()
             ACTION_START_SERVICE -> {
                 val baseNotification = notification.getBaseNotification()
-                Log.d("RunTrackingNotification", "Notification built: $baseNotification")
+
                 startForeground(
                     RunTrackNotification.RUN_TRACK_NOTIFICATION_ID,
                     baseNotification
                 )
-                Log.d("RunTrackingService", "onStartCommand called with action: ${intent.action}")
 
                 if (job == null) {
                     job = lifecycleScope.launch {

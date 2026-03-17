@@ -14,4 +14,12 @@ object PaceUt {
         return String.format(Locale.getDefault(), "%d:%02d /Km", minutes, seconds)
     }
 
+    fun formatPace(paceSeconds: Float): String {
+        val duration = paceSeconds.toInt()
+        val minutes = duration / 60
+        val seconds = duration % 60
+
+        return "%d:%02d".format(minutes, seconds)
+    }
+
 }

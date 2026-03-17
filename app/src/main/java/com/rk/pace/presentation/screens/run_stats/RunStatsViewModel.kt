@@ -4,8 +4,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rk.pace.auth.domain.use_case.GetCurrentUserIdUseCase
+import com.rk.pace.common.ut.PathUt.toSegments
+import com.rk.pace.common.ut.SplitsUt.calculateSplits
 import com.rk.pace.di.ApplicationIoCoroutineScope
 import com.rk.pace.domain.model.Run
+import com.rk.pace.domain.model.Split
 import com.rk.pace.domain.use_case.run.DeleteRunUseCase
 import com.rk.pace.domain.use_case.run.GetRunWithPathByRunIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -37,6 +40,9 @@ class RunStatsViewModel @Inject constructor(
     private val _state: MutableStateFlow<RunStatsState> = MutableStateFlow(RunStatsState.Load())
     val state = _state.asStateFlow()
 
+    private val _splits: MutableStateFlow<List<Split>> = MutableStateFlow(emptyList())
+    val splits = _splits.asStateFlow()
+
     init {
         getRun(runId)
     }
@@ -50,6 +56,9 @@ class RunStatsViewModel @Inject constructor(
             val runWithPath = getRunWithPathByRunIdUseCase(runId) ?: return@launch
             _state.update {
                 RunStatsState.Success(runWithPath)
+            }
+            _splits.update {
+                calculateSplits(runWithPath.path.toSegments())
             }
         }
     }

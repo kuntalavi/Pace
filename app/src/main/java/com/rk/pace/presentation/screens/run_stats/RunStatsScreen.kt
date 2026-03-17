@@ -38,8 +38,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.rk.pace.common.ut.PathUt.toSegments
 import com.rk.pace.common.ut.TimestampUt.getBarDate
 import com.rk.pace.domain.model.RunWithPath
+import com.rk.pace.domain.model.Split
 import com.rk.pace.presentation.components.Summary
 import com.rk.pace.presentation.screens.run_stats.components.RunStatsMap
+import com.rk.pace.presentation.charts.SplitChart
 import com.rk.pace.theme.back
 import com.rk.pace.theme.delete
 
@@ -52,6 +54,7 @@ fun RunStatsScreen(
 ) {
 
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val splits by viewModel.splits.collectAsStateWithLifecycle()
     val isCurrentUser by viewModel.isCurrentUser.collectAsStateWithLifecycle()
     val scaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberStandardBottomSheetState(
@@ -98,13 +101,14 @@ fun RunStatsScreen(
                                 .heightIn(min = 500.dp)
                         ) {
                             SheetContent(
-                                run = state.runWithPath
+                                run = state.runWithPath,
+                                splits = splits
                             )
                         }
                     },
                     sheetShape = RoundedCornerShape(0.dp),
                     sheetDragHandle = null,
-                    sheetSwipeEnabled = false,
+                    sheetSwipeEnabled = true,
                     topBar = {
                         CenterAlignedTopAppBar(
                             title = {
@@ -170,7 +174,8 @@ fun RunStatsScreen(
 
 @Composable
 fun SheetContent(
-    run: RunWithPath
+    run: RunWithPath,
+    splits: List<Split>
 ) {
     Column(
         modifier = Modifier
@@ -190,6 +195,10 @@ fun SheetContent(
 
         Summary(
             run = run.run
+        )
+
+        SplitChart(
+            splits
         )
     }
 }

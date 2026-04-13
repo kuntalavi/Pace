@@ -26,7 +26,8 @@ import com.rk.pace.domain.model.Split
 @Composable
 fun SplitChart(
     splits: List<Split>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    barColor: Color = MaterialTheme.colorScheme.primary
 ) {
     if (splits.isEmpty()) return
 
@@ -77,7 +78,8 @@ fun SplitChart(
             SplitRow(
                 split,
                 maxDuration,
-                minDuration
+                minDuration,
+                barColor = barColor,
             )
         }
     }
@@ -88,7 +90,8 @@ private fun SplitRow(
     split: Split,
     maxDuration: Long,
     minDuration: Long,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    barColor: Color = MaterialTheme.colorScheme.primary
 ) {
     Row(
         modifier = modifier
@@ -130,7 +133,7 @@ private fun SplitRow(
         val normalizedValue = if (range > 0) {
             ((maxDuration - split.durationMilliseconds) / range)
         } else {
-            .5f
+            .75f
         }
 
         val barWidthPercent = minBarWidthPercent + (normalizedValue * (maxBarWidthPercent - minBarWidthPercent))
@@ -139,8 +142,8 @@ private fun SplitRow(
                 .height(18.dp)
                 .fillMaxWidth(barWidthPercent / 100)
                 .background(
-                    color = Color(0xFF0052CC),
-                    shape = RoundedCornerShape(8.dp)
+                    color = barColor,
+                    shape = RoundedCornerShape(4.dp)
                 )
         )
     }

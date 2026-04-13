@@ -6,11 +6,13 @@ import com.rk.pace.data.repo.DataRepoImp
 import com.rk.pace.data.repo.FeedRepoImp
 import com.rk.pace.data.repo.RunRepoImp
 import com.rk.pace.data.repo.SocialRepoImp
+import com.rk.pace.data.repo.StatRepoImp
 import com.rk.pace.data.repo.UserRepoImp
 import com.rk.pace.domain.repo.DataRepo
 import com.rk.pace.domain.repo.FeedRepo
 import com.rk.pace.domain.repo.RunRepo
 import com.rk.pace.domain.repo.SocialRepo
+import com.rk.pace.domain.repo.StatRepo
 import com.rk.pace.domain.repo.UserRepo
 import dagger.Binds
 import dagger.Module
@@ -56,4 +58,10 @@ abstract class RepoModule {
     abstract fun bindSocialRepo(
         socialRepoImp: SocialRepoImp
     ): SocialRepo
+
+    @Binds
+    @Singleton
+    abstract fun bindStatRepo(
+        statRepoImp: StatRepoImp
+    ): StatRepo
 }

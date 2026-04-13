@@ -56,4 +56,13 @@ interface RunDao {
         insertRun(run)
         insertRunPathPoints(points)
     }
+
+    // STATS
+
+    @Query(
+        "SELECT * FROM runs " +
+                "WHERE timestamp >= :weekStart AND timestamp < :weekEnd " +
+                "ORDER BY timestamp ASC"
+    )
+    fun getRunsForWeek(weekStart: Long, weekEnd: Long): Flow<List<RunEntity>>
 }

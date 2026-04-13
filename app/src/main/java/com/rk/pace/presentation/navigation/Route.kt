@@ -29,11 +29,6 @@ sealed interface Route {
         data object EditProfile : Root
 
         @Serializable
-        data class History(
-            val userId: String
-        ) : Root
-
-        @Serializable
         data class Connections(
             val userId: String,
             val tab: Int
@@ -44,6 +39,9 @@ sealed interface Route {
             val userId: String,
             val runId: String
         ) : Route
+
+        @Serializable
+        data object AddGoal: Route
 
     }
 

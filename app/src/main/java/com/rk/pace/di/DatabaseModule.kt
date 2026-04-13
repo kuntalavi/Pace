@@ -44,4 +44,9 @@ object DatabaseModule {
     @Singleton
     @Provides
     fun provideDeleteRunDao(database: PaceDatabase) = database.deleteRunDao()
+
+    @Singleton
+    @Provides
+    fun provideWeekGoalsDao(database: PaceDatabase) = database.weekGoalsDao()
+
 }

@@ -1,23 +1,17 @@
 package com.rk.pace.presentation.screens.run_stats
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
@@ -29,7 +23,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,11 +30,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.rk.pace.common.ut.PathUt.toSegments
 import com.rk.pace.common.ut.TimestampUt.getBarDate
-import com.rk.pace.domain.model.RunWithPath
-import com.rk.pace.domain.model.Split
-import com.rk.pace.presentation.components.Summary
 import com.rk.pace.presentation.screens.run_stats.components.RunStatsMap
-import com.rk.pace.presentation.charts.SplitChart
+import com.rk.pace.presentation.screens.run_stats.components.SheetContent
 import com.rk.pace.theme.back
 import com.rk.pace.theme.delete
 
@@ -55,6 +45,7 @@ fun RunStatsScreen(
 
     val state by viewModel.state.collectAsStateWithLifecycle()
     val splits by viewModel.splits.collectAsStateWithLifecycle()
+    val paceChartData by viewModel.paceChartData.collectAsStateWithLifecycle()
     val isCurrentUser by viewModel.isCurrentUser.collectAsStateWithLifecycle()
     val scaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberStandardBottomSheetState(
@@ -98,11 +89,13 @@ fun RunStatsScreen(
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
+                                .background(MaterialTheme.colorScheme.background)
                                 .heightIn(min = 500.dp)
                         ) {
                             SheetContent(
                                 run = state.runWithPath,
-                                splits = splits
+                                splits = splits,
+                                paceChartData = paceChartData
                             )
                         }
                     },
@@ -169,36 +162,5 @@ fun RunStatsScreen(
                 }
             }
         }
-    }
-}
-
-@Composable
-fun SheetContent(
-    run: RunWithPath,
-    splits: List<Split>
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp)
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(15.dp)
-    ) {
-        Spacer(modifier = Modifier.height(10.dp))
-
-        Text(
-            text = run.run.title.uppercase().ifEmpty { "RUNNING" },
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Medium,
-            letterSpacing = 1.sp
-        )
-
-        Summary(
-            run = run.run
-        )
-
-        SplitChart(
-            splits
-        )
     }
 }

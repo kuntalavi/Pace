@@ -1,5 +1,7 @@
 package com.rk.pace.presentation.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -15,12 +17,14 @@ import com.rk.pace.presentation.screens.connections.ConnectionsScreen
 import com.rk.pace.presentation.screens.my_profile.EditProfileScreen
 import com.rk.pace.presentation.screens.run_stats.RunStatsScreen
 import com.rk.pace.presentation.screens.search.SearchScreen
+import com.rk.pace.presentation.screens.stats.AddGoalScreen
 import com.rk.pace.presentation.screens.user_profile.UserProfileScreen
 import com.rk.pace.presentation.ut.defaultEnterTransition
 import com.rk.pace.presentation.ut.defaultExitTransition
 import com.rk.pace.presentation.ut.defaultPopEnterTransition
 import com.rk.pace.presentation.ut.defaultPopExitTransition
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NavGraph(
     startDestination: Route
@@ -45,6 +49,12 @@ fun NavGraph(
         composable<Route.Root.BotNav> {
             BotNavScreen(
                 navController = navController
+            )
+        }
+
+        composable<Route.Root.AddGoal> {
+            AddGoalScreen(
+                goBack = { navController.popBackStack() }
             )
         }
 

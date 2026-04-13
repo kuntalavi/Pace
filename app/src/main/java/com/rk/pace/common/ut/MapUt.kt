@@ -50,12 +50,14 @@ object MapUt {
     fun buildStaticMapUrl(
         encodedPath: List<String>,
         width: Int = 600,
-        height: Int = 300
+        height: Int = 300,
+        color: String = "f44336"
     ): String {
+
         val overlays = encodedPath.joinToString(",") { encoded ->
             (if (encoded.isNotBlank()) {
                 val safeEncoded = Uri.encode(encoded)
-                "path-5+f44336($safeEncoded)"
+                "path-5+$color($safeEncoded)"
             } else null).toString()
         }
         if (overlays.isEmpty()) return ""
@@ -63,7 +65,8 @@ object MapUt {
         val attribution = "attribution=false"
         val logo = "logo=false"
 
-        val url =  "$BASE_URL/$overlays/auto/${width}x${height}@2x?${attribution}&${logo}&access_token=${MAPBOX_ACCESS_TOKEN}"
+        val url =
+            "$BASE_URL/$overlays/auto/${width}x${height}@2x?${attribution}&${logo}&access_token=${MAPBOX_ACCESS_TOKEN}"
         return url
     }
 

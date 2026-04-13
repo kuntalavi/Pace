@@ -4,9 +4,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rk.pace.auth.domain.use_case.GetCurrentUserIdUseCase
+import com.rk.pace.common.ut.ChartsUt.buildPaceChartData
 import com.rk.pace.common.ut.PathUt.toSegments
-import com.rk.pace.common.ut.SplitsUt.calculateSplits
+import com.rk.pace.common.ut.ChartsUt.buildSplitChartData
 import com.rk.pace.di.ApplicationIoCoroutineScope
+import com.rk.pace.domain.model.PacePoint
 import com.rk.pace.domain.model.Run
 import com.rk.pace.domain.model.Split
 import com.rk.pace.domain.use_case.run.DeleteRunUseCase
@@ -43,6 +45,9 @@ class RunStatsViewModel @Inject constructor(
     private val _splits: MutableStateFlow<List<Split>> = MutableStateFlow(emptyList())
     val splits = _splits.asStateFlow()
 
+    private val _paceChartData: MutableStateFlow<List<PacePoint>> = MutableStateFlow(emptyList())
+    val paceChartData = _paceChartData.asStateFlow()
+
     init {
         getRun(runId)
     }
@@ -58,7 +63,10 @@ class RunStatsViewModel @Inject constructor(
                 RunStatsState.Success(runWithPath)
             }
             _splits.update {
-                calculateSplits(runWithPath.path.toSegments())
+                buildSplitChartData(runWithPath.path.toSegments())
+            }
+            _paceChartData.update {
+                buildPaceChartData(runWithPath.path)
             }
         }
     }

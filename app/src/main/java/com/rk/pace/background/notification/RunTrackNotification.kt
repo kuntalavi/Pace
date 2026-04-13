@@ -46,7 +46,7 @@ class RunTrackNotification @Inject constructor(
             context,
             RUN_TRACK_NOTIFICATION_CHANNEL_ID
         )
-            .setSmallIcon(R.drawable.run_24px)
+            .setSmallIcon(R.mipmap.ic_launcher)
             .setAutoCancel(false)
             .setOngoing(true)
             .setContentTitle("Time")

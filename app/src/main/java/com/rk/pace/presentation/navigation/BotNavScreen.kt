@@ -1,5 +1,7 @@
 package com.rk.pace.presentation.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -38,6 +40,7 @@ data class BotNav(
     val icon: ImageVector
 )
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BotNavScreen(
@@ -68,7 +71,7 @@ fun BotNavScreen(
 
     val title = when {
         currentDestination?.hasRoute(Route.BotNav.Feed::class) == true -> "FEED"
-        currentDestination?.hasRoute(Route.BotNav.Stats::class) == true -> "HISTORY"
+        currentDestination?.hasRoute(Route.BotNav.Stats::class) == true -> "STATS"
         currentDestination?.hasRoute(Route.BotNav.MyProfile::class) == true -> "PROFILE"
         else -> ""
     }
@@ -101,16 +104,6 @@ fun BotNavScreen(
                                 contentDescription = ""
                             )
                         }
-//                        IconButton(
-//                            onClick = {
-//
-//                            } // go to notifications screen
-//                        ) {
-//                            Icon(
-//                                imageVector = notifications,
-//                                contentDescription = ""
-//                            )
-//                        }
                     }
                 }
             )
@@ -171,13 +164,13 @@ fun BotNavScreen(
 
             composable<Route.BotNav.Stats> {
                 StatsScreen(
-                    goToRunStats = { userId, runId ->
+                    onAddGoalClick = {
                         navController.navigate(
-                            Route.Root.RunStats(
-                                userId,
-                                runId
-                            )
+                            Route.Root.AddGoal
                         )
+                    },
+                    onGoalClick = {
+
                     }
                 )
             }

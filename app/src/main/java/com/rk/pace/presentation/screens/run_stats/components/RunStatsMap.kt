@@ -1,6 +1,7 @@
 package com.rk.pace.presentation.screens.run_stats.components
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -20,7 +21,6 @@ import com.rk.pace.R
 import com.rk.pace.common.ut.PathUt.toLatL
 import com.rk.pace.domain.model.RunPathPoint
 import com.rk.pace.presentation.screens.active_run.components.getBounds
-import com.rk.pace.theme.Red
 import kotlinx.coroutines.launch
 
 @OptIn(MapsComposeExperimentalApi::class)
@@ -89,7 +89,7 @@ fun RunStatsMap(
             if (segment.size > 1) {
                 Polyline(
                     points = segment,
-                    color = Red
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }

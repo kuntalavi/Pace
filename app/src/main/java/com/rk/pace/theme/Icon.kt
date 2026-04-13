@@ -84,3 +84,11 @@ val user: ImageVector
 val gps_off: ImageVector
     @Composable
     get() = ImageVector.vectorResource(R.drawable.gps_off_24px)
+
+val distance: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(R.drawable.distance_24px)
+
+val add: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(R.drawable.add_24px)

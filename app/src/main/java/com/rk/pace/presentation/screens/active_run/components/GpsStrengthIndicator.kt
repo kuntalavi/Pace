@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
@@ -16,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import com.rk.pace.domain.tracking.GpsStrength
+import com.rk.pace.theme.close
 
 @Composable
 fun GpsStrengthIndicator(
@@ -39,10 +41,18 @@ fun GpsStrengthIndicator(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(2.dp)
         ) {
-            repeat(4) { i ->
-                SignalBar(
-                    active = i < level
+            if (level == 0) {
+                Icon(
+                    imageVector = close,
+                    contentDescription = null,
+                    tint = colorScheme.error
                 )
+            } else {
+                repeat(3) { i ->
+                    SignalBar(
+                        active = i < level
+                    )
+                }
             }
         }
 

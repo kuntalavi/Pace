@@ -14,8 +14,10 @@ import com.rk.pace.presentation.screens.active_run.ActiveRunViewModel
 fun Content(
     viewModel: ActiveRunViewModel,
     ready: Boolean = true,
-    onNotReadyStartRunClick: () -> Unit = {},
-    onGpsDisabledStartRunClick: () -> Unit = {},
+    notReadyActionText: String = "Enable Location",
+    onNotReadyTrackingClick: () -> Unit = {},
+    onStartRun: () -> Unit = viewModel::startRun,
+    onResumeRun: () -> Unit = viewModel::resumeRun,
     goToSaveRun: () -> Unit,
     goBack: () -> Unit
 ) {
@@ -26,6 +28,16 @@ fun Content(
     val gpsEnabled by viewModel.gpsEnabled.collectAsStateWithLifecycle()
 
     var mapLoaded by rememberSaveable { mutableStateOf(false) }
+    val startText = when {
+        !ready -> notReadyActionText
+        gpsEnabled == false -> "Turn GPS On"
+        else -> "Start Run"
+    }
+    val resumeText = when {
+        !ready -> notReadyActionText.uppercase()
+        gpsEnabled == false -> "TURN GPS ON"
+        else -> "RESUME"
+    }
 
     ActiveRunContent(
         runState = runState,
@@ -35,26 +47,28 @@ fun Content(
         onMapLoaded = { mapLoaded = true },
         onStartClick = {
             if (ready) {
-                when (gpsEnabled) {
-                    true -> viewModel.startRun()
-                    false -> onGpsDisabledStartRunClick()
-                    null -> {}
-                }
+                onStartRun()
             } else {
-                onNotReadyStartRunClick()
+                onNotReadyTrackingClick()
             }
         },
         onPauseClick = {
             viewModel.pauseRun()
         },
         onResumeClick = {
-            viewModel.resumeRun()
+            if (ready) {
+                onResumeRun()
+            } else {
+                onNotReadyTrackingClick()
+            }
         },
         onStopClick = {
             viewModel.pauseRun()
             goToSaveRun()
         },
-        onBackClick = goBack
+        onBackClick = goBack,
+        startText = startText,
+        resumeText = resumeText
     )
 
 

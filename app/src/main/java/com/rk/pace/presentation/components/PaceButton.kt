@@ -26,13 +26,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.rk.pace.common.Constants.shape
 
 enum class ButtonVariant {
     Filled,
     Outlined,
     Tonal
+}
+
+enum class ButtonSize {
+    MEDIUM,
+    LARGE
 }
 
 @Composable
@@ -43,7 +47,8 @@ fun PaceButton(
     onClick: () -> Unit,
     text: String,
     icon: ImageVector? = null,
-    variant: ButtonVariant = ButtonVariant.Outlined
+    variant: ButtonVariant = ButtonVariant.Outlined,
+    size: ButtonSize = ButtonSize.MEDIUM
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -73,19 +78,17 @@ fun PaceButton(
         )
     }
 
-    val style = if (
-        text.all { it.isUpperCase() || it == ' ' }
-    ) {
-        typography.labelLarge.copy(
-            letterSpacing = 1.sp
-        )
-    } else typography.labelLarge
+    val style = when (size) {
+        ButtonSize.MEDIUM -> typography.titleMedium
+        ButtonSize.LARGE -> typography.titleLarge
+    }
 
     Button(
-        modifier = modifier.graphicsLayer {
-            scaleX = scale
-            scaleY = scale
-        },
+        modifier = modifier
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            },
         onClick = onClick,
         enabled = enabled && !load,
         interactionSource = interactionSource,

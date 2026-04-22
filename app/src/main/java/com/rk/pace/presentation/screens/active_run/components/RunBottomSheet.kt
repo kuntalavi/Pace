@@ -20,6 +20,7 @@ import com.rk.pace.common.extension.formatDistance
 import com.rk.pace.common.extension.formatTime
 import com.rk.pace.common.ut.PaceUt.getPace
 import com.rk.pace.domain.model.RunState
+import com.rk.pace.presentation.components.ButtonSize
 import com.rk.pace.presentation.components.ButtonVariant
 import com.rk.pace.presentation.components.PaceButton
 import com.rk.pace.presentation.components.StatItem
@@ -34,6 +35,8 @@ data class StatPage(
 fun RunBottomSheet(
     runState: RunState,
     isMapLoaded: Boolean,
+    startText: String = "Start Run",
+    resumeText: String = "RESUME",
     start: () -> Unit,
     pause: () -> Unit,
     resume: () -> Unit,
@@ -93,15 +96,15 @@ fun RunBottomSheet(
             PaceButton(
                 modifier = Modifier
                     .fillMaxWidth(),
-                text = "Start Run",
+                text = startText.uppercase(),
                 onClick = {
                     start()
                 },
                 variant = ButtonVariant.Filled,
-                enabled = isMapLoaded
+                enabled = isMapLoaded,
+                size = ButtonSize.LARGE
             )
-        }
-        if (runState.isAct && !runState.paused) {
+        } else if (!runState.paused) {
             PaceButton(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -109,10 +112,10 @@ fun RunBottomSheet(
                 onClick = {
                     pause()
                 },
-                variant = ButtonVariant.Filled
+                variant = ButtonVariant.Filled,
+                size = ButtonSize.LARGE
             )
-        }
-        if (runState.isAct && runState.paused) {
+        } else {
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -120,11 +123,12 @@ fun RunBottomSheet(
             ) {
                 PaceButton(
                     modifier = Modifier.fillMaxWidth(.4f),
-                    text = "RESUME",
+                    text = resumeText,
                     onClick = {
                         resume()
                     },
-                    variant = ButtonVariant.Filled
+                    variant = ButtonVariant.Filled,
+                    size = ButtonSize.LARGE
                 )
                 PaceButton(
                     modifier = Modifier.fillMaxWidth(.6f),
@@ -132,7 +136,8 @@ fun RunBottomSheet(
                     onClick = {
                         stop()
                     },
-                    variant = ButtonVariant.Filled
+                    variant = ButtonVariant.Filled,
+                    size = ButtonSize.LARGE
                 )
             }
         }

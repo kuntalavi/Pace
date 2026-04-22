@@ -1,5 +1,6 @@
 package com.rk.pace.presentation.screens.active_run.components
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -38,11 +39,14 @@ import com.rk.pace.common.extension.hasPreciseForegroundLocationPermission
 import com.rk.pace.domain.model.RunPathPoint
 import com.rk.pace.domain.model.RunState
 import com.rk.pace.domain.tracking.GpsStrength
+import com.rk.pace.theme.Gray
 import com.rk.pace.theme.arrowLeft
 
+@SuppressLint("ConfigurationScreenWidthHeight")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActiveRunContent(
+    modifier: Modifier = Modifier,
     runState: RunState,
     location: RunPathPoint,
     gpsStrength: GpsStrength,
@@ -53,7 +57,8 @@ fun ActiveRunContent(
     onResumeClick: () -> Unit,
     onStopClick: () -> Unit,
     onBackClick: () -> Unit,
-    modifier: Modifier = Modifier
+    startText: String = "Start Run",
+    resumeText: String = "RESUME"
 ) {
 
     val scaffoldState = rememberBottomSheetScaffoldState(
@@ -84,6 +89,8 @@ fun ActiveRunContent(
                     RunBottomSheet(
                         runState = runState,
                         isMapLoaded = mapLoaded,
+                        startText = startText,
+                        resumeText = resumeText,
                         start = onStartClick,
                         pause = onPauseClick,
                         resume = onResumeClick,
@@ -92,7 +99,7 @@ fun ActiveRunContent(
                 }
             },
             sheetShape = RectangleShape,
-            sheetPeekHeight = 300.dp,
+            sheetPeekHeight = 200.dp,
             sheetMaxWidth = Dp.Unspecified
         ) { p ->
             Box(
@@ -163,7 +170,8 @@ fun ActiveRunContent(
                     ) {
                         Icon(
                             imageVector = com.rk.pace.theme.location,
-                            contentDescription = null
+                            contentDescription = null,
+                            tint = Gray
                         )
                     }
                 }

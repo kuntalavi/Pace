@@ -11,7 +11,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
@@ -36,6 +35,11 @@ import com.rk.pace.presentation.ut.PermissionRationaleDialog
 import com.rk.pace.presentation.ut.PermissionState
 import com.rk.pace.theme.gps_off
 
+private enum class TrackAction {
+    START,
+    RESUME
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RunScreen(
@@ -46,59 +50,175 @@ fun RunScreen(
 
     val context = LocalContext.current
     val activity = context as ComponentActivity
-    val lifecycle = LocalLifecycleOwner.current
+    val lifecycleOwner = LocalLifecycleOwner.current
     val screenState by viewModel.screenState.collectAsStateWithLifecycle()
+
+    var action by remember { mutableStateOf<TrackAction?>(null) }
+    var showLocationPermissionRationale by remember { mutableStateOf(false) }
+    var showLocationPermissionSttRationale by remember { mutableStateOf(false) }
+    var showLocationPermissionInterruptedRationale by remember { mutableStateOf(false) }
+    var showNotificationPermissionRationale by remember { mutableStateOf(false) }
+    var showNotificationPermissionSttRationale by remember { mutableStateOf(false) }
+    var showGpsOffRationale by remember { mutableStateOf(false) }
+    var showGpsInterruptedRationale by remember { mutableStateOf(false) }
+
+    fun shouldShowLocationRationale() =
+        activity.shouldShowRequestPermissionRationale(
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
+
+    fun shouldShowNotificationRationale() =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            activity.shouldShowRequestPermissionRationale(
+                Manifest.permission.POST_NOTIFICATIONS
+            )
+        } else false
 
     fun evaluate() {
         viewModel.evaluate(
-            shouldShowLocationRationale =
-                activity.shouldShowRequestPermissionRationale(
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ),
-            shouldShowNotificationRationale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-                activity.shouldShowRequestPermissionRationale(
-                    Manifest.permission.POST_NOTIFICATIONS
-                )
-            else false
+            shouldShowLocationRationale = shouldShowLocationRationale()
         )
     }
+
+    fun rTrackAction(action: TrackAction) {
+        when (action) {
+            TrackAction.START -> viewModel.startRun()
+            TrackAction.RESUME -> viewModel.resumeRun()
+        }
+    }
+
+    var continueTrackAction: () -> Unit = {}
 
     val locationPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { grants ->
-        val fine = grants[Manifest.permission.ACCESS_FINE_LOCATION] == true
-
-        if (!fine) {
-            viewModel.markLocationRequested()
-        }
-
         evaluate()
+
+        val fineGranted = grants[Manifest.permission.ACCESS_FINE_LOCATION] != false
+        if (fineGranted) {
+            continueTrackAction()
+        } else {
+            action = null
+        }
     }
 
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        if (!granted) {
-            viewModel.markNotificationRequested()
-        }
+    ) {
         evaluate()
+        continueTrackAction()
     }
 
-    val seLauncher = rememberLauncherForActivityResult(
+    val sttLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) {
         evaluate()
     }
 
-    LaunchedEffect(Unit) {
-        lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-            evaluate()
+    fun requestLocationPermission() {
+        viewModel.markLocationRequested()
+        locationPermissionLauncher.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+            )
+        )
+    }
+
+    fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            viewModel.markNotificationRequested()
+            notificationPermissionLauncher.launch(
+                Manifest.permission.POST_NOTIFICATIONS
+            )
+        } else {
+            viewModel.skipNotification()
+            continueTrackAction()
         }
     }
 
-    var showLocationRationaleDialog by remember { mutableStateOf(false) }
-    var showNotificationRationaleDialog by remember { mutableStateOf(false) }
-    var showGpsRationaleDialog by remember { mutableStateOf(false) }
+    fun handleLocationRequirement(
+        permissionState: PermissionState,
+        a: TrackAction? = null
+    ) {
+        action = a
+
+        when (permissionState) {
+            PermissionState.NotRequested -> requestLocationPermission()
+            PermissionState.DeniedOnce -> showLocationPermissionRationale = true
+            PermissionState.DeniedPermanently -> showLocationPermissionSttRationale = true
+            PermissionState.Granted -> Unit
+        }
+    }
+
+    fun handleNotificationRequirement(
+        permissionState: PermissionState,
+        a: TrackAction
+    ) {
+        action = a
+
+        when (permissionState) {
+            PermissionState.NotRequested -> requestNotificationPermission()
+            PermissionState.DeniedOnce -> showNotificationPermissionRationale = true
+            PermissionState.DeniedPermanently -> showNotificationPermissionSttRationale = true
+            PermissionState.Granted -> Unit
+        }
+    }
+
+    fun prepareTrackAction(a: TrackAction) {
+        val locationState = viewModel.locationPermissionState(
+            shouldShowLocationRationale()
+        )
+        if (locationState != PermissionState.Granted) {
+            evaluate()
+            handleLocationRequirement(
+                locationState,
+                a
+            )
+            return
+        }
+
+        if (viewModel.gpsEnabled.value == false) {
+            action = null
+            showGpsOffRationale = true
+            return
+        }
+
+        val notificationState = viewModel.notificationPermissionState(
+            shouldShowNotificationRationale()
+        )
+        if (notificationState != PermissionState.Granted) {
+            handleNotificationRequirement(
+                notificationState,
+                a
+            )
+            return
+        }
+
+        action = null
+        rTrackAction(a)
+    }
+
+    continueTrackAction = action@{
+        val action = action ?: return@action
+
+        if (
+            viewModel.locationPermissionState(
+                shouldShowLocationRationale()
+            ) != PermissionState.Granted
+        ) {
+            evaluate()
+            return@action
+        }
+
+        prepareTrackAction(action)
+    }
+
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            evaluate()
+        }
+    }
 
     when (val state = screenState) {
         is RunScreenState.Load -> {
@@ -109,213 +229,280 @@ fun RunScreen(
                         colorScheme.surface
                     ),
                 contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
+            ) { }
         }
 
         is RunScreenState.Ready -> {
             Content(
                 viewModel = viewModel,
-                onGpsDisabledStartRunClick = {
-                    showGpsRationaleDialog = true
-                },
+                onStartRun = { prepareTrackAction(TrackAction.START) },
+                onResumeRun = { prepareTrackAction(TrackAction.RESUME) },
                 goToSaveRun = goToSaveRun,
                 goBack = goBack
             )
         }
 
         is RunScreenState.LocationPermissionRequired -> {
-
-            val permissionState = state.state
-            when (permissionState) {
-                PermissionState.NotRequested -> {
-                    LaunchedEffect(key1 = Unit) {
-                        locationPermissionLauncher.launch(
-                            arrayOf(
-                                Manifest.permission.ACCESS_FINE_LOCATION,
-                                Manifest.permission.ACCESS_COARSE_LOCATION,
-                            )
-                        )
-                    }
+            LaunchedEffect(state) {
+                if (state.mRun) {
+                    showLocationPermissionInterruptedRationale = true
                 }
-
-                PermissionState.DeniedOnce -> {
-                    Content(
-                        viewModel = viewModel,
-                        ready = false,
-                        onNotReadyStartRunClick = {
-                            showLocationRationaleDialog = true
-                        },
-                        goToSaveRun = goToSaveRun,
-                        goBack = goBack
-                    )
-                }
-
-                PermissionState.DeniedPermanently -> {
-                    Content(
-                        viewModel = viewModel,
-                        ready = false,
-                        onNotReadyStartRunClick = {
-                            seLauncher.launch(
-                                context.openAppSettings()
-                            )
-                        },
-                        goToSaveRun = goToSaveRun,
-                        goBack = goBack
-                    )
-                }
-
-                else -> {}
             }
 
-        }
-
-        is RunScreenState.NotificationPermissionRequired -> {
-
-            val permissionState = state.state
-            when (permissionState) {
-                PermissionState.NotRequested -> {
-                    LaunchedEffect(key1 = Unit) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            notificationPermissionLauncher.launch(
-                                Manifest.permission.POST_NOTIFICATIONS
-                            )
-                        }
-                    }
-                }
-
-                PermissionState.DeniedOnce -> {
-                    Content(
-                        viewModel = viewModel,
-                        ready = false,
-                        onNotReadyStartRunClick = {
-                            showNotificationRationaleDialog = true
-                        },
-                        goToSaveRun = goToSaveRun,
-                        goBack = goBack
-                    )
-                }
-
-                PermissionState.DeniedPermanently -> {
-                    Content(
-                        viewModel = viewModel,
-                        ready = false,
-                        onNotReadyStartRunClick = {
-                            seLauncher.launch(
-                                context.openAppSettings()
-                            )
-                        },
-                        goToSaveRun = goToSaveRun,
-                        goBack = goBack
-                    )
-                }
-
-                else -> {}
-            }
-        }
-
-        is RunScreenState.GpsDisabledMidRun -> {
             Content(
                 viewModel = viewModel,
+                ready = false,
+                notReadyActionText = if (state.state == PermissionState.DeniedPermanently) {
+                    "Open Settings"
+                } else {
+                    "Enable Location"
+                },
+                onNotReadyTrackingClick = {
+                    handleLocationRequirement(state.state)
+                },
+                onStartRun = { prepareTrackAction(TrackAction.START) },
+                onResumeRun = { prepareTrackAction(TrackAction.RESUME) },
                 goToSaveRun = goToSaveRun,
                 goBack = goBack
             )
+        }
 
-            AlertDialog(
-                onDismissRequest = { },
-                icon = {
-                    Icon(
-                        imageVector = gps_off,
-                        contentDescription = null,
-                        tint = colorScheme.error
-                    )
-                },
-                title = {
-                    Text(
-                        text = "GPS Signal Lost"
-                    )
-                },
-                text = {
-                    Text(
-                        text = "Your run has been automatically paused because GPS was turned off. Re-enable Location Services to continue your run."
-                    )
-                },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            seLauncher.launch(
-                                Intent(
-                                    Settings.ACTION_LOCATION_SOURCE_SETTINGS
-                                )
-                            )
-                        }
-                    ) {
-                        Text("Turn GPS On")
-                    }
-                },
-                dismissButton = null
+        is RunScreenState.NotificationPermissionRequired -> {
+            Content(
+                viewModel = viewModel,
+                onStartRun = { prepareTrackAction(TrackAction.START) },
+                onResumeRun = { prepareTrackAction(TrackAction.RESUME) },
+                goToSaveRun = goToSaveRun,
+                goBack = goBack
+            )
+        }
+
+        is RunScreenState.GpsDisabledMRun -> {
+            LaunchedEffect(Unit) {
+                showGpsInterruptedRationale = true
+            }
+
+            Content(
+                viewModel = viewModel,
+                onStartRun = { prepareTrackAction(TrackAction.START) },
+                onResumeRun = { prepareTrackAction(TrackAction.RESUME) },
+                goToSaveRun = goToSaveRun,
+                goBack = goBack
             )
         }
     }
 
-    if (showGpsRationaleDialog) {
+    if (showGpsOffRationale) {
         PermissionRationaleDialog(
-            title = "GPS Off",
-            text = "Your device's Location Services are disabled. Open GPS Settings to turn it on.",
-            confirmLabel = "Turn GPS On",
-            dismissLabel = "Fuck Off",
+            title = "Location Services Off",
+            text = "Turn on device Location Services before starting so Pace can record an accurate GPS route.",
+            confirmLabel = "Open Settings",
+            dismissLabel = "Not now",
             onConfirm = {
-                showGpsRationaleDialog = false
-                seLauncher.launch(
+                showGpsOffRationale = false
+                sttLauncher.launch(
                     Intent(
                         Settings.ACTION_LOCATION_SOURCE_SETTINGS
                     )
                 )
             },
-            onDismiss = { showGpsRationaleDialog = false }
-        )
-    }
-
-    if (showLocationRationaleDialog) {
-        PermissionRationaleDialog(
-            title = "Precise Location Required",
-            text = "Pace needs precise GPS to record your route, distance, and pace accurately.",
-            confirmLabel = "Allow",
-            dismissLabel = "Not now",
-            onConfirm = {
-                showLocationRationaleDialog = false
-                locationPermissionLauncher.launch(
-                    arrayOf(
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.ACCESS_COARSE_LOCATION,
-                    )
-                )
-            },
-            onDismiss = { showLocationRationaleDialog = false }
-        )
-    }
-
-    if (showNotificationRationaleDialog) {
-        PermissionRationaleDialog(
-            title = "Stay Updated While You Run",
-            text = "Notifications show your live pace and distance in the status bar, even with the screen off..",
-            confirmLabel = "Allow",
-            dismissLabel = "Skip",
-            onConfirm = {
-                showNotificationRationaleDialog = false
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    notificationPermissionLauncher.launch(
-                        Manifest.permission.POST_NOTIFICATIONS
-                    )
-                } else evaluate()
-            },
             onDismiss = {
-                showNotificationRationaleDialog = false
-                viewModel.skipNotification()
-                evaluate()
+                showGpsOffRationale = false
+                action = null
             }
         )
     }
 
+    if (showLocationPermissionRationale) {
+        PermissionRationaleDialog(
+            title = "Precise Location Required",
+            text = "Pace needs Precise Location to record your route, distance, and pace accurately.",
+            confirmLabel = "Allow",
+            dismissLabel = "Not now",
+            onConfirm = {
+                showLocationPermissionRationale = false
+                requestLocationPermission()
+            },
+            onDismiss = {
+                showLocationPermissionRationale = false
+                action = null
+            }
+        )
+    }
+
+    if (showLocationPermissionSttRationale) {
+        PermissionRationaleDialog(
+            title = "Enable Precise Location",
+            text = "Location access is disabled for Pace. Open app settings and allow Location with Precise Location turned on.",
+            confirmLabel = "Open Settings",
+            dismissLabel = "Not now",
+            onConfirm = {
+                showLocationPermissionSttRationale = false
+                action = null
+                sttLauncher.launch(
+                    context.openAppSettings()
+                )
+            },
+            onDismiss = {
+                showLocationPermissionSttRationale = false
+                action = null
+            }
+        )
+    }
+
+    if (showNotificationPermissionRationale) {
+        PermissionRationaleDialog(
+            title = "Stay Updated While You Run",
+            text = "Notifications show your live run progress while Pace is tracking in the background.",
+            confirmLabel = "Allow",
+            dismissLabel = "Continue",
+            onConfirm = {
+                showNotificationPermissionRationale = false
+                requestNotificationPermission()
+            },
+            onDismiss = {
+                showNotificationPermissionRationale = false
+                viewModel.skipNotification()
+                continueTrackAction()
+            }
+        )
+    }
+
+    if (showNotificationPermissionSttRationale) {
+        PermissionRationaleDialog(
+            title = "Notifications Disabled",
+            text = "You can still track this run. Enable notifications in Settings if you want live progress while the screen is off.",
+            confirmLabel = "Open Settings",
+            dismissLabel = "Continue",
+            onConfirm = {
+                showNotificationPermissionSttRationale = false
+                action = null
+                viewModel.skipNotification()
+                sttLauncher.launch(
+                    context.openAppSettings()
+                )
+            },
+            onDismiss = {
+                showLocationPermissionSttRationale = false
+                viewModel.skipNotification()
+                continueTrackAction()
+            }
+        )
+    }
+
+    if (
+        showGpsInterruptedRationale &&
+        screenState == RunScreenState.GpsDisabledMRun
+    ) {
+        AlertDialog(
+            onDismissRequest = {
+                showGpsInterruptedRationale = false
+            },
+            icon = {
+                Icon(
+                    imageVector = gps_off,
+                    contentDescription = null,
+                    tint = colorScheme.error
+                )
+            },
+            title = {
+                Text(
+                    text = "GPS Turned Off"
+                )
+            },
+            text = {
+                Text(
+                    text = "Pace paused your run because device Location Services were turned off. Turn them back on before resuming."
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showGpsInterruptedRationale = false
+                        sttLauncher.launch(
+                            Intent(
+                                Settings.ACTION_LOCATION_SOURCE_SETTINGS
+                            )
+                        )
+                    }
+                ) {
+                    Text("Open Settings")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showGpsInterruptedRationale = false
+                    }
+                ) {
+                    Text("Stay Paused")
+                }
+            }
+        )
+    }
+
+    val locationIssueState = screenState as? RunScreenState.LocationPermissionRequired
+    if (
+        showLocationPermissionInterruptedRationale &&
+        locationIssueState?.mRun == true
+    ) {
+        AlertDialog(
+            onDismissRequest = {
+                showLocationPermissionInterruptedRationale = false
+            },
+            icon = {
+                Icon(
+                    imageVector = com.rk.pace.theme.location,
+                    contentDescription = null,
+                    tint = colorScheme.error
+                )
+            },
+            title = {
+                Text(
+                    text = "Location Access Lost"
+                )
+            },
+            text = {
+                Text(
+                    text = "Pace paused your run because Precise Location is unavailable. Restore it before resuming, or stop and save the run so far."
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showLocationPermissionInterruptedRationale = false
+                        when (locationIssueState.state) {
+                            PermissionState.DeniedPermanently -> {
+                                sttLauncher.launch(
+                                    context.openAppSettings()
+                                )
+                            }
+
+                            PermissionState.NotRequested,
+                            PermissionState.DeniedOnce -> requestLocationPermission()
+
+                            PermissionState.Granted -> Unit
+                        }
+                    }
+                ) {
+                    Text(
+                        if (locationIssueState.state == PermissionState.DeniedPermanently) {
+                            "Open Settings"
+                        } else {
+                            "Allow Location"
+                        }
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showLocationPermissionInterruptedRationale = false
+                    }
+                ) {
+                    Text("Stay Paused")
+                }
+            }
+        )
+    }
 }

@@ -20,6 +20,8 @@ import com.rk.pace.presentation.ut.PermissionState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -58,10 +60,11 @@ class ActiveRunViewModel @Inject constructor(
     val location = trackerManager.location
     val gpsStrength = trackerManager.gpsStrength
 
-    private var notificationSkipped = false
+    private var notificationPromptHandled = false
 
     init {
         observeGps()
+        observeLocationPermission()
     }
 
     private fun observeGps() {
@@ -72,16 +75,38 @@ class ActiveRunViewModel @Inject constructor(
 
             if (!gpsEnabled && run.isAct && !run.paused) {
                 trackerManager.pause()
-                _screenState.update { RunScreenState.GpsDisabledMidRun }
+                _screenState.update { RunScreenState.GpsDisabledMRun }
 
-            } else if (gpsEnabled && currentState == RunScreenState.GpsDisabledMidRun) {
+            } else if (gpsEnabled && currentState == RunScreenState.GpsDisabledMRun) {
                 _screenState.update { RunScreenState.Ready }
             }
         }
             .launchIn(viewModelScope)
     }
 
-    private fun resolveLocationState(shouldShowRationale: Boolean): PermissionState {
+    private fun observeLocationPermission() {
+        viewModelScope.launch {
+            while (isActive) {
+                val run = runState.value
+
+                if (
+                    run.isAct &&
+                    !run.paused &&
+                    !context.hasPreciseForegroundLocationPermission()
+                ) {
+                    trackerManager.pause()
+                    _screenState.value = RunScreenState.LocationPermissionRequired(
+                        state = locationPermissionState(shouldShowRationale = false),
+                        mRun = true
+                    )
+                }
+
+                delay(1000L)
+            }
+        }
+    }
+
+    fun locationPermissionState(shouldShowRationale: Boolean): PermissionState {
         if (context.hasPreciseForegroundLocationPermission()) return PermissionState.Granted
         return when {
             shouldShowRationale -> PermissionState.DeniedOnce
@@ -90,9 +115,9 @@ class ActiveRunViewModel @Inject constructor(
         }
     }
 
-    private fun resolveNotificationState(shouldShowRationale: Boolean): PermissionState {
+    fun notificationPermissionState(shouldShowRationale: Boolean): PermissionState {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return PermissionState.Granted
-        if (notificationSkipped) return PermissionState.Granted
+        if (notificationPromptHandled) return PermissionState.Granted
         if (context.hasPostNotificationPermission()) return PermissionState.Granted
         return when {
             shouldShowRationale -> PermissionState.DeniedOnce
@@ -102,14 +127,16 @@ class ActiveRunViewModel @Inject constructor(
     }
 
     fun skipNotification() {
-        notificationSkipped = true
+        notificationPromptHandled = true
     }
 
     fun markLocationRequested() =
         prefs.edit { putBoolean("location_ever_requested", true) }
 
-    fun markNotificationRequested() =
+    fun markNotificationRequested() {
+        notificationPromptHandled = true
         prefs.edit { putBoolean("notification_ever_requested", true) }
+    }
 
     private fun wasLocationEverRequested() =
         prefs.getBoolean("location_ever_requested", false)
@@ -118,21 +145,25 @@ class ActiveRunViewModel @Inject constructor(
         prefs.getBoolean("notification_ever_requested", false)
 
     fun evaluate(
-        shouldShowLocationRationale: Boolean,
-        shouldShowNotificationRationale: Boolean
+        shouldShowLocationRationale: Boolean
     ) {
-        val locationState = resolveLocationState(shouldShowLocationRationale)
+        val locationState = locationPermissionState(shouldShowLocationRationale)
+        val run = runState.value
+
         if (locationState != PermissionState.Granted) {
-            _screenState.value = RunScreenState.LocationPermissionRequired(locationState)
+            if (run.isAct && !run.paused) {
+                trackerManager.pause()
+            }
+            _screenState.value = RunScreenState.LocationPermissionRequired(
+                state = locationState,
+                mRun = run.isAct
+            )
             return
         }
 
-        val notificationState = resolveNotificationState(shouldShowNotificationRationale)
-        if (notificationState != PermissionState.Granted) {
-            _screenState.value = RunScreenState.NotificationPermissionRequired(notificationState)
+        if (_screenState.value == RunScreenState.GpsDisabledMRun && gpsEnabled.value == false) {
             return
         }
-
         _screenState.value = RunScreenState.Ready
     }
 
@@ -146,7 +177,13 @@ class ActiveRunViewModel @Inject constructor(
     }
 
     fun startRun() {
+        if (
+            !context.hasPreciseForegroundLocationPermission() ||
+            gpsEnabled.value != true
+        ) return
+
         trackerManager.start()
+        _screenState.value = RunScreenState.Ready
     }
 
     fun pauseRun() {
@@ -154,7 +191,13 @@ class ActiveRunViewModel @Inject constructor(
     }
 
     fun resumeRun() {
+        if (
+            !context.hasPreciseForegroundLocationPermission() ||
+            gpsEnabled.value != true
+        ) return
+
         trackerManager.resume()
+        _screenState.value = RunScreenState.Ready
     }
 
     fun saveRun() {

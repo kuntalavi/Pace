@@ -9,10 +9,8 @@ import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.core.app.ActivityCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.rk.pace.auth.presentation.AuthViewModel
-import com.rk.pace.common.extension.hasPostNotificationPermission
 import com.rk.pace.presentation.navigation.PaceNavGraph
 import com.rk.pace.theme.PaceTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,16 +26,6 @@ class MainActivity : ComponentActivity() {
 
         installSplashScreen().setKeepOnScreenCondition {
             authViewModel.startDestination.value == null
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (!this.hasPostNotificationPermission()) {
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
-                    101
-                )
-            }
         }
 
         enableEdgeToEdge()

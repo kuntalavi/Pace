@@ -2,6 +2,7 @@ package com.rk.pace.presentation.screens.active_run.components
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -22,7 +23,6 @@ import com.rk.pace.R
 import com.rk.pace.common.extension.hasPreciseForegroundLocationPermission
 import com.rk.pace.common.ut.PathUt.toLatL
 import com.rk.pace.domain.model.RunPathPoint
-import com.rk.pace.theme.Red
 
 @SuppressLint("MissingPermission")
 @OptIn(MapsComposeExperimentalApi::class)
@@ -31,6 +31,7 @@ fun RunMap(
     modifier: Modifier,
     segments: List<List<RunPathPoint>>,
     currentLocation: RunPathPoint,
+    moveToUserTrigger: Int,
     isAct: Boolean,
     paused: Boolean,
     bottomPaddingDp: Dp,
@@ -48,7 +49,10 @@ fun RunMap(
         modifier = modifier,
         cameraPositionState = cameraPositionState,
         uiSettings = MapUiSettings(
-            zoomControlsEnabled = false
+            zoomControlsEnabled = false,
+            compassEnabled = false,
+            rotationGesturesEnabled = false,
+            myLocationButtonEnabled = false
         ),
         properties = MapProperties(
             isMyLocationEnabled = context.hasPreciseForegroundLocationPermission(),
@@ -62,7 +66,7 @@ fun RunMap(
         }
     ) {
 
-        // bottom sheet and top p
+        // bottom sheet P
         MapEffect(key1 = bottomPaddingPx) { map ->
             map.setPadding(
                 0,
@@ -70,6 +74,20 @@ fun RunMap(
                 0,
                 bottomPaddingPx
             )
+        }
+
+        MapEffect(key1 = moveToUserTrigger) {
+            if (currentLocation.lat != 0.0) {
+                cameraPositionState.animate(
+                    update = CameraUpdateFactory.newLatLngZoom(
+                        LatLng(
+                            currentLocation.lat,
+                            currentLocation.long
+                        ),
+                        18f
+                    )
+                )
+            }
         }
 
         // follow user location when !active
@@ -117,7 +135,7 @@ fun RunMap(
             if (segment.size > 1) {
                 Polyline(
                     points = segment,
-                    color = Red
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }

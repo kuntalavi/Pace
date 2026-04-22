@@ -13,9 +13,9 @@ val feed: ImageVector
     @Composable
     get() = ImageVector.vectorResource(R.drawable.feed_24px)
 
-val back: ImageVector
+val arrowLeft: ImageVector
     @Composable
-    get() = ImageVector.vectorResource(R.drawable.back_24px)
+    get() = ImageVector.vectorResource(R.drawable.arrow_left_24px)
 
 val delete: ImageVector
     @Composable
@@ -49,9 +49,9 @@ val edit: ImageVector
     @Composable
     get() = ImageVector.vectorResource(R.drawable.edit_24px)
 
-val arrow: ImageVector
+val arrowRight: ImageVector
     @Composable
-    get() = ImageVector.vectorResource(R.drawable.arrow_24px)
+    get() = ImageVector.vectorResource(R.drawable.arrow_right_24px)
 
 val user: ImageVector
     @Composable
@@ -68,3 +68,23 @@ val distance: ImageVector
 val add: ImageVector
     @Composable
     get() = ImageVector.vectorResource(R.drawable.add_24px)
+
+val resume: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(R.drawable.resume_24px)
+
+val pause: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(R.drawable.pause_24px)
+
+val stop: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(R.drawable.stop_24px)
+
+val back: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(R.drawable.back_24px)
+
+val location: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(R.drawable.location_24px)

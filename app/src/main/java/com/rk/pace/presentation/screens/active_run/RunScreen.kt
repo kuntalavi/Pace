@@ -7,6 +7,7 @@ import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.AlertDialog
@@ -14,6 +15,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -47,7 +49,6 @@ fun RunScreen(
     val activity = context as ComponentActivity
     val lifecycle = LocalLifecycleOwner.current
     val screenState by viewModel.screenState.collectAsStateWithLifecycle()
-    val gpsEnabled by viewModel.gpsEnabled.collectAsStateWithLifecycle()
 
     fun evaluate() {
         viewModel.evaluate(
@@ -103,7 +104,11 @@ fun RunScreen(
     when (val state = screenState) {
         is RunScreenState.Load -> {
             Box(
-                Modifier.fillMaxSize(),
+                Modifier
+                    .fillMaxSize()
+                    .background(
+                        colorScheme.surface
+                    ),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator()
@@ -113,11 +118,11 @@ fun RunScreen(
         is RunScreenState.Ready -> {
             Content(
                 viewModel = viewModel,
-                gpsEnabled = gpsEnabled,
                 onGpsDisabledStartRunClick = {
                     showGpsRationaleDialog = true
                 },
-                goToSaveRun = goToSaveRun
+                goToSaveRun = goToSaveRun,
+                goBack = goBack
             )
         }
 
@@ -143,7 +148,8 @@ fun RunScreen(
                         onNotReadyStartRunClick = {
                             showLocationRationaleDialog = true
                         },
-                        goToSaveRun = goToSaveRun
+                        goToSaveRun = goToSaveRun,
+                        goBack = goBack
                     )
                 }
 
@@ -156,7 +162,8 @@ fun RunScreen(
                                 context.openAppSettings()
                             )
                         },
-                        goToSaveRun = goToSaveRun
+                        goToSaveRun = goToSaveRun,
+                        goBack = goBack
                     )
                 }
 
@@ -186,7 +193,8 @@ fun RunScreen(
                         onNotReadyStartRunClick = {
                             showNotificationRationaleDialog = true
                         },
-                        goToSaveRun = goToSaveRun
+                        goToSaveRun = goToSaveRun,
+                        goBack = goBack
                     )
                 }
 
@@ -199,7 +207,8 @@ fun RunScreen(
                                 context.openAppSettings()
                             )
                         },
-                        goToSaveRun = goToSaveRun
+                        goToSaveRun = goToSaveRun,
+                        goBack = goBack
                     )
                 }
 
@@ -210,7 +219,8 @@ fun RunScreen(
         is RunScreenState.GpsDisabledMidRun -> {
             Content(
                 viewModel = viewModel,
-                goToSaveRun = goToSaveRun
+                goToSaveRun = goToSaveRun,
+                goBack = goBack
             )
 
             AlertDialog(
@@ -219,7 +229,7 @@ fun RunScreen(
                     Icon(
                         imageVector = gps_off,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.error
+                        tint = colorScheme.error
                     )
                 },
                 title = {

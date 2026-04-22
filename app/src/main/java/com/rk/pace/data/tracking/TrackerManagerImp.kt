@@ -78,6 +78,14 @@ class TrackerManagerImp @Inject constructor(
     private val _runState = MutableStateFlow(RunState())
     override val runState = _runState.asStateFlow()
 
+    override val isRunAct: StateFlow<Boolean> = runState
+        .map { it.isAct }
+        .stateIn(
+            scope = scope,
+            SharingStarted.WhileSubscribed(5000L),
+            false
+        )
+
     private var job: Job? = null
 
     private var point: RunPathPoint? = null

@@ -12,17 +12,48 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
+import com.rk.pace.theme.feed
+import com.rk.pace.theme.progress
+import com.rk.pace.theme.run
+import com.rk.pace.theme.user
+
+data class BotNav(
+    val route: Route,
+    val icon: ImageVector,
+    val iconSelected: ImageVector
+)
 
 @Composable
 fun PaceBotNavBar(
-    botNavList: List<BotNav>,
     destination: NavDestination?,
     onTabClick: (Route) -> Unit
 ) {
 
-    if (destination == null) return
+    val botNavList = listOf(
+        BotNav(
+            route = Route.BotNav.Feed,
+            icon = feed,
+            iconSelected = feed
+        ),
+        BotNav(
+            route = Route.ActiveRun.Run,
+            icon = run,
+            iconSelected = run
+        ),
+        BotNav(
+            route = Route.BotNav.Stats,
+            icon = progress,
+            iconSelected = progress
+        ),
+        BotNav(
+            route = Route.BotNav.MyProfile,
+            icon = user,
+            iconSelected = user
+        )
+    )
 
     NavigationBar(
         modifier = Modifier
@@ -32,7 +63,9 @@ fun PaceBotNavBar(
     ) {
 
         botNavList.forEach { i ->
-            val selected = destination.hasRoute(i.route::class)
+            val selected = destination?.hasRoute(i.route::class) ?: (
+                    i.route == Route.ActiveRun.Run
+                    )
 
             val color by animateColorAsState(
                 targetValue = if (selected) colorScheme.onPrimaryContainer

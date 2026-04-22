@@ -6,13 +6,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.app.ActivityCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.rk.pace.auth.presentation.AuthViewModel
 import com.rk.pace.common.extension.hasPostNotificationPermission
-import com.rk.pace.presentation.navigation.NavGraph
+import com.rk.pace.presentation.navigation.PaceNavGraph
 import com.rk.pace.theme.PaceTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -21,6 +22,7 @@ class MainActivity : ComponentActivity() {
 
     private val authViewModel: AuthViewModel by viewModels()
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -43,7 +45,9 @@ class MainActivity : ComponentActivity() {
             val startDestination by authViewModel.startDestination.collectAsState()
             if (startDestination != null) {
                 PaceTheme {
-                    NavGraph(startDestination!!)
+                    PaceNavGraph(
+                        startDestination = startDestination!!
+                    )
                 }
             }
         }

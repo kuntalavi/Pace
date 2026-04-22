@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface TrackerManager {
 
+    val isRunAct: StateFlow<Boolean>
     val runState: StateFlow<RunState>
     val location: StateFlow<RunPathPoint>
     val gpsStrength: StateFlow<GpsStrength>

@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.rk.pace.auth.presentation.AuthUIState
 import com.rk.pace.auth.presentation.AuthViewModel
+import com.rk.pace.presentation.components.ButtonVariant
 import com.rk.pace.presentation.components.PaceButton
 import com.rk.pace.presentation.components.PaceInputBox
 
@@ -157,7 +158,7 @@ fun SignUpScreen(
                     }
                 },
                 load = authState is AuthUIState.Load,
-                filled = true
+                variant = ButtonVariant.Filled
             )
         }
     }

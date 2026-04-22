@@ -28,10 +28,10 @@ fun AuthScreen(
 
             composable<Route.Auth.Welcome>{
                 WelcomeScreen(
-                    goToSignUp = {
+                    onSignUpClick = {
                         authNavController.navigate(Route.Auth.SignUp)
                     },
-                    goToSignIn = {
+                    onSignInClick = {
                         authNavController.navigate(Route.Auth.SignIn)
                     }
                 )

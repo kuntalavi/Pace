@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.rk.pace.domain.model.Run
+import com.rk.pace.presentation.components.ButtonVariant
 import com.rk.pace.presentation.components.PaceButton
 import com.rk.pace.presentation.components.PaceInputBox
 import com.rk.pace.presentation.screens.run_stats.components.RunStatsMap
@@ -99,7 +100,7 @@ fun SaveRunScreen(
                             viewModel.saveRun()
                         },
                         enabled = isMapLoaded && !state.saving,
-                        filled = true,
+                        variant = ButtonVariant.Filled,
                         load = state.saving
                     )
                 }

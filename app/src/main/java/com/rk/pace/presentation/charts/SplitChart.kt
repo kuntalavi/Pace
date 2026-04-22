@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.rk.pace.common.Constants.shape
 import com.rk.pace.common.ut.PaceUt.formatPace
 import com.rk.pace.domain.model.Split
 
@@ -136,14 +136,15 @@ private fun SplitRow(
             .75f
         }
 
-        val barWidthPercent = minBarWidthPercent + (normalizedValue * (maxBarWidthPercent - minBarWidthPercent))
+        val barWidthPercent =
+            minBarWidthPercent + (normalizedValue * (maxBarWidthPercent - minBarWidthPercent))
         Box(
             modifier = Modifier
                 .height(18.dp)
                 .fillMaxWidth(barWidthPercent / 100)
                 .background(
                     color = barColor,
-                    shape = RoundedCornerShape(4.dp)
+                    shape = shape
                 )
         )
     }

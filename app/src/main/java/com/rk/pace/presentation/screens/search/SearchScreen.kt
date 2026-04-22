@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.rk.pace.presentation.screens.search.components.UserItem
-import com.rk.pace.theme.back
+import com.rk.pace.theme.arrowLeft
 import com.rk.pace.theme.close
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -87,7 +87,7 @@ fun SearchScreen(
                                 }
                             ) {
                                 Icon(
-                                    imageVector = back,
+                                    imageVector = arrowLeft,
                                     contentDescription = ""
                                 )
                             }

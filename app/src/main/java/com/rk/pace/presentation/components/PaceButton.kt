@@ -77,7 +77,7 @@ fun PaceButton(
         text.all { it.isUpperCase() || it == ' ' }
     ) {
         typography.labelLarge.copy(
-            letterSpacing = 2.sp
+            letterSpacing = 1.sp
         )
     } else typography.labelLarge
 

@@ -25,6 +25,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.rk.pace.auth.presentation.AuthUIState
 import com.rk.pace.auth.presentation.AuthViewModel
+import com.rk.pace.presentation.components.ButtonVariant
 import com.rk.pace.presentation.components.PaceButton
 import com.rk.pace.presentation.components.PaceInputBox
 
@@ -88,16 +89,21 @@ fun SignInScreen(
                 isPassword = true
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(
+                modifier = Modifier.height(20.dp)
+            )
 
             PaceButton(
                 modifier = Modifier.fillMaxWidth(.3f),
                 text = "Log In",
                 onClick = {
-                    viewModel.signIn(email, password)
+                    viewModel.signIn(
+                        email,
+                        password
+                    )
                 },
                 load = authState is AuthUIState.Load,
-                filled = true
+                variant = ButtonVariant.Filled
             )
         }
     }

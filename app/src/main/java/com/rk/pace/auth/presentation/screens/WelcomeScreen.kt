@@ -1,6 +1,6 @@
 package com.rk.pace.auth.presentation.screens
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,51 +12,51 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.rk.pace.presentation.components.ButtonVariant
 import com.rk.pace.presentation.components.PaceButton
 
 @Preview(showSystemUi = true, showBackground = true)
 @Composable
 fun WelcomeScreenPreview() {
     WelcomeScreen(
-        goToSignUp = {},
-        goToSignIn = {}
+        onSignUpClick = {},
+        onSignInClick = {}
     )
 }
 
 
 @Composable
 fun WelcomeScreen(
-    goToSignUp: () -> Unit,
-    goToSignIn: () -> Unit
+    onSignUpClick: () -> Unit,
+    onSignInClick: () -> Unit
 ) {
-
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 20.dp),
-        contentAlignment = Alignment.Center
+            .padding(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Bottom
     ) {
-        Column {
-            PaceButton(
-                modifier = Modifier.fillMaxWidth(.8f),
-                onClick = {
-                    goToSignUp()
-                },
-                text = "CREATE AN ACCOUNT",
-                filled = true
-            )
+        PaceButton(
+            modifier = Modifier.fillMaxWidth(.8f),
+            onClick = onSignUpClick,
+            text = "JOIN NOW",
+            variant = ButtonVariant.Filled
+        )
 
-            Spacer(
-                modifier = Modifier.height(20.dp)
-            )
+        Spacer(
+            modifier = Modifier.height(15.dp)
+        )
 
-            PaceButton(
-                modifier = Modifier.fillMaxWidth(.8f),
-                onClick = {
-                    goToSignIn()
-                },
-                text = "LOG IN"
-            )
-        }
+        PaceButton(
+            modifier = Modifier.fillMaxWidth(.8f),
+            onClick = onSignInClick,
+            text = "LOG IN",
+            variant = ButtonVariant.Tonal
+        )
+
+        Spacer(
+            modifier = Modifier.height(20.dp)
+        )
     }
 }

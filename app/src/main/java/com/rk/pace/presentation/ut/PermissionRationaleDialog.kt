@@ -7,6 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.rk.pace.presentation.components.ButtonVariant
 import com.rk.pace.presentation.components.PaceButton
 
 @Composable
@@ -38,7 +39,7 @@ fun PermissionRationaleDialog(
             PaceButton(
                 onClick = onConfirm,
                 text = confirmLabel,
-                filled = true
+                variant = ButtonVariant.Filled
             )
         },
         dismissButton = dismissLabel?.let {

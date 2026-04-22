@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.rk.pace.domain.model.WeekGoals
 import com.rk.pace.presentation.components.PaceButton
-import com.rk.pace.theme.back
+import com.rk.pace.theme.arrowLeft
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,7 +39,7 @@ fun AddGoalScreen(
                         onClick = { }
                     ) {
                         Icon(
-                            imageVector = back,
+                            imageVector = arrowLeft,
                             contentDescription = null
                         )
                     }

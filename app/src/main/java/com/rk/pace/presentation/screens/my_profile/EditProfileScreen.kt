@@ -40,7 +40,7 @@ import com.rk.pace.presentation.components.PaceInputBox
 import com.rk.pace.presentation.components.UserImage
 import com.rk.pace.presentation.components.UserImageSize
 import com.rk.pace.theme.Gray
-import com.rk.pace.theme.back
+import com.rk.pace.theme.arrowLeft
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -118,7 +118,7 @@ fun EditProfileScreen(
                                 }
                             ) {
                                 Icon(
-                                    imageVector = back,
+                                    imageVector = arrowLeft,
                                     contentDescription = ""
                                 )
                             }

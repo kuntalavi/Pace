@@ -13,7 +13,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -73,40 +75,45 @@ fun FeedScreen(
                 },
                 state = rememberPullToRefreshState()
             ) {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(15.dp),
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = colorScheme.surface,
                 ) {
-                    items(
-                        items = state.posts,
-                        key = { post ->
-                            post.run.runId
-                        }
-                    ) { post ->
-                        FeedItem(
-                            post = post,
-                            toggleLike = {
-                                viewmodel.toggleLike(post)
-                            },
-                            onLikesClick = {
-                                likes = post.run.likes
-                                viewmodel.getLikedByUsers(post.run.likedBy)
-                                showBottomSheet = true
-                            },
-                            onUserClick = {
-                                onUserClick(
-                                    post.user.userId
-                                )
-                            },
-                            onRunClick = {
-                                onRunClick(
-                                    post.user.userId,
-                                    post.run.runId
-                                )
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(15.dp),
+                    ) {
+                        items(
+                            items = state.posts,
+                            key = { post ->
+                                post.run.runId
                             }
-                        )
-                        HorizontalDivider()
+                        ) { post ->
+                            FeedItem(
+                                post = post,
+                                toggleLike = {
+                                    viewmodel.toggleLike(post)
+                                },
+                                onLikesClick = {
+                                    likes = post.run.likes
+                                    viewmodel.getLikedByUsers(post.run.likedBy)
+                                    showBottomSheet = true
+                                },
+                                onUserClick = {
+                                    onUserClick(
+                                        post.user.userId
+                                    )
+                                },
+                                onRunClick = {
+                                    onRunClick(
+                                        post.user.userId,
+                                        post.run.runId
+                                    )
+                                }
+                            )
+                            HorizontalDivider()
+                        }
                     }
                 }
             }

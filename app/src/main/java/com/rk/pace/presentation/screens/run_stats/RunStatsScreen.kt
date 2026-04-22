@@ -32,7 +32,7 @@ import com.rk.pace.common.ut.PathUt.toSegments
 import com.rk.pace.common.ut.TimestampUt.getBarDate
 import com.rk.pace.presentation.screens.run_stats.components.RunStatsMap
 import com.rk.pace.presentation.screens.run_stats.components.SheetContent
-import com.rk.pace.theme.back
+import com.rk.pace.theme.arrowLeft
 import com.rk.pace.theme.delete
 
 
@@ -117,7 +117,7 @@ fun RunStatsScreen(
                                     }
                                 ) {
                                     Icon(
-                                        imageVector = back,
+                                        imageVector = arrowLeft,
                                         contentDescription = ""
                                     )
                                 }

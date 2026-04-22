@@ -30,11 +30,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.rk.pace.presentation.components.ButtonVariant
 import com.rk.pace.presentation.components.PaceButton
 import com.rk.pace.presentation.components.UserImage
 import com.rk.pace.presentation.components.UserImageSize
 import com.rk.pace.presentation.components.RunSummary
-import com.rk.pace.theme.back
+import com.rk.pace.theme.arrowLeft
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,7 +78,7 @@ fun UserProfileScreen(
                                 }
                             ) {
                                 Icon(
-                                    imageVector = back,
+                                    imageVector = arrowLeft,
                                     contentDescription = ""
                                 )
                             }
@@ -176,7 +177,7 @@ fun UserProfileScreen(
                                     },
                                     text = if (!currentState.userProfileUiState.isFollowed) "FOLLOW" else "FOLLOWING",
                                     enabled = !currentState.userProfileUiState.followJ,
-                                    filled = !currentState.userProfileUiState.isFollowed
+                                    variant = ButtonVariant.Filled
                                 )
                             }
 

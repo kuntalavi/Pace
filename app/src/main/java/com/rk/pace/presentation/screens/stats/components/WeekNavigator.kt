@@ -11,8 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.rk.pace.theme.Black
-import com.rk.pace.theme.arrow
-import com.rk.pace.theme.back
+import com.rk.pace.theme.arrowRight
+import com.rk.pace.theme.arrowLeft
 
 @Composable
 fun WeekNavigator(
@@ -31,7 +31,7 @@ fun WeekNavigator(
             onClick = onPrevious
         ) {
             Icon(
-                imageVector = back,
+                imageVector = arrowLeft,
                 contentDescription = null
             )
         }
@@ -46,7 +46,7 @@ fun WeekNavigator(
             enabled = canGoForward
         ) {
             Icon(
-                imageVector = arrow,
+                imageVector = arrowRight,
                 contentDescription = null,
                 tint = if (!canGoForward) MaterialTheme.colorScheme.background else Black
             )

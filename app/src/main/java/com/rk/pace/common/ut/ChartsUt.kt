@@ -65,7 +65,7 @@ object ChartsUt {
 
     fun filterPacePoints(data: List<PacePoint>): List<PacePoint> {
         return data.filter {
-            it.paceMinPerKm in 2f..12f
+            it.paceMinPerKm in 1f..15f
         }
     }
 

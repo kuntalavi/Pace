@@ -1,25 +1,39 @@
 package com.rk.pace.presentation.components
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.rk.pace.common.Constants.shape
+
+enum class ButtonVariant {
+    Filled,
+    Outlined,
+    Tonal
+}
 
 @Composable
 fun PaceButton(
@@ -29,59 +43,113 @@ fun PaceButton(
     onClick: () -> Unit,
     text: String,
     icon: ImageVector? = null,
-    filled: Boolean = false
+    variant: ButtonVariant = ButtonVariant.Outlined
 ) {
-    Button(
-        modifier = modifier,
-        onClick = {
-            onClick()
-        },
-        enabled = enabled,
-        border = BorderStroke(
-            width = 1.dp,
-            color = if (filled) MaterialTheme.colorScheme.onPrimary
-            else MaterialTheme.colorScheme.primary
-        ),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = if (filled) MaterialTheme.colorScheme.onBackground
-            else MaterialTheme.colorScheme.background
-        ),
-        shape = RoundedCornerShape(0.dp),
-        contentPadding = PaddingValues(horizontal = 15.dp, vertical = 10.dp)
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed && enabled) 0.97f else 1f,
+        label = ""
+    )
+
+    val (containerColor, contentColor, borderColor) = when (variant) {
+        ButtonVariant.Filled -> Triple(
+            colorScheme.primary,
+            colorScheme.onPrimary,
+            null
+        )
+
+        ButtonVariant.Outlined -> Triple(
+            colorScheme.surface,
+            colorScheme.primary,
+            colorScheme.primary
+        )
+
+        ButtonVariant.Tonal -> Triple(
+            Color.Transparent,
+            colorScheme.primary,
+            null
+        )
+    }
+
+    val style = if (
+        text.all { it.isUpperCase() || it == ' ' }
     ) {
-        if (!load) {
+        typography.labelLarge.copy(
+            letterSpacing = 2.sp
+        )
+    } else typography.labelLarge
+
+    Button(
+        modifier = modifier.graphicsLayer {
+            scaleX = scale
+            scaleY = scale
+        },
+        onClick = onClick,
+        enabled = enabled && !load,
+        interactionSource = interactionSource,
+        border = borderColor?.let {
+            BorderStroke(
+                width = 1.dp,
+                color = it
+            )
+        },
+        shape = shape,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = containerColor,
+            contentColor = contentColor,
+            disabledContainerColor = containerColor.copy(
+                alpha = 0.38f
+            ),
+            disabledContentColor = contentColor.copy(
+                alpha = 0.38f
+            )
+        ),
+        contentPadding = PaddingValues(
+            horizontal = 20.dp,
+            vertical = 10.dp
+        ),
+        elevation = ButtonDefaults.buttonElevation(
+            defaultElevation = if (variant == ButtonVariant.Filled) 2.dp else 0.dp,
+            pressedElevation = if (variant == ButtonVariant.Filled) 4.dp else 0.dp,
+            disabledElevation = 0.dp
+        )
+    ) {
+        if (load) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(
+                    20.dp
+                ),
+                color = contentColor,
+                strokeWidth = 2.dp
+            )
+        } else {
             Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = text.uppercase(),
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 2.sp,
-                        color = if (filled) MaterialTheme.colorScheme.background
-                        else MaterialTheme.colorScheme.onBackground
-                    )
-                )
-
-                icon?.let {
-
-                    Spacer(modifier = Modifier.width(10.dp))
-
+                if (icon != null) {
                     Icon(
                         imageVector = icon,
-                        tint = if (filled) MaterialTheme.colorScheme.onPrimary
-                        else MaterialTheme.colorScheme.primary,
-                        contentDescription = ""
+                        tint = contentColor,
+                        contentDescription = null,
+                        modifier = Modifier.size(
+                            18.dp
+                        )
                     )
 
+                    Spacer(
+                        modifier = Modifier.width(8.dp)
+                    )
                 }
+
+                Text(
+                    text = text,
+                    style = style,
+                    color = contentColor
+                )
             }
-        } else {
-            CircularProgressIndicator(
-                color = if (filled) MaterialTheme.colorScheme.onPrimary
-                else MaterialTheme.colorScheme.primary
-            )
         }
     }
 }

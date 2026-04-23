@@ -1,6 +1,7 @@
 package com.rk.pace.di
 
 import android.content.Context
+import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.rk.pace.background.service.RunTrackServiceControllerImp
@@ -39,8 +40,8 @@ abstract class TrackerModule {
         @Provides
         @Singleton
         @PassiveLocationRequest
-        fun providePassiveLocationRequest(): com.google.android.gms.location.LocationRequest {
-            return com.google.android.gms.location.LocationRequest.Builder(
+        fun providePassiveLocationRequest(): LocationRequest {
+            return LocationRequest.Builder(
                 Priority.PRIORITY_BALANCED_POWER_ACCURACY,
                 10000L
             )
@@ -51,8 +52,8 @@ abstract class TrackerModule {
         @Provides
         @Singleton
         @ActiveTrackLocationRequest
-        fun provideActiveTrackLocationRequest(): com.google.android.gms.location.LocationRequest {
-            return com.google.android.gms.location.LocationRequest.Builder(
+        fun provideActiveTrackLocationRequest(): LocationRequest {
+            return LocationRequest.Builder(
                 Priority.PRIORITY_HIGH_ACCURACY,
                 2000L
             )

@@ -9,10 +9,12 @@ import com.rk.pace.di.IoDispatcher
 import com.rk.pace.domain.tracking.GpsStatusTracker
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
@@ -28,6 +30,7 @@ class GpsStatusTrackerImp @Inject constructor(
             Context.LOCATION_SERVICE
         ) as LocationManager
 
+    @OptIn(FlowPreview::class)
     override val isGpsEnabled: Flow<Boolean> = callbackFlow {
         val checkGps = {
             val status = locationManager.isProviderEnabled(
@@ -58,6 +61,7 @@ class GpsStatusTrackerImp @Inject constructor(
         }
     }
         .distinctUntilChanged()
+        .debounce(3000L)
         .conflate()
         .flowOn(ioDispatcher)
 }

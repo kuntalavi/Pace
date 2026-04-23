@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface LocationTracker {
 
-    val locationFlow: Flow<RunPathPoint>
+    val passiveLocation: Flow<RunPathPoint?>
+    val activeTrackLocation: Flow<RunPathPoint>
 
 }

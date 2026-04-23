@@ -10,11 +10,14 @@ import com.rk.pace.domain.tracking.RunTrackServiceController
 import com.rk.pace.domain.tracking.TimeTracker
 import com.rk.pace.domain.tracking.TrackerManager
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -31,19 +34,33 @@ class TrackerManagerImp @Inject constructor(
     private val timeTracker: TimeTracker
 ) : TrackerManager {
 
-    override val location: StateFlow<RunPathPoint> = locationTracker.locationFlow
+    private val _runState = MutableStateFlow(RunState())
+    override val runState = _runState.asStateFlow()
+
+    override val isAct: StateFlow<Boolean> = runState
+        .map { it.isAct }
+        .distinctUntilChanged()
         .stateIn(
             scope = scope,
             SharingStarted.WhileSubscribed(5000L),
-            RunPathPoint(
-                lat = 0.0,
-                long = 0.0
-            )
+            false
         )
 
-    override val gpsStrength: StateFlow<GpsStrength> = locationTracker.locationFlow
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override val location: StateFlow<RunPathPoint?> =
+        isAct.flatMapLatest { isAct ->
+            if (isAct) locationTracker.activeTrackLocation
+            else locationTracker.passiveLocation
+        }.stateIn(
+            scope = scope,
+            SharingStarted.WhileSubscribed(5000L),
+            null
+        )
+
+    override val gpsStrength: StateFlow<GpsStrength> = location
         .map { point ->
             when {
+                point == null || point.accuracy == 0f -> GpsStrength.NONE
                 point.accuracy <= 10f -> GpsStrength.STRONG
                 point.accuracy <= 20f -> GpsStrength.MODERATE
                 else -> GpsStrength.WEAK
@@ -55,70 +72,50 @@ class TrackerManagerImp @Inject constructor(
             GpsStrength.NONE
         )
 
-    private var isAct = false
-        set(value) {
-            _runState.update { runState ->
-                runState.copy(
-                    isAct = value
-                )
-            }
-            field = value
-        }
-
-    private var paused = false
-        set(value) {
-            _runState.update { runState ->
-                runState.copy(
-                    paused = value
-                )
-            }
-            field = value
-        }
-
-    private val _runState = MutableStateFlow(RunState())
-    override val runState = _runState.asStateFlow()
-
-    override val isRunAct: StateFlow<Boolean> = runState
-        .map { it.isAct }
-        .stateIn(
-            scope = scope,
-            SharingStarted.WhileSubscribed(5000L),
-            false
-        )
-
     private var job: Job? = null
-
     private var point: RunPathPoint? = null
     private var tDistance = 0f
-    private var cSegment: MutableList<RunPathPoint> = mutableListOf()
+    private var lastSegment: MutableList<RunPathPoint> = mutableListOf()
 
     private val timeCallback = { time: Long ->
-        _runState.update { runState ->
-            runState.copy(
+        _runState.update { state ->
+            state.copy(
                 durationMilliseconds = time
             )
         }
     }
 
     private fun updatePath(point: RunPathPoint) {
-        val newDistance = getDistance(
-            this@TrackerManagerImp.point,
-            point
-        )
-        tDistance += newDistance
+        _runState.update { state ->
+            val newDistance = getDistance(
+                this@TrackerManagerImp.point,
+                point
+            )
+            tDistance += newDistance
 
-        this@TrackerManagerImp.point = point
-        cSegment += point
+            this@TrackerManagerImp.point = point
+            lastSegment.add(
+                point
+            )
 
-        _runState.update { runState ->
-            val segments = runState.segments.dropLast(1) + listOf(cSegment.toList())
+            val isNewSegment = lastSegment.size == 1
 
-            val durationSeconds = runState.durationMilliseconds / 1000f
+            val segments = if (isNewSegment) {
+                state.segments + listOf(
+                    lastSegment.toList()
+                )
+            } else {
+                state.segments.dropLast(1) + listOf(
+                    lastSegment.toList()
+                )
+            }
+
+            val durationSeconds = state.durationMilliseconds / 1000f
             val avgSpeedMps = if (durationSeconds > 0) {
                 tDistance / durationSeconds
             } else 0f
 
-            runState.copy(
+            state.copy(
                 distanceMeters = tDistance,
                 avgSpeedMps = avgSpeedMps,
                 speedMps = point.speedMps,
@@ -127,27 +124,15 @@ class TrackerManagerImp @Inject constructor(
         }
     }
 
-    private fun resetRunState() {
-        _runState.update {
-            RunState()
-        }
-    }
-
     private fun pauseUpdatePath() {
-        if (cSegment.isNotEmpty()) {
-            _runState.update { state ->
-                state.copy(
-                    segments = state.segments + listOf(cSegment.toList())
-                )
-            }
-            cSegment = mutableListOf()
-        }
+        lastSegment = mutableListOf()
+        point = null
     }
 
     private fun startJob() {
         if (job?.isActive == true) return
 
-        job = locationTracker.locationFlow
+        job = locationTracker.activeTrackLocation
             .onEach { point ->
                 updatePath(point)
             }
@@ -161,12 +146,15 @@ class TrackerManagerImp @Inject constructor(
     }
 
     override fun start() {
-        if (isAct) return
-        cSegment = mutableListOf()
+        if (isAct.value) return
+        lastSegment = mutableListOf()
         point = null
         tDistance = 0f
-        resetRunState()
-        isAct = true
+        _runState.update {
+            RunState(
+                isAct = true
+            )
+        }
 
         runTrackServiceController.startRunTrackService()
         timeTracker.startTimer(timeCallback)
@@ -174,8 +162,12 @@ class TrackerManagerImp @Inject constructor(
     }
 
     override fun pause() {
-        if (paused) return
-        paused = true
+        if (runState.value.paused) return
+        _runState.update { state ->
+            state.copy(
+                paused = true
+            )
+        }
 
         pauseUpdatePath()
 
@@ -184,23 +176,31 @@ class TrackerManagerImp @Inject constructor(
     }
 
     override fun resume() {
-        if (!paused) return
-        paused = false
+        if (!runState.value.paused) return
+        _runState.update { state ->
+            state.copy(
+                paused = false
+            )
+        }
 
         timeTracker.resumeTimer(timeCallback)
         startJob()
     }
 
     override fun stop() {
-        isAct = false
-        paused = false
         pauseUpdatePath()
 
         runTrackServiceController.stopRunTrackService()
         timeTracker.stopTimer()
         stopJob()
+
         tDistance = 0f
-        resetRunState()
+        lastSegment = mutableListOf()
+        point = null
+
+        _runState.update {
+            RunState()
+        }
     }
 
 }

@@ -1,11 +1,10 @@
 package com.rk.pace.di
 
 import android.content.Context
-import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.rk.pace.background.service.RunTrackServiceControllerImp
 import com.rk.pace.data.tracking.GpsStatusTrackerImp
-import com.rk.pace.data.tracking.LocationRequest
 import com.rk.pace.data.tracking.LocationTrackerImp
 import com.rk.pace.data.tracking.TimeTrackerImp
 import com.rk.pace.data.tracking.TrackerManagerImp
@@ -20,14 +19,48 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineScope
+import javax.inject.Qualifier
 import javax.inject.Singleton
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class PassiveLocationRequest
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class ActiveTrackLocationRequest
 
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class TrackerModule {
 
     companion object {
+
+        @Provides
+        @Singleton
+        @PassiveLocationRequest
+        fun providePassiveLocationRequest(): com.google.android.gms.location.LocationRequest {
+            return com.google.android.gms.location.LocationRequest.Builder(
+                Priority.PRIORITY_BALANCED_POWER_ACCURACY,
+                10000L
+            )
+                .setMinUpdateIntervalMillis(5000L)
+                .build()
+        }
+
+        @Provides
+        @Singleton
+        @ActiveTrackLocationRequest
+        fun provideActiveTrackLocationRequest(): com.google.android.gms.location.LocationRequest {
+            return com.google.android.gms.location.LocationRequest.Builder(
+                Priority.PRIORITY_HIGH_ACCURACY,
+                2000L
+            )
+                .setMinUpdateIntervalMillis(1000L)
+                .setMinUpdateDistanceMeters(1f)
+                .setWaitForAccurateLocation(true)
+                .build()
+        }
 
         @Singleton
         @Provides
@@ -36,27 +69,18 @@ abstract class TrackerModule {
         ) = LocationServices
             .getFusedLocationProviderClient(context)
 
-        @Singleton
-        @Provides
-        fun provideLocationTracker(
-            @ApplicationContext context: Context,
-            @ApplicationDefaultCoroutineScope scope: CoroutineScope,
-            fusedLocationProviderClient: FusedLocationProviderClient
-        ): LocationTracker {
-            return LocationTrackerImp(
-                context = context,
-                scope = scope,
-                fusedLocationProviderClient = fusedLocationProviderClient,
-                locationRequest = LocationRequest.locationRequest.build()
-            )
-        }
-
     }
 
     @Binds
     @Singleton
+    abstract fun provideLocationTracker(
+        locationTracker: LocationTrackerImp
+    ): LocationTracker
+
+    @Binds
+    @Singleton
     abstract fun provideGpsStatusTracker(
-        gpsStatusTrackerImp: GpsStatusTrackerImp
+        gpsStatusTracker: GpsStatusTrackerImp
     ): GpsStatusTracker
 
     @Binds

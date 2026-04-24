@@ -2,7 +2,6 @@ package com.rk.pace.presentation.screens.active_run
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
@@ -22,11 +21,5 @@ fun SaveRunScreenRoot(
         onAction = viewModel::onAction,
         onBack = onBack,
     )
-
-    LaunchedEffect(key1 = state.isRunSaved) {
-        if (state.isRunSaved) {
-            onBack()
-        }
-    }
 
 }

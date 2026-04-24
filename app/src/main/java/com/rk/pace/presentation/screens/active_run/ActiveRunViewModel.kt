@@ -90,6 +90,13 @@ class ActiveRunViewModel @Inject constructor(
                     )
                 }
             }
+            is ActiveRunAction.ClearSaveError -> {
+                _state.update {
+                    it.copy(
+                        saveError = null
+                    )
+                }
+            }
 
             is ActiveRunAction.DismissAllRationale -> {
                 _state.update {
@@ -296,7 +303,8 @@ class ActiveRunViewModel @Inject constructor(
             } else {
                 _state.update {
                     it.copy(
-                        saving = false
+                        saving = false,
+                        saveError = "Try Again"
                     )
                 }
             }

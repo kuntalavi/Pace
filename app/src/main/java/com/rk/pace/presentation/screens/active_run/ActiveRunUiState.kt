@@ -14,5 +14,6 @@ data class ActiveRunUiState(
 
     val runTitle: String = "",
     val saving: Boolean = false,
-    val isRunSaved: Boolean = false
+    val isRunSaved: Boolean = false,
+    val saveError: String? = null
 )

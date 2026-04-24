@@ -9,6 +9,7 @@ sealed interface ActiveRunAction {
     data class OnRunTitleChange(
         val title: String
     ) : ActiveRunAction
+    object ClearSaveError : ActiveRunAction
 
     object DismissAllRationale : ActiveRunAction
     object RequestLocationPermission : ActiveRunAction

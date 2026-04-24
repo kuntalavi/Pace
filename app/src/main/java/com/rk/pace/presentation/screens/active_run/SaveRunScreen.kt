@@ -18,8 +18,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,11 +51,35 @@ fun SaveRunScreen(
 ) {
 
     var mapLoaded by remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(
+        key1 = state.isRunSaved
+    ) {
+        if (state.isRunSaved) {
+            onBack()
+        }
+    }
+
+    LaunchedEffect(
+        key1 = state.saveError
+    ) {
+        val error = state.saveError
+        if (error != null) {
+            onAction(ActiveRunAction.ClearSaveError)
+
+            snackbarHostState.showSnackbar(
+                message = error,
+                withDismissAction = true
+            )
+        }
+    }
 
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
         Scaffold(
+            snackbarHost = { SnackbarHost(snackbarHostState) },
             topBar = {
                 CenterAlignedTopAppBar(
                     title = {

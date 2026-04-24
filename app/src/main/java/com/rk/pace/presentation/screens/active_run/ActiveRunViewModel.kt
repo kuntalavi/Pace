@@ -15,6 +15,7 @@ import com.rk.pace.domain.tracking.TrackerManager
 import com.rk.pace.domain.use_case.run.SaveRunUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -251,35 +252,55 @@ class ActiveRunViewModel @Inject constructor(
             )
         }
 
-        scope.launch {
-            val currentUserId = getCurrentUserIdUseCase() ?: return@launch
-            val run = runState.value
-            val encodedPath = MapUt.encodeSegments(run.segments)
-            val r = Run(
-                userId = currentUserId,
-                timestamp = run.timestamp,
-                durationMilliseconds = run.durationMilliseconds,
-                distanceMeters = run.distanceMeters,
-                avgSpeedMps = run.avgSpeedMps,
-                encodedPath = encodedPath,
-                title = state.value.runTitle,
-                likes = 0,
-                likedBy = emptyList()
-            )
-            val path = run.segments.toList()
-            saveRunUseCase(
-                RunWithPath(
-                    run = r,
-                    path = path
-                )
-            )
-            trackerManager.stop()
-            _state.update {
-                it.copy(
-                    isRunSaved = true,
-                    saving = false,
-                )
+        viewModelScope.launch {
+
+            val defferedSave = scope.async {
+                try {
+                    val currentUserId = getCurrentUserIdUseCase() ?: return@async false
+                    val run = runState.value
+                    val encodedPath = MapUt.encodeSegments(run.segments)
+                    val r = Run(
+                        userId = currentUserId,
+                        timestamp = run.timestamp,
+                        durationMilliseconds = run.durationMilliseconds,
+                        distanceMeters = run.distanceMeters,
+                        avgSpeedMps = run.avgSpeedMps,
+                        encodedPath = encodedPath,
+                        title = state.value.runTitle,
+                        likes = 0,
+                        likedBy = emptyList()
+                    )
+                    val path = run.segments.toList()
+                    saveRunUseCase(
+                        RunWithPath(
+                            run = r,
+                            path = path
+                        )
+                    )
+                    true
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    false
+                }
             }
+            val success = defferedSave.await()
+
+            if (success) {
+                trackerManager.stop()
+                _state.update {
+                    it.copy(
+                        isRunSaved = true,
+                        saving = false,
+                    )
+                }
+            } else {
+                _state.update {
+                    it.copy(
+                        saving = false
+                    )
+                }
+            }
+
         }
     }
 

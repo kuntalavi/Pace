@@ -1,75 +1,202 @@
 package com.rk.pace.presentation.screens.active_run.components
 
+import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.rk.pace.presentation.screens.active_run.ActiveRunViewModel
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
+import com.rk.pace.common.Constants.shape
+import com.rk.pace.common.extension.hasPreciseForegroundLocationPermission
+import com.rk.pace.domain.model.RunPathPoint
+import com.rk.pace.domain.model.RunState
+import com.rk.pace.domain.tracking.GpsStrength
+import com.rk.pace.theme.Gray
+import com.rk.pace.theme.arrowLeft
 
+@SuppressLint("ConfigurationScreenWidthHeight")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Content(
-    viewModel: ActiveRunViewModel,
-    ready: Boolean = true,
-    notReadyActionText: String = "Enable Location",
-    onNotReadyTrackingClick: () -> Unit = {},
-    onStartRun: () -> Unit = viewModel::startRun,
-    onResumeRun: () -> Unit = viewModel::resumeRun,
-    goToSaveRun: () -> Unit,
-    goBack: () -> Unit
+    modifier: Modifier = Modifier,
+    warning: String?,
+    runState: RunState,
+    location: RunPathPoint?,
+    gpsStrength: GpsStrength,
+    onStartRun: () -> Unit,
+    onResumeRun: () -> Unit,
+    onPauseRun: () -> Unit,
+    onStopRun: () -> Unit,
+    onBackClick: () -> Unit
 ) {
 
-    val runState by viewModel.runState.collectAsStateWithLifecycle()
-    val location by viewModel.location.collectAsStateWithLifecycle()
-    val gpsStrength by viewModel.gpsStrength.collectAsStateWithLifecycle()
-    val gpsEnabled by viewModel.gpsEnabled.collectAsStateWithLifecycle()
-
     var mapLoaded by rememberSaveable { mutableStateOf(false) }
-    val startText = when {
-        !ready -> notReadyActionText
-        gpsEnabled == false -> "Turn GPS On"
-        else -> "Start Run"
-    }
-    val resumeText = when {
-        !ready -> notReadyActionText.uppercase()
-        gpsEnabled == false -> "TURN GPS ON"
-        else -> "RESUME"
-    }
 
-    ActiveRunContent(
-        runState = runState,
-        location = location,
-        gpsStrength = gpsStrength,
-        mapLoaded = mapLoaded,
-        onMapLoaded = { mapLoaded = true },
-        onStartClick = {
-            if (ready) {
-                onStartRun()
-            } else {
-                onNotReadyTrackingClick()
-            }
-        },
-        onPauseClick = {
-            viewModel.pauseRun()
-        },
-        onResumeClick = {
-            if (ready) {
-                onResumeRun()
-            } else {
-                onNotReadyTrackingClick()
-            }
-        },
-        onStopClick = {
-            viewModel.pauseRun()
-            goToSaveRun()
-        },
-        onBackClick = goBack,
-        startText = startText,
-        resumeText = resumeText
+    val scaffoldState = rememberBottomSheetScaffoldState(
+        bottomSheetState = rememberStandardBottomSheetState(
+            initialValue = SheetValue.PartiallyExpanded,
+            skipHiddenState = true
+        )
     )
+    val context = LocalContext.current
+    var moveToUserTrigger by remember { mutableIntStateOf(0) }
 
+    Box(
+        modifier = modifier.fillMaxSize()
+    ) {
+        BottomSheetScaffold(
+            scaffoldState = scaffoldState,
+            sheetContainerColor = colorScheme.surface,
+            containerColor = colorScheme.surface,
+            sheetContent = {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(colorScheme.surface)
+                        .padding(
+                            horizontal = 20.dp
+                        )
+                ) {
+                    RunBottomSheet(
+                        runState = runState,
+                        isMapLoaded = mapLoaded,
+                        start = onStartRun,
+                        pause = onPauseRun,
+                        resume = onResumeRun,
+                        stop = onStopRun
+                    )
+                }
+            },
+            sheetShape = RectangleShape,
+            sheetPeekHeight = 200.dp,
+            sheetMaxWidth = Dp.Unspecified
+        ) { p ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(p)
+            ) {
+                RunMap(
+                    modifier = Modifier.fillMaxSize(),
+                    segments = runState.segments,
+                    currentLocation = location,
+                    moveToUserTrigger = moveToUserTrigger,
+                    isAct = runState.isAct,
+                    paused = runState.paused,
+                    bottomPaddingDp = 0.dp,
+                    onMapLoadedCallback = { mapLoaded = true }
+                )
 
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.TopCenter)
+                        .windowInsetsPadding(WindowInsets.statusBars)
+                        .padding(15.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+
+                    WarnBanner(
+                        message = warning
+                    )
+
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+
+                        AnimatedVisibility(
+                            visible = runState.isAct,
+                            exit = androidx.compose.animation.fadeOut()
+                        ) {
+                            IconButton(
+                                onClick = onBackClick,
+                                modifier = Modifier.background(
+                                    colorScheme.surface,
+                                    shape = shape
+                                )
+                            ) {
+                                Icon(
+                                    imageVector = arrowLeft,
+                                    contentDescription = null
+                                )
+                            }
+                        }
+                        IconButton(
+                            onClick = { },
+                            modifier = Modifier.background(
+                                colorScheme.surface,
+                                shape = shape
+                            )
+                        ) {
+                            GpsStrengthIndicator(
+                                strength = gpsStrength
+                            )
+                        }
+                    }
+
+                    IconButton(
+                        onClick = { moveToUserTrigger++ },
+                        enabled = context.hasPreciseForegroundLocationPermission(),
+                        modifier = Modifier.background(
+                            colorScheme.surface,
+                            shape = shape
+                        )
+                    ) {
+                        Icon(
+                            imageVector = com.rk.pace.theme.location,
+                            contentDescription = null,
+                            tint = Gray
+                        )
+                    }
+                }
+            }
+        }
+        AnimatedVisibility(
+            visible = !mapLoaded,
+            exit = androidx.compose.animation.fadeOut()
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        colorScheme.surface
+                    )
+                    .zIndex(2f),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+    }
 }

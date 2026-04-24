@@ -16,11 +16,10 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,31 +29,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.rk.pace.domain.model.Run
+import com.rk.pace.domain.model.RunState
 import com.rk.pace.presentation.components.ButtonVariant
 import com.rk.pace.presentation.components.PaceButton
 import com.rk.pace.presentation.components.PaceInputBox
-import com.rk.pace.presentation.screens.run_stats.components.RunStatsMap
 import com.rk.pace.presentation.components.Summary
+import com.rk.pace.presentation.screens.run_stats.components.RunStatsMap
 import com.rk.pace.theme.delete
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SaveRunScreen(
-    viewModel: ActiveRunViewModel,
-    goBack: () -> Unit
+    state: ActiveRunUiState,
+    runState: RunState,
+    onAction: (ActiveRunAction) -> Unit,
+    onBack: () -> Unit
 ) {
 
-    val runState by viewModel.runState.collectAsStateWithLifecycle()
-    val state by viewModel.state.collectAsStateWithLifecycle()
-    var isMapLoaded by remember { mutableStateOf(false) }
-
-    LaunchedEffect(key1 = state.saved) {
-        if (state.saved) {
-            goBack()
-        }
-    }
+    var mapLoaded by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -65,7 +58,7 @@ fun SaveRunScreen(
                     title = {
                         Text(
                             text = "SAVE RUN",
-                            style = MaterialTheme.typography.titleLarge.copy(
+                            style = typography.titleLarge.copy(
                                 fontWeight = FontWeight.Bold,
                                 letterSpacing = 1.sp
                             )
@@ -74,8 +67,8 @@ fun SaveRunScreen(
                     actions = {
                         IconButton(
                             onClick = {
-                                viewModel.stopRun()
-                                goBack()
+                                onAction(ActiveRunAction.OnStopClick)
+                                onBack()
                             }
                         ) {
                             Icon(
@@ -97,9 +90,9 @@ fun SaveRunScreen(
                         modifier = Modifier.fillMaxWidth(.9f),
                         text = "SAVE RUN",
                         onClick = {
-                            viewModel.saveRun()
+                            onAction(ActiveRunAction.OnSaveClick)
                         },
-                        enabled = isMapLoaded && !state.saving,
+                        enabled = mapLoaded && !state.saving,
                         variant = ButtonVariant.Filled,
                         load = state.saving
                     )
@@ -123,7 +116,7 @@ fun SaveRunScreen(
                     segments = runState.segments,
                     bottomPaddingDp = 0.dp,
                     onMapLoadedCallback = {
-                        isMapLoaded = true
+                        mapLoaded = true
                     }
                 )
 
@@ -131,9 +124,13 @@ fun SaveRunScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 10.dp),
-                    value = state.title,
+                    value = state.runTitle,
                     onValueChange = { title ->
-                        viewModel.onTitleChange(title)
+                        onAction(
+                            ActiveRunAction.OnRunTitleChange(
+                                title = title
+                            )
+                        )
                     },
                     placeholder = "TITLE"
                 )
@@ -146,14 +143,14 @@ fun SaveRunScreen(
                         durationMilliseconds = runState.durationMilliseconds,
                         avgSpeedMps = runState.avgSpeedMps,
                         encodedPath = emptyList(),
-                        title = state.title,
+                        title = state.runTitle,
                         likes = 0,
                         likedBy = emptyList()
                     )
                 )
             }
         }
-        if (!isMapLoaded) {
+        if (!mapLoaded) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center

@@ -30,7 +30,7 @@ import com.rk.pace.domain.model.RunPathPoint
 fun RunMap(
     modifier: Modifier,
     segments: List<List<RunPathPoint>>,
-    currentLocation: RunPathPoint,
+    currentLocation: RunPathPoint?,
     moveToUserTrigger: Int,
     isAct: Boolean,
     paused: Boolean,
@@ -77,7 +77,7 @@ fun RunMap(
         }
 
         MapEffect(key1 = moveToUserTrigger) {
-            if (currentLocation.lat != 0.0) {
+            if (currentLocation != null) {
                 cameraPositionState.animate(
                     update = CameraUpdateFactory.newLatLngZoom(
                         LatLng(
@@ -97,7 +97,7 @@ fun RunMap(
             key3 = paused
         ) {
             if (!isAct || paused) {
-                if (currentLocation.lat != 0.0) {
+                if (currentLocation != null) {
                     cameraPositionState.animate(
                         update = CameraUpdateFactory.newLatLngZoom(
                             LatLng(

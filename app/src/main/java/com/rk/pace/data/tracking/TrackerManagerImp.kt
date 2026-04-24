@@ -12,6 +12,7 @@ import com.rk.pace.domain.tracking.TrackerManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -21,6 +22,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
@@ -51,11 +53,18 @@ class TrackerManagerImp @Inject constructor(
         isAct.flatMapLatest { isAct ->
             if (isAct) locationTracker.activeTrackLocation
             else locationTracker.passiveLocation
-        }.stateIn(
-            scope = scope,
-            SharingStarted.WhileSubscribed(5000L),
-            null
-        )
+        }
+            .retryWhen { cause, _ ->
+                if (cause is SecurityException) {
+                    delay(2000L)
+                    true
+                } else false
+            }
+            .stateIn(
+                scope = scope,
+                SharingStarted.WhileSubscribed(5000L),
+                null
+            )
 
     override val gpsStrength: StateFlow<GpsStrength> = location
         .map { point ->
@@ -133,6 +142,12 @@ class TrackerManagerImp @Inject constructor(
         if (job?.isActive == true) return
 
         job = locationTracker.activeTrackLocation
+            .retryWhen { cause, _ ->
+                if (cause is SecurityException) {
+                    delay(2000L)
+                    true
+                } else false
+            }
             .onEach { point ->
                 updatePath(point)
             }

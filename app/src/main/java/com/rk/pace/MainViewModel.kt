@@ -10,5 +10,5 @@ class MainViewModel @Inject constructor(
     trackerManager: TrackerManager
 ): ViewModel() {
 
-    val isRunAct = trackerManager.isRunAct
+    val isRunAct = trackerManager.isAct
 }

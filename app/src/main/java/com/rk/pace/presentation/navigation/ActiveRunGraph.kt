@@ -5,8 +5,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.rk.pace.presentation.screens.active_run.ActiveRunViewModel
-import com.rk.pace.presentation.screens.active_run.RunScreen
-import com.rk.pace.presentation.screens.active_run.SaveRunScreen
+import com.rk.pace.presentation.screens.active_run.RunScreenRoot
+import com.rk.pace.presentation.screens.active_run.SaveRunScreenRoot
 
 fun NavGraphBuilder.activeRunNavGraph(
     navController: NavController
@@ -26,7 +26,7 @@ fun NavGraphBuilder.activeRunNavGraph(
                     Route.Root.ActiveRun::class
                 )
 
-            RunScreen(
+            RunScreenRoot(
                 viewModel = viewModel,
                 goBack = { navController.popBackStack() },
                 goToSaveRun = {
@@ -45,9 +45,9 @@ fun NavGraphBuilder.activeRunNavGraph(
                     Route.Root.ActiveRun::class
                 )
 
-            SaveRunScreen(
+            SaveRunScreenRoot(
                 viewModel = viewModel,
-                goBack = {
+                onBack = {
                     navController.navigate(
                         Route.Root.BotNav
                     ) {

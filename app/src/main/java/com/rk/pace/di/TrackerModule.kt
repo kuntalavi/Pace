@@ -20,16 +20,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Qualifier
 import javax.inject.Singleton
-
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class PassiveLocationRequest
-
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class ActiveTrackLocationRequest
 
 @Module
 @InstallIn(SingletonComponent::class)

@@ -3,8 +3,12 @@ package com.rk.pace.presentation.navigation
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -16,8 +20,13 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -66,6 +75,15 @@ fun PaceNavGraph(
         }
     }
 
+    val density = LocalDensity.current
+    var bottomNavHeight by remember { mutableStateOf(100.dp) }
+
+    val animatedBottomPadding by animateDpAsState(
+        targetValue = if (showBotNavBar) bottomNavHeight else 0.dp,
+        animationSpec = tween(durationMillis = 300),
+        label = ""
+    )
+
     Scaffold(
         topBar = {
             if (showTopBar) {
@@ -101,12 +119,46 @@ fun PaceNavGraph(
                     }
                 )
             }
-        },
-        bottomBar = {
+        }
+    ) { p ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = if (showTopBar) p.calculateTopPadding() else 0.dp)
+        ) {
+            NavHost(
+                modifier = Modifier.padding(
+                    bottom = animatedBottomPadding
+                ),
+                navController = navController,
+                startDestination = startDestination,
+                enterTransition = { defaultEnterTransition() },
+                exitTransition = { defaultExitTransition() },
+                popEnterTransition = { defaultPopEnterTransition() },
+                popExitTransition = { defaultPopExitTransition() }
+            ) {
+
+                rootNavGraph(navController)
+
+                authNavGraph(navController)
+
+                botNavGraph(navController)
+
+                activeRunNavGraph(navController)
+
+            }
+
             AnimatedVisibility(
                 visible = showBotNavBar,
                 enter = slideInVertically(initialOffsetY = { it }),
-                exit = slideOutVertically(targetOffsetY = { it })
+                exit = slideOutVertically(targetOffsetY = { it }),
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .onSizeChanged(
+                        onSizeChanged = { size ->
+                            bottomNavHeight = with(density) { size.height.toDp() }
+                        }
+                    )
             ) {
                 PaceBotNavBar(
                     destination = destination
@@ -120,29 +172,6 @@ fun PaceNavGraph(
                     }
                 }
             }
-        }
-    ) { p ->
-        NavHost(
-            modifier = Modifier.padding(
-                top = if (showTopBar) p.calculateTopPadding() else 0.dp,
-                bottom = p.calculateBottomPadding()
-            ),
-            navController = navController,
-            startDestination = startDestination,
-            enterTransition = { defaultEnterTransition() },
-            exitTransition = { defaultExitTransition() },
-            popEnterTransition = { defaultPopEnterTransition() },
-            popExitTransition = { defaultPopExitTransition() }
-        ) {
-
-            rootNavGraph(navController)
-
-            authNavGraph(navController)
-
-            botNavGraph(navController)
-
-            activeRunNavGraph(navController)
-
         }
     }
 }

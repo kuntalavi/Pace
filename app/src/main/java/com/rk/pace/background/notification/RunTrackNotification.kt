@@ -13,6 +13,8 @@ import com.rk.pace.MainActivity
 import com.rk.pace.R
 import com.rk.pace.background.service.RunTrackService
 import com.rk.pace.presentation.navigation.Route
+import com.rk.pace.presentation.ut.FormatUt.formatDistance
+import com.rk.pace.presentation.ut.FormatUt.formatDuration
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -21,7 +23,7 @@ class RunTrackNotification @Inject constructor(
 ) {
 
     companion object {
-        private const val RUN_TRACK_NOTIFICATION_CHANNEL_ID = "r_track_notification"
+        private const val RUN_TRACK_NOTIFICATION_CHANNEL_ID = "track_notification"
         private const val RUN_TRACK_NOTIFICATION_CHANNEL_NAME = "Run Track"
         const val RUN_TRACK_NOTIFICATION_ID = 3
     }
@@ -49,34 +51,48 @@ class RunTrackNotification @Inject constructor(
             .setSmallIcon(R.mipmap.ic_launcher)
             .setAutoCancel(false)
             .setOngoing(true)
-            .setContentTitle("Time")
-            .setContentText("00:00:00")
             .setContentIntent(intentToRunScreen)
             .setSilent(true)
 
-    private fun getNotificationAction(): NotificationCompat.Action {
+    private fun getPauseResumeAction(paused: Boolean): NotificationCompat.Action {
+        val actionText = if (paused) "Resume" else "Pause"
+
+        val serviceAction = if (paused) {
+            RunTrackService.ACTION_RESUME_SERVICE
+        } else {
+            RunTrackService.ACTION_PAUSE_SERVICE
+        }
+
+        val intent = Intent(context, RunTrackService::class.java).apply {
+            action = serviceAction
+        }
+        val pendingIntent = PendingIntent.getService(
+            context,
+            1,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
         return NotificationCompat.Action(
             R.drawable.ic_launcher_foreground,
-            "Pause",
-            PendingIntent.getService(
-                context,
-                43,
-                Intent(
-                    context,
-                    RunTrackService::class.java,
-                ).apply {
-                    action = RunTrackService.ACTION_PAUSE_SERVICE
-                },
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-            )
+            actionText,
+            pendingIntent
         )
     }
 
-    fun updateNotification(durationMilliseconds: Long) {
+    fun updateNotification(
+        paused: Boolean,
+        distanceMeters: Float,
+        durationMilliseconds: Long
+    ) {
+        val distance = formatDistance(distanceMeters)
+        val time = formatDuration(durationMilliseconds)
+
         val notification = baseNotification
-            .setContentText("$durationMilliseconds")
+            .setContentTitle("$distance km")
+            .setContentText(time)
             .clearActions()
-            .addAction(getNotificationAction())
+            .addAction(getPauseResumeAction(paused))
             .build()
 
         notificationManager.notify(RUN_TRACK_NOTIFICATION_ID, notification)
@@ -99,4 +115,5 @@ class RunTrackNotification @Inject constructor(
         )
         notificationManager.createNotificationChannel(notificationChannel)
     }
+
 }

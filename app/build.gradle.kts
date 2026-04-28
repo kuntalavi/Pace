@@ -1,24 +1,18 @@
-import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kserialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.firebase.crashlytics)
+    alias(libs.plugins.secrets)
 }
-
-val properties = Properties()
-properties.load(project.rootProject.file("local.properties").inputStream())
 
 android {
     namespace = "com.rk.pace"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.rk.pace"
@@ -29,21 +23,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField(
-            "String",
-            "GOOGLE_MAPS_API_KEY",
-            "\"${properties.getProperty("GOOGLE_MAPS_API_KEY")}\""
-        )
-
-        buildConfigField(
-            "String",
-            "MAPBOX_ACCESS_TOKEN",
-            "\"${properties.getProperty("MAPBOX_ACCESS_TOKEN")}\""
-        )
-
-        manifestPlaceholders[
-            "GOOGLE_MAPS_API_KEY"
-        ] = properties.getProperty("GOOGLE_MAPS_API_KEY")
     }
 
     buildTypes {
@@ -56,13 +35,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    kotlin {
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
-        }
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
     buildFeatures {
         compose = true

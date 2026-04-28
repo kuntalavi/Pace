@@ -1,9 +1,5 @@
 package com.rk.pace.presentation.screens.active_run.components
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -21,42 +17,37 @@ import com.rk.pace.theme.close
 
 @Composable
 fun WarnBanner(
-    modifier: Modifier = Modifier,
     message: String?
 ) {
-    AnimatedVisibility(
-        visible = message != null,
-        enter = expandVertically(animationSpec = tween(300)),
-        exit = shrinkVertically(animationSpec = tween(300)),
-        modifier = modifier
+
+    if (message == null) return
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(colorScheme.errorContainer)
+            .padding(
+                vertical = 12.dp,
+                horizontal = 16.dp
+            ),
+        contentAlignment = Alignment.CenterStart
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(colorScheme.errorContainer)
-                .padding(
-                    vertical = 12.dp,
-                    horizontal = 16.dp
-                ),
-            contentAlignment = Alignment.CenterStart
+        Row(
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = close,
-                    contentDescription = null,
-                    tint = colorScheme.onErrorContainer,
-                    modifier = Modifier.padding(
-                        end = 12.dp
-                    )
+            Icon(
+                imageVector = close,
+                contentDescription = null,
+                tint = colorScheme.onErrorContainer,
+                modifier = Modifier.padding(
+                    end = 12.dp
                 )
-                Text(
-                    text = message ?: "",
-                    color = colorScheme.onErrorContainer,
-                    style = typography.bodyMedium
-                )
-            }
+            )
+            Text(
+                text = message,
+                color = colorScheme.onErrorContainer,
+                style = typography.bodyMedium
+            )
         }
     }
 }

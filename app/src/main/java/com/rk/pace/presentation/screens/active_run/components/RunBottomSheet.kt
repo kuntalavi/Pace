@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -16,27 +15,28 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.rk.pace.common.extension.formatDistance
-import com.rk.pace.common.extension.formatTime
-import com.rk.pace.common.ut.PaceUt.getPace
 import com.rk.pace.domain.model.RunState
 import com.rk.pace.presentation.components.ButtonSize
 import com.rk.pace.presentation.components.ButtonVariant
 import com.rk.pace.presentation.components.PaceButton
-import com.rk.pace.presentation.components.StatItem
+import com.rk.pace.presentation.components.PaceStatItem
+import com.rk.pace.presentation.components.StatItemStyle
+import com.rk.pace.presentation.ut.FormatUt.formatDistance
+import com.rk.pace.presentation.ut.FormatUt.formatDuration
+import com.rk.pace.presentation.ut.FormatUt.formatPace
 import kotlinx.coroutines.delay
 
 data class StatPage(
-    val title: String,
-    val value: String
+    val label: String,
+    val value: String,
+    val unit: String?
 )
 
 @Composable
 fun RunBottomSheet(
+    modifier: Modifier = Modifier,
     runState: RunState,
-    isMapLoaded: Boolean,
-    startText: String = "Start Run",
-    resumeText: String = "RESUME",
+    mapLoaded: Boolean,
     start: () -> Unit,
     pause: () -> Unit,
     resume: () -> Unit,
@@ -44,16 +44,16 @@ fun RunBottomSheet(
 ) {
 
     val stats = listOf(
-        StatPage("DISTANCE", runState.distanceMeters.formatDistance()),
-        StatPage("DURATION", runState.durationMilliseconds.formatTime()),
-        StatPage("AVG PACE", getPace(runState.avgSpeedMps))
+        StatPage("DISTANCE", formatDistance(runState.distanceMeters), "KM"),
+        StatPage("DURATION", formatDuration(runState.durationMilliseconds), null),
+        StatPage("AVG PACE", formatPace(runState.avgSpeedMps), "/KM")
     )
 
     val pagerState = rememberPagerState(pageCount = { stats.size })
 
     LaunchedEffect(Unit) {
         while (true) {
-            delay(2000L)
+            delay(5000L)
             val nextPage = (pagerState.currentPage + 1) % stats.size
             pagerState.animateScrollToPage(
                 nextPage,
@@ -65,82 +65,90 @@ fun RunBottomSheet(
         }
     }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+        contentAlignment = Alignment.TopStart
     ) {
-
-        HorizontalPager(
-            modifier = Modifier
+        Column(
+            modifier = modifier
                 .fillMaxWidth()
-                .height(100.dp),
-            state = pagerState,
-            verticalAlignment = Alignment.CenterVertically
-        ) { page ->
-            val stat = stats[page]
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                StatItem(
-                    title = stat.title,
-                    value = stat.value
-                )
-            }
-        }
+                .wrapContentHeight(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
 
-        if (!runState.isAct) {
-            PaceButton(
+            HorizontalPager(
                 modifier = Modifier
                     .fillMaxWidth(),
-                text = startText.uppercase(),
-                onClick = {
-                    start()
-                },
-                variant = ButtonVariant.Filled,
-                enabled = isMapLoaded,
-                size = ButtonSize.LARGE
-            )
-        } else if (!runState.paused) {
-            PaceButton(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                text = "PAUSE",
-                onClick = {
-                    pause()
-                },
-                variant = ButtonVariant.Filled,
-                size = ButtonSize.LARGE
-            )
-        } else {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround
-            ) {
+                state = pagerState,
+                verticalAlignment = Alignment.CenterVertically
+            ) { page ->
+                val stat = stats[page]
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    PaceStatItem(
+                        value = stat.value,
+                        label = stat.label,
+                        unit = stat.unit,
+                        style = StatItemStyle.Hero
+                    )
+                }
+            }
+
+            if (!runState.isAct) {
                 PaceButton(
-                    modifier = Modifier.fillMaxWidth(.4f),
-                    text = resumeText,
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    text = "START",
                     onClick = {
-                        resume()
+                        start()
+                    },
+                    variant = ButtonVariant.Filled,
+                    enabled = mapLoaded,
+                    size = ButtonSize.LARGE
+                )
+            } else if (!runState.paused) {
+                PaceButton(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    text = "PAUSE",
+                    onClick = {
+                        pause()
                     },
                     variant = ButtonVariant.Filled,
                     size = ButtonSize.LARGE
                 )
-                PaceButton(
-                    modifier = Modifier.fillMaxWidth(.6f),
-                    text = "STOP",
-                    onClick = {
-                        stop()
-                    },
-                    variant = ButtonVariant.Filled,
-                    size = ButtonSize.LARGE
-                )
+            } else {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    PaceButton(
+                        modifier = Modifier.fillMaxWidth(.4f),
+                        text = "RESUME",
+                        onClick = {
+                            resume()
+                        },
+                        variant = ButtonVariant.Filled,
+                        size = ButtonSize.LARGE
+                    )
+                    PaceButton(
+                        modifier = Modifier.fillMaxWidth(.6f),
+                        text = "STOP",
+                        onClick = {
+                            stop()
+                        },
+                        variant = ButtonVariant.Filled,
+                        size = ButtonSize.LARGE
+                    )
+                }
             }
-        }
 
+        }
     }
 }

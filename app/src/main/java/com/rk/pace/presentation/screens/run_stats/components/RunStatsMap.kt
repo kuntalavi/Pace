@@ -1,7 +1,7 @@
 package com.rk.pace.presentation.screens.run_stats.components
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -9,6 +9,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.ButtCap
+import com.google.android.gms.maps.model.JointType
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapEffect
@@ -18,9 +20,9 @@ import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.rk.pace.R
+import com.rk.pace.common.ut.MapUt.getBounds
 import com.rk.pace.common.ut.PathUt.toLatL
 import com.rk.pace.domain.model.RunPathPoint
-import com.rk.pace.presentation.screens.active_run.components.getBounds
 import kotlinx.coroutines.launch
 
 @OptIn(MapsComposeExperimentalApi::class)
@@ -89,7 +91,10 @@ fun RunStatsMap(
             if (segment.size > 1) {
                 Polyline(
                     points = segment,
-                    color = MaterialTheme.colorScheme.primary
+                    color = colorScheme.primary,
+                    startCap = ButtCap(),
+                    endCap = ButtCap(),
+                    jointType = JointType.BEVEL
                 )
             }
         }

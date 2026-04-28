@@ -8,8 +8,10 @@ object FormatUt {
 
     fun formatDistance(meters: Float): String {
         if (meters == 0f) return "-"
-        val km = meters / 1000f
-        return "%.2f".format(km)
+        val km = "%.2f".format(meters / 1000f)
+
+        return if (km[2] == '0' && km[0] == '0') "0"
+        else km
     }
 
     fun formatPace(speedMps: Float): String {
@@ -31,7 +33,7 @@ object FormatUt {
         val minutes = (s % 3600) / 60
         val seconds = s % 60
 
-        return if (hours >0){
+        return if (hours > 0) {
             "%d:%02d:%02d".format(hours, minutes, seconds)
         } else {
             "%02d:%02d".format(minutes, seconds)

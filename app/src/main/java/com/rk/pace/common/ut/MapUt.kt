@@ -1,6 +1,8 @@
 package com.rk.pace.common.ut
 
 import android.net.Uri
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.rk.pace.BuildConfig
 import com.rk.pace.domain.model.RunPathPoint
 import kotlin.math.roundToInt
@@ -8,7 +10,25 @@ import kotlin.math.roundToInt
 object MapUt {
 
     private const val MAPBOX_ACCESS_TOKEN = BuildConfig.MAPBOX_ACCESS_TOKEN
-    private const val BASE_URL = "https://api.mapbox.com/styles/v1/mapbox/outdoors-v12/static"
+    private const val MAP_STYLE = "mapbox/outdoors-v12"
+    private const val BASE_URL = "https://api.mapbox.com/styles/v1/${MAP_STYLE}/static"
+
+    fun getBounds(
+        segments: List<List<RunPathPoint>>
+    ): LatLngBounds {
+        val boundsB = LatLngBounds.Builder()
+        segments.forEach { segment ->
+            segment.forEach { point ->
+                boundsB.include(
+                    LatLng(
+                        point.lat,
+                        point.long
+                    )
+                )
+            }
+        }
+        return boundsB.build()
+    }
 
     fun encodeSegments(segments: List<List<RunPathPoint>>): List<String> {
         return segments.map { segment ->
@@ -49,17 +69,19 @@ object MapUt {
 
     fun buildStaticMapUrl(
         encodedPath: List<String>,
-        width: Int = 600,
-        height: Int = 300,
+        width: Int,
+        height: Int,
         color: String = "f44336"
     ): String {
 
-        val overlays = encodedPath.joinToString(",") { encoded ->
-            (if (encoded.isNotBlank()) {
+        val pathWidth = 10
+
+        val overlays = encodedPath
+            .filter { it.isNotBlank() }
+            .joinToString(",") { encoded ->
                 val safeEncoded = Uri.encode(encoded)
-                "path-5+$color($safeEncoded)"
-            } else null).toString()
-        }
+                "path-${pathWidth}+$color($safeEncoded)"
+            }
         if (overlays.isEmpty()) return ""
 
         val attribution = "attribution=false"
@@ -67,6 +89,7 @@ object MapUt {
 
         val url =
             "$BASE_URL/$overlays/auto/${width}x${height}@2x?${attribution}&${logo}&access_token=${MAPBOX_ACCESS_TOKEN}"
+
         return url
     }
 

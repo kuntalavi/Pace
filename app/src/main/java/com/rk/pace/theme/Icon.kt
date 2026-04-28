@@ -88,3 +88,11 @@ val back: ImageVector
 val location: ImageVector
     @Composable
     get() = ImageVector.vectorResource(R.drawable.location_24px)
+
+val navigationFilled: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(R.drawable.navigation_filled_24px)
+
+val navigation: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(R.drawable.navigation_24px)

@@ -1,11 +1,12 @@
-package com.rk.pace.presentation.screens.search.components
+package com.rk.pace.presentation.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -13,8 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rk.pace.domain.model.User
-import com.rk.pace.presentation.components.UserImage
-import com.rk.pace.presentation.components.UserImageSize
 
 @Composable
 fun UserItem(
@@ -27,15 +26,17 @@ fun UserItem(
             .clickable { onClick() },
         verticalAlignment = Alignment.CenterVertically
     ) {
-        UserImage(
+        PaceUserDp(
             imageUrl = user.photoURL,
-            size = UserImageSize.Medium
+            size = PaceUserDpSize.Small
         )
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(
+            modifier = Modifier.width(15.dp)
+        )
         Text(
-            text = user.name.uppercase(),
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurface,
+            text = user.name,
+            style = typography.titleMedium,
+            color = colorScheme.onSurface,
             letterSpacing = 1.sp
         )
     }

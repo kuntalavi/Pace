@@ -1,18 +1,21 @@
 package com.rk.pace.presentation.screens.feed
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
@@ -28,13 +31,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.rk.pace.presentation.components.UserItem
 import com.rk.pace.presentation.screens.feed.components.FeedItem
-import com.rk.pace.presentation.screens.search.components.UserItem
+import com.rk.pace.theme.like
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,7 +58,9 @@ fun FeedScreen(
     when {
         state.isInitialLoad -> {
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(colorScheme.surface),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator()
@@ -61,9 +68,12 @@ fun FeedScreen(
         }
 
         state.error != null -> {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = "Failed to load state ${state.error}")
-                Log.d("index", state.error!!)
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "Failed to load ${state.error}")
+                Log.e("Feed", state.error!!)
             }
         }
 
@@ -125,7 +135,7 @@ fun FeedScreen(
                         viewmodel.clearLikedByUsers()
                         showBottomSheet = false
                     },
-                    shape = RoundedCornerShape(0.dp),
+                    shape = RectangleShape,
                     dragHandle = null
                 ) {
                     if (state.isLikedByUsersLoading) {
@@ -143,15 +153,18 @@ fun FeedScreen(
                             contentPadding = PaddingValues(15.dp)
                         ) {
                             item {
-                                if (likes > 1) {
-                                    Text(
-                                        text = "$likes LIKES",
-                                        letterSpacing = 3.sp
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = like,
+                                        contentDescription = null,
+                                        tint = colorScheme.primary
                                     )
-                                } else {
                                     Text(
-                                        text = "$likes LIKE",
-                                        letterSpacing = 3.sp
+                                        text = "$likes",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        letterSpacing = 1.sp
                                     )
                                 }
                             }

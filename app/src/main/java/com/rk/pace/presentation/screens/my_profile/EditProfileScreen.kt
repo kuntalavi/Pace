@@ -37,8 +37,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.rk.pace.presentation.components.PaceButton
 import com.rk.pace.presentation.components.PaceInputBox
-import com.rk.pace.presentation.components.UserImage
-import com.rk.pace.presentation.components.UserImageSize
+import com.rk.pace.presentation.components.PaceUserDp
+import com.rk.pace.presentation.components.PaceUserDpSize
 import com.rk.pace.theme.Gray
 import com.rk.pace.theme.arrowLeft
 
@@ -145,9 +145,9 @@ fun EditProfileScreen(
                             val imageToShow = newPhotoURI.ifEmpty {
                                 currentState.user.photoURI
                             }
-                            UserImage(
+                            PaceUserDp(
                                 imageUrl = imageToShow,
-                                size = UserImageSize.XLarge,
+                                size = PaceUserDpSize.XLarge,
                                 onClick = {
                                     photoPickerLauncher.launch(
                                         PickVisualMediaRequest(

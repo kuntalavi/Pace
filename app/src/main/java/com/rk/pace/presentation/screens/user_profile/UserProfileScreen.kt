@@ -32,8 +32,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.rk.pace.presentation.components.ButtonVariant
 import com.rk.pace.presentation.components.PaceButton
-import com.rk.pace.presentation.components.UserImage
-import com.rk.pace.presentation.components.UserImageSize
+import com.rk.pace.presentation.components.PaceUserDp
+import com.rk.pace.presentation.components.PaceUserDpSize
 import com.rk.pace.presentation.components.RunSummary
 import com.rk.pace.theme.arrowLeft
 
@@ -97,9 +97,9 @@ fun UserProfileScreen(
                         contentPadding = PaddingValues(20.dp)
                     ) {
                         item {
-                            UserImage(
+                            PaceUserDp(
                                 imageUrl = currentState.userProfileUiState.user.photoURL, // draw first letter of name if no photo is there
-                                size = UserImageSize.XLarge
+                                size = PaceUserDpSize.XLarge
                             )
 
                             Spacer(modifier = Modifier.height(10.dp))

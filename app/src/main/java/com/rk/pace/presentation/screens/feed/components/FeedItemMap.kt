@@ -2,7 +2,7 @@ package com.rk.pace.presentation.screens.feed.components
 
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -16,9 +16,9 @@ fun FeedItemMap(
     path: List<String>
 ) {
 
-    val mapWidth = 600
-    val mapHeight = 300
-    val color = MaterialTheme.colorScheme.primary
+    val mapWidth = 800
+    val mapHeight = 600
+    val color = colorScheme.primary
 
     val hex = String.format(
         "%02X%02X%02X",

@@ -20,20 +20,20 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.rk.pace.theme.user
 
-sealed class UserImageSize(
+sealed class PaceUserDpSize(
     val size: Dp,
     val borderWidth: Dp
 ) {
-    data object Small : UserImageSize(32.dp, 1.dp)
-    data object Medium : UserImageSize(48.dp, 1.5.dp)
-    data object Large : UserImageSize(96.dp, 2.dp)
-    data object XLarge : UserImageSize(140.dp, 3.dp)
+    data object Small : PaceUserDpSize(32.dp, 1.dp)
+    data object Medium : PaceUserDpSize(48.dp, 1.5.dp)
+    data object Large : PaceUserDpSize(96.dp, 2.dp)
+    data object XLarge : PaceUserDpSize(140.dp, 3.dp)
 }
 
 @Composable
-fun UserImage(
+fun PaceUserDp(
     imageUrl: String?,
-    size: UserImageSize,
+    size: PaceUserDpSize,
     modifier: Modifier = Modifier,
     showBorder: Boolean = false,
     borderColor: Color = MaterialTheme.colorScheme.primary,

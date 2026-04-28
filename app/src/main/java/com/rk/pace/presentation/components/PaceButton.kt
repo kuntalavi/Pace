@@ -23,10 +23,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.rk.pace.common.Constants.shape
 
 enum class ButtonVariant {
     Filled,
@@ -98,7 +98,7 @@ fun PaceButton(
                 color = it
             )
         },
-        shape = shape,
+        shape = RectangleShape,
         colors = ButtonDefaults.buttonColors(
             containerColor = containerColor,
             contentColor = contentColor,

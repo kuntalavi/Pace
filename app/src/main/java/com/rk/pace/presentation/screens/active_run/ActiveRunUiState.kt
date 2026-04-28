@@ -4,6 +4,8 @@ data class ActiveRunUiState(
 
     val warning: NotReadyWarn? = null,
 
+    val openSystemLocationPrompt: Boolean = false,
+
     val showLocationPermissionRationale: Boolean = false,
     val showLocationPermissionSttRationale: Boolean = false,
     val showNotificationPermissionRationale: Boolean = false,

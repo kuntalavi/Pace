@@ -23,8 +23,8 @@ import com.rk.pace.common.extension.openAppSettings
 @Composable
 fun RunScreenRoot(
     viewModel: ActiveRunViewModel,
-    goToSaveRun: () -> Unit,
-    goBack: () -> Unit
+    onFinishRunClick: () -> Unit,
+    onBack: () -> Unit
 ) {
 
     val context = LocalContext.current
@@ -89,6 +89,17 @@ fun RunScreenRoot(
         )
     }
 
+    LaunchedEffect(key1 = state.openSystemLocationPrompt) {
+        if (state.openSystemLocationPrompt) {
+            locationPermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
+            viewModel.onAction(ActiveRunAction.InitialLocationPromptFired)
+        }
+    }
 
     RunScreen(
         state = state,
@@ -129,8 +140,8 @@ fun RunScreenRoot(
                 )
             )
         },
-        onCompleteRun = goToSaveRun,
-        onBackClick = goBack
+        onStopRunClick = onFinishRunClick,
+        onBack = onBack
     )
 
 }

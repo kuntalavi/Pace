@@ -1,11 +1,11 @@
 package com.rk.pace.presentation.screens.active_run
 
 sealed interface ActiveRunAction {
-    object OnStartClick : ActiveRunAction
-    object OnPauseClick : ActiveRunAction
-    object OnResumeClick : ActiveRunAction
-    object OnStopClick : ActiveRunAction
-    object OnSaveClick : ActiveRunAction
+    object OnStartRunClick : ActiveRunAction
+    object OnPauseRunClick : ActiveRunAction
+    object OnResumeRunClick : ActiveRunAction
+    object OnStopRunClick : ActiveRunAction
+    object OnSaveRunClick : ActiveRunAction
     data class OnRunTitleChange(
         val title: String
     ) : ActiveRunAction
@@ -25,6 +25,8 @@ sealed interface ActiveRunAction {
         val granted: Boolean,
         val shouldShowRationale: Boolean
     ) : ActiveRunAction
+
+    object InitialLocationPromptFired: ActiveRunAction
 
     object CheckNotReadyWarn: ActiveRunAction
 

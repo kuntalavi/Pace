@@ -48,7 +48,7 @@ class ActiveRunViewModel @Inject constructor(
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
-            false
+            null
         )
 
     private var pTrackAction: PTrackAction? = null
@@ -61,7 +61,7 @@ class ActiveRunViewModel @Inject constructor(
         gpsEnabled.onEach { enabled ->
             val run = runState.value
 
-            if (!enabled && run.isAct && !run.paused) {
+            if (enabled == false && run.isAct && !run.paused) {
                 trackerManager.pause()
                 _state.update {
                     it.copy(
@@ -77,11 +77,11 @@ class ActiveRunViewModel @Inject constructor(
 
     fun onAction(action: ActiveRunAction) {
         when (action) {
-            is ActiveRunAction.OnStartClick -> prepareToTrack(PTrackAction.START)
-            is ActiveRunAction.OnResumeClick -> prepareToTrack(PTrackAction.RESUME)
-            is ActiveRunAction.OnPauseClick -> trackerManager.pause()
-            is ActiveRunAction.OnStopClick -> trackerManager.stop()
-            is ActiveRunAction.OnSaveClick -> saveRun()
+            is ActiveRunAction.OnStartRunClick -> prepareToTrack(PTrackAction.START)
+            is ActiveRunAction.OnResumeRunClick -> prepareToTrack(PTrackAction.RESUME)
+            is ActiveRunAction.OnPauseRunClick -> trackerManager.pause()
+            is ActiveRunAction.OnStopRunClick -> trackerManager.stop()
+            is ActiveRunAction.OnSaveRunClick -> saveRun()
             is ActiveRunAction.OnRunTitleChange -> {
                 if (state.value.saving) return
                 _state.update {
@@ -90,6 +90,7 @@ class ActiveRunViewModel @Inject constructor(
                     )
                 }
             }
+
             is ActiveRunAction.ClearSaveError -> {
                 _state.update {
                     it.copy(
@@ -135,14 +136,34 @@ class ActiveRunViewModel @Inject constructor(
                 action.shouldShowRationale
             )
 
+            is ActiveRunAction.InitialLocationPromptFired -> {
+                prefs.markLocationPermissionRequested()
+                _state.update {
+                    it.copy(
+                        openSystemLocationPrompt = false
+                    )
+                }
+            }
+
             is ActiveRunAction.CheckNotReadyWarn -> checkNotReadyWarn()
         }
     }
 
     private fun checkNotReadyWarn() {
+
+        if (!permissionManager.hasPreciseLocationPermission() && !prefs.wasLocationPermissionRequested()) {
+            _state.update {
+                it.copy(
+                    openSystemLocationPrompt = true
+                )
+            }
+            return
+        }
+
         val warning = when {
             !permissionManager.hasPreciseLocationPermission() -> NotReadyWarn.LOCATION_PERMISSION_NOT_GRANTED
-            !gpsEnabled.value -> NotReadyWarn.GPS_OFF
+            gpsEnabled.value == null -> NotReadyWarn.ACQUIRING_GPS
+            gpsEnabled.value == false -> NotReadyWarn.GPS_OFF
             else -> null
         }
         _state.update {
@@ -172,7 +193,7 @@ class ActiveRunViewModel @Inject constructor(
             return
         }
 
-        if (!gpsEnabled.value) {
+        if (gpsEnabled.value == false) {
             _state.update {
                 it.copy(
                     showGpsOffRationale = true
@@ -210,14 +231,22 @@ class ActiveRunViewModel @Inject constructor(
             )
         }
         if (granted) {
-            prepareToTrack(pTrackAction ?: return)
-        } else if (!shouldShowRationale) {
+            pTrackAction?.let { prepareToTrack(it) }
+        } else if (shouldShowRationale) {
+            _state.update {
+                it.copy(
+                    showLocationPermissionRationale = true
+                )
+            }
+        } else {
             _state.update {
                 it.copy(
                     showLocationPermissionSttRationale = true
                 )
             }
         }
+
+        checkNotReadyWarn()
     }
 
     private fun handleNotificationPermissionResult(

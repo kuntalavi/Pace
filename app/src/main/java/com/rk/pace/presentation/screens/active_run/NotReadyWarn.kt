@@ -4,5 +4,6 @@ enum class NotReadyWarn(
     val message: String
 ) {
     LOCATION_PERMISSION_NOT_GRANTED("location"),
-    GPS_OFF("gps")
+    GPS_OFF("gps"),
+    ACQUIRING_GPS("Acquiring Gps")
 }

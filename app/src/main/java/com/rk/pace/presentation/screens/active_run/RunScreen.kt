@@ -1,8 +1,5 @@
 package com.rk.pace.presentation.screens.active_run
 
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import com.rk.pace.domain.model.RunPathPoint
 import com.rk.pace.domain.model.RunState
@@ -21,8 +18,8 @@ fun RunScreen(
     onLaunchNotificationPermission: () -> Unit,
     onOpenAppSett: () -> Unit,
     onOpenLocationSett: () -> Unit,
-    onCompleteRun: () -> Unit,
-    onBackClick: () -> Unit,
+    onStopRunClick: () -> Unit,
+    onBack: () -> Unit,
 ) {
 
     Content(
@@ -30,21 +27,21 @@ fun RunScreen(
         runState = runState,
         location = location,
         gpsStrength = gpsStrength,
-        onStartRun = { onAction(ActiveRunAction.OnStartClick) },
-        onResumeRun = { onAction(ActiveRunAction.OnResumeClick) },
-        onPauseRun = { onAction(ActiveRunAction.OnPauseClick) },
+        onStartRun = { onAction(ActiveRunAction.OnStartRunClick) },
+        onResumeRun = { onAction(ActiveRunAction.OnResumeRunClick) },
+        onPauseRun = { onAction(ActiveRunAction.OnPauseRunClick) },
         onStopRun = {
-            onAction(ActiveRunAction.OnPauseClick)
-            onCompleteRun()
+            onAction(ActiveRunAction.OnPauseRunClick)
+            onStopRunClick()
         },
-        onBackClick = onBackClick
+        onBack = onBack
     )
 
     when {
         state.showLocationPermissionRationale -> {
             PermissionRationaleDialog(
                 title = "Precise Location Required",
-                text = "Pace needs Precise Location to record your route and pace accurately.",
+                body = "Pace needs Precise Location to record your route and pace accurately.",
                 confirmLabel = "Allow",
                 dismissLabel = "Not Now",
                 onConfirm = onLaunchLocationPermission,
@@ -55,9 +52,9 @@ fun RunScreen(
         state.showLocationPermissionSttRationale -> {
             PermissionRationaleDialog(
                 title = "Enable Precise Location",
-                text = "Location access is disabled. Open app settings and allow Location with Precise Location turned on.",
-                confirmLabel = "Open Settings",
-                dismissLabel = "Not now",
+                body = "Location access is disabled. Open app settings and allow Location with Precise Location turned on.",
+                confirmLabel = "Okay",
+                dismissLabel = "Not Now",
                 onConfirm = onOpenAppSett,
                 onDismiss = { onAction(ActiveRunAction.DismissAllRationale) }
             )
@@ -66,7 +63,7 @@ fun RunScreen(
         state.showGpsOffRationale -> {
             PermissionRationaleDialog(
                 title = "Location Services Off",
-                text = "Turn on device Location Services before starting so Pace can record an accurate GPS route.",
+                body = "Turn on device Location Services before starting so Pace can record an accurate GPS route.",
                 confirmLabel = "Turn On",
                 dismissLabel = "Not Now",
                 onConfirm = onOpenLocationSett,
@@ -77,7 +74,7 @@ fun RunScreen(
         state.showNotificationPermissionRationale -> {
             PermissionRationaleDialog(
                 title = "Stay Updated While You Run",
-                text = "Notifications show your live run progress while Pace is tracking in the background.",
+                body = "Notifications show your live run progress while Pace is tracking in the background.",
                 confirmLabel = "Allow",
                 dismissLabel = "Skip",
                 onConfirm = onLaunchNotificationPermission,
@@ -88,26 +85,22 @@ fun RunScreen(
         state.showNotificationPermissionSttRationale -> {
             PermissionRationaleDialog(
                 title = "Notifications Disabled",
-                text = "You can still track this run. Enable notifications in Settings if you want live progress while the screen is off.",
-                confirmLabel = "Open Settings",
-                dismissLabel = "Continue",
+                body = "You can still track this run. Enable notifications in Settings if you want live progress while the screen is off.",
+                confirmLabel = "Okay",
+                dismissLabel = "Skip",
                 onConfirm = onOpenAppSett,
                 onDismiss = { onAction(ActiveRunAction.SkipNotificationPermission) }
             )
         }
 
         state.showGpsInterruptedRationale -> {
-            AlertDialog(
-                onDismissRequest = { onAction(ActiveRunAction.DismissAllRationale) },
-                icon = {},
-                title = { Text("GPS Turned Off") },
-                text = { Text("Pace paused your run because device Location Services were turned off. Turn them back on before resuming.") },
-                confirmButton = {
-                    TextButton(onClick = { onOpenLocationSett() }) { Text("Open Settings") }
-                },
-                dismissButton = {
-                    TextButton(onClick = { onAction(ActiveRunAction.DismissAllRationale) }) { Text("Stay Paused") }
-                }
+            PermissionRationaleDialog(
+                title = "GPS Turned Off",
+                body = "Pace paused your run because device Location Services were turned off. Turn them back on before resuming.",
+                confirmLabel = "Okay",
+                dismissLabel = "Stay Paused",
+                onConfirm = onOpenLocationSett,
+                onDismiss = { onAction(ActiveRunAction.DismissAllRationale) }
             )
         }
     }

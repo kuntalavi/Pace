@@ -28,8 +28,8 @@ fun NavGraphBuilder.activeRunNavGraph(
 
             RunScreenRoot(
                 viewModel = viewModel,
-                goBack = { navController.popBackStack() },
-                goToSaveRun = {
+                onBack = { navController.popBackStack() },
+                onFinishRunClick = {
                     navController.navigate(
                         Route.ActiveRun.SaveRun
                     )

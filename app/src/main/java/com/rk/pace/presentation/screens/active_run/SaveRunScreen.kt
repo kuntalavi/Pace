@@ -94,7 +94,7 @@ fun SaveRunScreen(
                     actions = {
                         IconButton(
                             onClick = {
-                                onAction(ActiveRunAction.OnStopClick)
+                                onAction(ActiveRunAction.OnStopRunClick)
                                 onBack()
                             }
                         ) {
@@ -117,7 +117,7 @@ fun SaveRunScreen(
                         modifier = Modifier.fillMaxWidth(.9f),
                         text = "SAVE RUN",
                         onClick = {
-                            onAction(ActiveRunAction.OnSaveClick)
+                            onAction(ActiveRunAction.OnSaveRunClick)
                         },
                         enabled = mapLoaded && !state.saving,
                         variant = ButtonVariant.Filled,

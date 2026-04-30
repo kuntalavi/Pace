@@ -1,111 +1,172 @@
 package com.rk.pace.auth.presentation
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rk.pace.auth.domain.model.AuthResult
 import com.rk.pace.auth.domain.use_case.SignInWithEmailUseCase
-import com.rk.pace.auth.domain.use_case.SignOutUseCase
 import com.rk.pace.auth.domain.use_case.SignUpWithEmailUseCase
 import com.rk.pace.domain.repo.RunRepo
-import com.rk.pace.presentation.ut.restartApp
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    @param:ApplicationContext private val context: Context,
     private val runRepo: RunRepo,
     private val signUpWithEmailUseCase: SignUpWithEmailUseCase,
-    private val signInWithEmailUseCase: SignInWithEmailUseCase,
-    private val signOutUseCase: SignOutUseCase
+    private val signInWithEmailUseCase: SignInWithEmailUseCase
 ) : ViewModel() {
 
-    private val _authState = MutableStateFlow<AuthUIState>(AuthUIState.Empty)
-    val authState = _authState
+    private var _state = MutableStateFlow(AuthUiState())
+    val state = _state.asStateFlow()
 
-    fun resetState() {
-        _authState.update {
-            AuthUIState.Empty
+    private val _events = Channel<AuthUiEvent>()
+    val events = _events.receiveAsFlow()
+
+    fun onAction(action: AuthAction) {
+        when (action) {
+            AuthAction.OnSignUpClick -> signUp()
+
+            AuthAction.OnSignInClick -> signIn()
+
+            is AuthAction.OnNameChange -> {
+                _state.update {
+                    it.copy(
+                        name = action.name
+                    )
+                }
+            }
+
+            is AuthAction.OnUsernameChange -> {
+                _state.update {
+                    it.copy(
+                        username = action.username
+                    )
+                }
+            }
+
+            is AuthAction.OnEmailChange -> {
+                _state.update {
+                    it.copy(
+                        email = action.email
+                    )
+                }
+            }
+
+            is AuthAction.OnPasswordChange -> {
+                _state.update {
+                    it.copy(
+                        password = action.password
+                    )
+                }
+            }
+
+            is AuthAction.OnConfirmPasswordChange -> {
+                _state.update {
+                    it.copy(
+                        confirmPassword = action.confirmPassword
+                    )
+                }
+            }
         }
     }
 
-    fun signUp(
-        name: String,
-        username: String,
-        email: String,
-        password: String,
-        photoURI: String? = null
-    ) {
+    private fun signUp() {
+        val value = _state.value
+
         viewModelScope.launch {
-            _authState.update {
-                AuthUIState.Load
+            if (value.password != value.confirmPassword) {
+                _events.send(
+                    AuthUiEvent.Error(
+                        "Passwords Dont Match"
+                    )
+                )
+                return@launch
             }
-            when (val result = signUpWithEmailUseCase(name, username, email, password, photoURI)) {
+
+            _state.update {
+                it.copy(
+                    load = true
+                )
+            }
+
+            when (
+                val result = signUpWithEmailUseCase(
+                    value.name,
+                    value.username,
+                    value.email,
+                    value.password,
+                    value.photoURI
+                )
+            ) {
                 is AuthResult.Success -> {
-                    _authState.update {
-                        AuthUIState.Success(result.user)
+                    _state.update {
+                        it.copy(
+                            load = false
+                        )
                     }
                 }
 
                 is AuthResult.Error -> {
-                    _authState.update {
-                        AuthUIState.Error(result.message)
+                    _state.update {
+                        it.copy(
+                            load = false
+                        )
                     }
+                    _events.send(
+                        AuthUiEvent.Error(
+                            result.message
+                        )
+                    )
                 }
             }
         }
     }
 
-    fun signIn(
-        email: String,
-        password: String
-    ) {
+    private fun signIn() {
+        val value = _state.value
         viewModelScope.launch {
-            _authState.update {
-                AuthUIState.Load
+            _state.update {
+                it.copy(
+                    load = true
+                )
             }
 
-            when (val result = signInWithEmailUseCase(email, password)) {
+            when (
+                val result = signInWithEmailUseCase(
+                    value.email,
+                    value.password
+                )
+            ) {
                 is AuthResult.Success -> {
                     runRepo.restoreRuns(result.user.userId)
-                    _authState.update {
-                        AuthUIState.Success(result.user)
+                    _state.update {
+                        it.copy(
+                            load = false
+                        )
                     }
                 }
 
                 is AuthResult.Error -> {
-                    _authState.update {
-                        AuthUIState.Error(result.message)
+                    _state.update {
+                        it.copy(
+                            load = false
+                        )
                     }
+                    _events.send(
+                        AuthUiEvent.Error(
+                            result.message
+                        )
+                    )
                 }
             }
 
         }
     }
 
-    fun resetPassword(email: String) {
-        viewModelScope.launch {
-        }
-    }
-
-    fun signOut() {
-        viewModelScope.launch {
-            signOutUseCase().fold(
-                onSuccess = {
-                    resetState()
-                    context.restartApp()
-                },
-                onFailure = { error ->
-                    _authState.update {
-                        AuthUIState.Error(error.message ?: "")
-                    }
-                }
-            )
-        }
-    }
 }

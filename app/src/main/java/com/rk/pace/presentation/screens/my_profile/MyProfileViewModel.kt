@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.rk.pace.auth.domain.use_case.SignOutUseCase
 import com.rk.pace.data.ut.InternalStorageHelper
 import com.rk.pace.domain.model.User
 import com.rk.pace.domain.use_case.user.GetMyProfileUseCase
@@ -21,7 +22,8 @@ import javax.inject.Inject
 class MyProfileViewModel @Inject constructor(
     private val internalStorageHelper: InternalStorageHelper,
     private val getMyProfileUseCase: GetMyProfileUseCase,
-    private val updateProfileUseCase: UpdateMyProfileUseCase
+    private val updateProfileUseCase: UpdateMyProfileUseCase,
+    private val signOutUseCase: SignOutUseCase
 ) : ViewModel() {
 
     private val _state: MutableStateFlow<MyProfileState> = MutableStateFlow(MyProfileState.Load)
@@ -100,6 +102,22 @@ class MyProfileViewModel @Inject constructor(
                     }
                 }
             )
+        }
+    }
+
+    fun signOut() {
+        viewModelScope.launch {
+            signOutUseCase()
+                .fold(
+                    onSuccess = {},
+                    onFailure = { error ->
+//                        _events.send(
+//                            AuthUiEvent.Error(
+//                                error.message ?: "Unknown Error"
+//                            )
+//                        )
+                    }
+                )
         }
     }
 }

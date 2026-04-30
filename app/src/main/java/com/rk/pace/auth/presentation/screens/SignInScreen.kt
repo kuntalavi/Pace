@@ -9,61 +9,74 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
-import androidx.compose.material3.Text
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.rk.pace.auth.presentation.AuthUIState
+import androidx.lifecycle.repeatOnLifecycle
+import com.rk.pace.auth.presentation.AuthAction
+import com.rk.pace.auth.presentation.AuthUiEvent
 import com.rk.pace.auth.presentation.AuthViewModel
 import com.rk.pace.presentation.components.ButtonVariant
 import com.rk.pace.presentation.components.PaceButton
 import com.rk.pace.presentation.components.PaceInputBox
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun SignInScreen(
-    viewModel: AuthViewModel = hiltViewModel(),
-    onSignInSuccess: () -> Unit
+    viewModel: AuthViewModel = hiltViewModel()
 ) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    val authState by viewModel.authState.collectAsStateWithLifecycle()
 
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
-    LaunchedEffect(key1 = Unit) {
-        viewModel.resetState()
-    }
-    LaunchedEffect(key1 = authState) {
-        if (authState is AuthUIState.Success) {
-            onSignInSuccess()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(
+        key1 = viewModel.events,
+        key2 = lifecycleOwner.lifecycle
+    ) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.events.collectLatest { event ->
+                when (event) {
+                    is AuthUiEvent.Error -> {
+                        snackbarHostState.showSnackbar(
+                            message = event.message,
+                            duration = SnackbarDuration.Short
+                        )
+                    }
+                }
+            }
         }
     }
 
     Scaffold(
         snackbarHost = {
-            if (authState is AuthUIState.Error) {
+            SnackbarHost(hostState = snackbarHostState) { data ->
                 Snackbar(
-                    containerColor = MaterialTheme.colorScheme.errorContainer,
-                    contentColor = MaterialTheme.colorScheme.onErrorContainer
-                ) {
-                    Text(text = (authState as AuthUIState.Error).message)
-                }
+                    containerColor = colorScheme.errorContainer,
+                    contentColor = colorScheme.onErrorContainer,
+                    snackbarData = data
+                )
             }
         }
-    ) {
+    ) { p ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(it)
+                .padding(p)
                 .padding(horizontal = 20.dp)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.Center
@@ -71,9 +84,9 @@ fun SignInScreen(
             Spacer(modifier = Modifier.height(20.dp))
 
             PaceInputBox(
-                value = email,
-                onValueChange = { value ->
-                    email = value
+                value = state.email,
+                onValueChange = {
+                    viewModel.onAction(AuthAction.OnEmailChange(it))
                 },
                 placeholder = "your@em.com",
             )
@@ -81,9 +94,9 @@ fun SignInScreen(
             Spacer(modifier = Modifier.height(20.dp))
 
             PaceInputBox(
-                value = password,
-                onValueChange = { value ->
-                    password = value
+                value = state.password,
+                onValueChange = {
+                    viewModel.onAction(AuthAction.OnPasswordChange(it))
                 },
                 placeholder = "password",
                 isPassword = true
@@ -97,12 +110,12 @@ fun SignInScreen(
                 modifier = Modifier.fillMaxWidth(.3f),
                 text = "Log In",
                 onClick = {
-                    viewModel.signIn(
-                        email,
-                        password
+                    viewModel.onAction(
+                        AuthAction.OnSignInClick
                     )
                 },
-                load = authState is AuthUIState.Load,
+                load = state.load,
+                enabled = !state.load,
                 variant = ButtonVariant.Filled
             )
         }

@@ -28,27 +28,11 @@ fun NavGraphBuilder.authNavGraph(
         }
 
         composable<Route.Auth.SignUp> {
-            SignUpScreen(
-                onSignUpSuccess = {
-                    navController.navigate(Route.Root.BotNav) {
-                        popUpTo(Route.Root.Auth) {
-                            inclusive = true
-                        }
-                    }
-                }
-            )
+            SignUpScreen()
         }
 
         composable<Route.Auth.SignIn> {
-            SignInScreen(
-                onSignInSuccess = {
-                    navController.navigate(Route.Root.BotNav) {
-                        popUpTo(Route.Root.Auth) {
-                            inclusive = true
-                        }
-                    }
-                }
-            )
+            SignInScreen()
         }
 
     }

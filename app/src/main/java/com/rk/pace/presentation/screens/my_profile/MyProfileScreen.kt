@@ -29,7 +29,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.rk.pace.auth.presentation.AuthViewModel
 import com.rk.pace.presentation.components.PaceButton
 import com.rk.pace.presentation.components.PaceUserDp
 import com.rk.pace.presentation.components.PaceUserDpSize
@@ -37,7 +36,6 @@ import com.rk.pace.presentation.theme.edit
 
 @Composable
 fun UserScreen(
-    authViewModel: AuthViewModel = hiltViewModel(),
     viewModel: MyProfileViewModel = hiltViewModel(),
     onEditClick: () -> Unit,
     onFollowersClick: (userId: String, tab: Int) -> Unit,
@@ -155,7 +153,7 @@ fun UserScreen(
 
                     PaceButton(
                         onClick = {
-                            authViewModel.signOut()
+                            viewModel.signOut()
                         },
                         text = "LOG OUT"
                     )

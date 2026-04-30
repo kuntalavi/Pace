@@ -28,7 +28,6 @@ interface AuthRepo {
         email: String
     ): Result<Unit>
 
-//    val authState: Flow<MyProfile?>
     // signInWithGoogle(idToken: String): AuthResult
     //
 

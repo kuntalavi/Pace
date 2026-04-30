@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 interface AuthRepo {
 
     val currentUserId: String?
+    fun observeAuthState(): Flow<AuthState>
 
     suspend fun signUpWithEmail(
         name: String,
@@ -26,12 +27,6 @@ interface AuthRepo {
     suspend fun resetPassword(
         email: String
     ): Result<Unit>
-
-    //
-
-    fun isUserLoggedIn(): Boolean
-
-    fun observeAuthState(): Flow<AuthState>
 
 //    val authState: Flow<MyProfile?>
     // signInWithGoogle(idToken: String): AuthResult

@@ -16,7 +16,9 @@ import com.rk.pace.data.ut.InternalStorageHelper
 import com.rk.pace.di.IoDispatcher
 import com.rk.pace.domain.model.User
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -33,6 +35,22 @@ constructor(
 
     override val currentUserId: String?
         get() = auth.currentUser?.uid
+
+    override fun observeAuthState(): Flow<AuthState> = callbackFlow {
+        val authStateListener = FirebaseAuth.AuthStateListener { auth ->
+            val user = auth.currentUser
+            if (user != null){
+                trySend(AuthState.Authenticated)
+            }else {
+                trySend(AuthState.Unauthenticated)
+            }
+        }
+
+        auth.addAuthStateListener(authStateListener)
+        awaitClose {
+            auth.removeAuthStateListener(authStateListener)
+        }
+    }
 
     private val usersCollection = firestore.collection("users")
 
@@ -152,14 +170,6 @@ constructor(
         } catch (e: Exception) {
             Result.failure(e)
         }
-    }
-
-    override fun isUserLoggedIn(): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun observeAuthState(): Flow<AuthState> {
-        TODO("Not yet implemented")
     }
 
 }

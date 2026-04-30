@@ -4,12 +4,10 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rk.pace.auth.domain.model.AuthResult
-import com.rk.pace.auth.domain.repo.AuthRepo
 import com.rk.pace.auth.domain.use_case.SignInWithEmailUseCase
 import com.rk.pace.auth.domain.use_case.SignOutUseCase
 import com.rk.pace.auth.domain.use_case.SignUpWithEmailUseCase
 import com.rk.pace.domain.repo.RunRepo
-import com.rk.pace.presentation.navigation.Route
 import com.rk.pace.presentation.ut.restartApp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -21,7 +19,6 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     @param:ApplicationContext private val context: Context,
-    private val authRepo: AuthRepo,
     private val runRepo: RunRepo,
     private val signUpWithEmailUseCase: SignUpWithEmailUseCase,
     private val signInWithEmailUseCase: SignInWithEmailUseCase,
@@ -30,30 +27,6 @@ class AuthViewModel @Inject constructor(
 
     private val _authState = MutableStateFlow<AuthUIState>(AuthUIState.Empty)
     val authState = _authState
-
-    private val _startDestination = MutableStateFlow<Route?>(null)
-    val startDestination = _startDestination
-
-    init {
-        checkAuthStatus()
-    }
-
-    private fun checkAuthStatus() {
-        viewModelScope.launch {
-            val currentUserId = authRepo.currentUserId
-
-            if (currentUserId != null) {
-                _startDestination.update {
-                    Route.Root.BotNav
-                }
-            } else {
-                _startDestination.update {
-                    Route.Root.Auth
-                }
-            }
-        }
-    }
-
 
     fun resetState() {
         _authState.update {

@@ -40,11 +40,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.rk.pace.MainViewModel
+import com.rk.pace.presentation.theme.add_people
 import com.rk.pace.presentation.ut.defaultEnterTransition
 import com.rk.pace.presentation.ut.defaultExitTransition
 import com.rk.pace.presentation.ut.defaultPopEnterTransition
 import com.rk.pace.presentation.ut.defaultPopExitTransition
-import com.rk.pace.presentation.theme.add_people
 import kotlin.reflect.KClass
 
 @OptIn(ExperimentalMaterial3Api::class)

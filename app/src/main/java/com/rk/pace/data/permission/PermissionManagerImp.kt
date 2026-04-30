@@ -1,9 +1,8 @@
 package com.rk.pace.data.permission
 
 import android.content.Context
-import android.os.Build
-import com.rk.pace.common.extension.hasPostNotificationPermission
-import com.rk.pace.common.extension.hasPreciseForegroundLocationPermission
+import com.rk.pace.data.ut.hasPostNotificationPermission
+import com.rk.pace.data.ut.hasPreciseForegroundLocationPermission
 import com.rk.pace.domain.permission.PermissionManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -16,7 +15,6 @@ class PermissionManagerImp @Inject constructor(
     }
 
     override fun hasNotificationPermission(): Boolean {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return true
         return context.hasPostNotificationPermission()
     }
 }

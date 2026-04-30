@@ -25,7 +25,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.rk.pace.theme.Gray
+import com.rk.pace.presentation.theme.Gray
 
 @Composable
 fun PaceInputBox(

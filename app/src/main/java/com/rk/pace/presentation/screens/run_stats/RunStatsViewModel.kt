@@ -4,9 +4,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rk.pace.auth.domain.use_case.GetCurrentUserIdUseCase
-import com.rk.pace.common.ut.ChartsUt.buildPaceChartData
-import com.rk.pace.common.ut.PathUt.toSegments
-import com.rk.pace.common.ut.ChartsUt.buildSplitChartData
+import com.rk.pace.presentation.ut.ChartsUt.buildPaceChartData
+import com.rk.pace.presentation.ut.PathUt.toSegments
+import com.rk.pace.presentation.ut.ChartsUt.buildSplitChartData
 import com.rk.pace.di.ApplicationIoCoroutineScope
 import com.rk.pace.domain.model.PacePoint
 import com.rk.pace.domain.model.Run

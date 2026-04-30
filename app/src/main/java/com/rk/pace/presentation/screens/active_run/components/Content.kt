@@ -38,14 +38,14 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.rk.pace.common.Constants.shape
-import com.rk.pace.common.extension.hasPreciseForegroundLocationPermission
+import com.rk.pace.data.ut.hasPreciseForegroundLocationPermission
 import com.rk.pace.domain.model.RunPathPoint
 import com.rk.pace.domain.model.RunState
-import com.rk.pace.domain.tracking.GpsStrength
-import com.rk.pace.theme.Gray
-import com.rk.pace.theme.arrowLeft
-import com.rk.pace.theme.navigationFilled
+import com.rk.pace.domain.tracker.GpsStrength
+import com.rk.pace.presentation.theme.Gray
+import com.rk.pace.presentation.theme.arrowLeft
+import com.rk.pace.presentation.theme.navigationFilled
+import com.rk.pace.presentation.theme.shape
 
 @SuppressLint("ConfigurationScreenWidthHeight")
 @OptIn(ExperimentalMaterial3Api::class)

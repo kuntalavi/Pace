@@ -8,7 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import coil3.compose.AsyncImage
-import com.rk.pace.common.ut.MapUt.buildStaticMapUrl
+import com.rk.pace.presentation.ut.MapUt.buildStaticMapUrl
 import kotlin.math.roundToInt
 
 @Composable

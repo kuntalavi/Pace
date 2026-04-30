@@ -17,7 +17,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
-import com.rk.pace.common.extension.openAppSettings
+import com.rk.pace.presentation.ut.openAppSettings
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

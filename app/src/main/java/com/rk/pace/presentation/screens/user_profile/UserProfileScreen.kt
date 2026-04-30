@@ -35,7 +35,7 @@ import com.rk.pace.presentation.components.PaceButton
 import com.rk.pace.presentation.components.PaceUserDp
 import com.rk.pace.presentation.components.PaceUserDpSize
 import com.rk.pace.presentation.components.RunSummary
-import com.rk.pace.theme.arrowLeft
+import com.rk.pace.presentation.theme.arrowLeft
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -20,7 +20,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.rk.pace.theme.arrowLeft
+import com.rk.pace.presentation.theme.arrowLeft
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)

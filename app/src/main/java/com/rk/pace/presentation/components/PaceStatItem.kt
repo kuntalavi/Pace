@@ -31,8 +31,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.rk.pace.theme.Error
-import com.rk.pace.theme.Success
+import com.rk.pace.presentation.theme.Error
+import com.rk.pace.presentation.theme.Success
 
 /**
  * A beautiful, reusable stat display component for the Pace app.

@@ -72,7 +72,7 @@ fun DistanceCard(
                     }
                 }
                 Icon(
-                    imageVector = com.rk.pace.theme.distance,
+                    imageVector = com.rk.pace.presentation.theme.distance,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(32.dp)

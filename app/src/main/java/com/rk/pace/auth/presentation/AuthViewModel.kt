@@ -8,9 +8,9 @@ import com.rk.pace.auth.domain.repo.AuthRepo
 import com.rk.pace.auth.domain.use_case.SignInWithEmailUseCase
 import com.rk.pace.auth.domain.use_case.SignOutUseCase
 import com.rk.pace.auth.domain.use_case.SignUpWithEmailUseCase
-import com.rk.pace.common.extension.restartApp
 import com.rk.pace.domain.repo.RunRepo
 import com.rk.pace.presentation.navigation.Route
+import com.rk.pace.presentation.ut.restartApp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject

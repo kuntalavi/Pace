@@ -39,7 +39,7 @@ import com.rk.pace.presentation.components.PaceButton
 import com.rk.pace.presentation.components.PaceInputBox
 import com.rk.pace.presentation.components.Summary
 import com.rk.pace.presentation.screens.run_stats.components.RunStatsMap
-import com.rk.pace.theme.delete
+import com.rk.pace.presentation.theme.delete
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

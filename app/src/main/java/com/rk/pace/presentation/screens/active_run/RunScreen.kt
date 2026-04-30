@@ -3,9 +3,9 @@ package com.rk.pace.presentation.screens.active_run
 import androidx.compose.runtime.Composable
 import com.rk.pace.domain.model.RunPathPoint
 import com.rk.pace.domain.model.RunState
-import com.rk.pace.domain.tracking.GpsStrength
+import com.rk.pace.domain.tracker.GpsStrength
 import com.rk.pace.presentation.screens.active_run.components.Content
-import com.rk.pace.presentation.ut.PermissionRationaleDialog
+import com.rk.pace.presentation.components.PermissionRationaleDialog
 
 @Composable
 fun RunScreen(

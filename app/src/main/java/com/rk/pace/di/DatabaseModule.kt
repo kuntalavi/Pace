@@ -2,7 +2,6 @@ package com.rk.pace.di
 
 import android.content.Context
 import androidx.room.Room
-import com.rk.pace.common.Constants.PACE_DB_NAME
 import com.rk.pace.data.room.PaceDatabase
 import dagger.Module
 import dagger.Provides
@@ -23,7 +22,7 @@ object DatabaseModule {
         return Room.databaseBuilder(
             context,
             PaceDatabase::class.java,
-            PACE_DB_NAME,
+            "pace_DB",
         )
             .fallbackToDestructiveMigration(true)
             .build()

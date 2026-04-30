@@ -13,7 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.rk.pace.theme.close
+import com.rk.pace.presentation.theme.close
 
 @Composable
 fun WarnBanner(

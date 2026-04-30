@@ -12,7 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.rk.pace.auth.presentation.AuthViewModel
 import com.rk.pace.presentation.navigation.PaceNavGraph
-import com.rk.pace.theme.PaceTheme
+import com.rk.pace.presentation.theme.PaceTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

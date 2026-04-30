@@ -20,8 +20,8 @@ import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.rk.pace.R
-import com.rk.pace.common.ut.MapUt.getBounds
-import com.rk.pace.common.ut.PathUt.toLatL
+import com.rk.pace.presentation.ut.MapUt.getBounds
+import com.rk.pace.presentation.ut.PathUt.toLatL
 import com.rk.pace.domain.model.RunPathPoint
 import kotlinx.coroutines.launch
 

@@ -7,7 +7,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
-import com.rk.pace.theme.Gray
+import com.rk.pace.presentation.theme.Gray
 
 @Composable
 fun StatItem(

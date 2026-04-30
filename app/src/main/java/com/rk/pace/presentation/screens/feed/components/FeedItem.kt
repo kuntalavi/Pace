@@ -33,7 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.rk.pace.common.ut.TimestampUt.getDate
+import com.rk.pace.presentation.ut.TimestampUt.getDate
 import com.rk.pace.domain.model.FeedPost
 import com.rk.pace.domain.model.Run
 import com.rk.pace.domain.model.User
@@ -44,8 +44,8 @@ import com.rk.pace.presentation.components.StatItemStyle
 import com.rk.pace.presentation.ut.FormatUt.formatDistance
 import com.rk.pace.presentation.ut.FormatUt.formatDuration
 import com.rk.pace.presentation.ut.FormatUt.formatPace
-import com.rk.pace.theme.like
-import com.rk.pace.theme.unlike
+import com.rk.pace.presentation.theme.like
+import com.rk.pace.presentation.theme.unlike
 
 @Composable
 fun FeedItem(

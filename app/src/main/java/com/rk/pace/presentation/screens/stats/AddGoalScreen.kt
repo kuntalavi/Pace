@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.rk.pace.domain.model.WeekGoals
 import com.rk.pace.presentation.components.PaceButton
-import com.rk.pace.theme.arrowLeft
+import com.rk.pace.presentation.theme.arrowLeft
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

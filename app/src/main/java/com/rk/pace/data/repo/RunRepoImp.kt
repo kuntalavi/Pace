@@ -6,7 +6,7 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.google.firebase.firestore.FirebaseFirestore
-import com.rk.pace.background.SyncRunWorker
+import com.rk.pace.data.background.SyncRunWorker
 import com.rk.pace.data.mapper.toDomain
 import com.rk.pace.data.mapper.toEntity
 import com.rk.pace.data.mapper.toRunWithPathDomain

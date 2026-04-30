@@ -15,10 +15,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
-import com.rk.pace.theme.feed
-import com.rk.pace.theme.progress
-import com.rk.pace.theme.run
-import com.rk.pace.theme.user
+import com.rk.pace.presentation.theme.feed
+import com.rk.pace.presentation.theme.progress
+import com.rk.pace.presentation.theme.run
+import com.rk.pace.presentation.theme.user
 
 data class BotNav(
     val route: Route,

@@ -10,9 +10,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.rk.pace.theme.Black
-import com.rk.pace.theme.arrowRight
-import com.rk.pace.theme.arrowLeft
+import com.rk.pace.presentation.theme.Black
+import com.rk.pace.presentation.theme.arrowRight
+import com.rk.pace.presentation.theme.arrowLeft
 
 @Composable
 fun WeekNavigator(

@@ -39,7 +39,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.rk.pace.presentation.components.UserItem
 import com.rk.pace.presentation.screens.feed.components.FeedItem
-import com.rk.pace.theme.like
+import com.rk.pace.presentation.theme.like
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

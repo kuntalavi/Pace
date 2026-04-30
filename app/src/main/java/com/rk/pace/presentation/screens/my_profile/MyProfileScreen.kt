@@ -33,7 +33,7 @@ import com.rk.pace.auth.presentation.AuthViewModel
 import com.rk.pace.presentation.components.PaceButton
 import com.rk.pace.presentation.components.PaceUserDp
 import com.rk.pace.presentation.components.PaceUserDpSize
-import com.rk.pace.theme.edit
+import com.rk.pace.presentation.theme.edit
 
 @Composable
 fun UserScreen(

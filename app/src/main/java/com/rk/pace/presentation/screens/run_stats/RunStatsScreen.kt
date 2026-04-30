@@ -28,12 +28,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.rk.pace.common.ut.PathUt.toSegments
-import com.rk.pace.common.ut.TimestampUt.getBarDate
+import com.rk.pace.presentation.ut.PathUt.toSegments
+import com.rk.pace.presentation.ut.TimestampUt.getBarDate
 import com.rk.pace.presentation.screens.run_stats.components.RunStatsMap
 import com.rk.pace.presentation.screens.run_stats.components.SheetContent
-import com.rk.pace.theme.arrowLeft
-import com.rk.pace.theme.delete
+import com.rk.pace.presentation.theme.arrowLeft
+import com.rk.pace.presentation.theme.delete
 
 
 @OptIn(ExperimentalMaterial3Api::class)

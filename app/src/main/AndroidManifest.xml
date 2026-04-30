@@ -16,7 +16,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
-        android:name=".App"
+        android:name=".PaceApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -37,7 +37,7 @@
         </activity>
 
         <service
-            android:name=".background.service.RunTrackService"
+            android:name=".data.tracker.service.RunTrackService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="location" />

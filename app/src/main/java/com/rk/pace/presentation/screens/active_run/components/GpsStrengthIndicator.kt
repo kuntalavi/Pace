@@ -16,8 +16,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
-import com.rk.pace.domain.tracking.GpsStrength
-import com.rk.pace.theme.close
+import com.rk.pace.domain.tracker.GpsStrength
+import com.rk.pace.presentation.theme.close
 
 @Composable
 fun GpsStrengthIndicator(

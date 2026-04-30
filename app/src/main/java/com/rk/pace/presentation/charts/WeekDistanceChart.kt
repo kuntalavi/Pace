@@ -20,7 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.rk.pace.domain.model.DayDistance
-import com.rk.pace.theme.Black
+import com.rk.pace.presentation.theme.Black
 
 @Composable
 fun WeekDistanceChart(

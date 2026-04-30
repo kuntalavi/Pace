@@ -8,13 +8,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.rk.pace.common.extension.formatDistance
-import com.rk.pace.common.extension.formatTime
-import com.rk.pace.common.ut.PaceUt.getPace
 import com.rk.pace.domain.model.Run
-import java.util.Locale
+import com.rk.pace.presentation.ut.FormatUt.formatDistance
+import com.rk.pace.presentation.ut.FormatUt.formatDuration
+import com.rk.pace.presentation.ut.FormatUt.formatPace
 
 @Composable
 fun Summary(
@@ -36,11 +36,11 @@ fun Summary(
         ) {
             StatItem(
                 title = "DISTANCE",
-                value = run.distanceMeters.formatDistance()
+                value = formatDistance(run.distanceMeters)
             )
             StatItem(
                 title = "DURATION",
-                value = run.durationMilliseconds.formatTime()
+                value = formatDuration(run.durationMilliseconds)
             )
         }
         Row(
@@ -49,11 +49,15 @@ fun Summary(
         ) {
             StatItem(
                 title = "AVG PACE",
-                value = getPace(run.avgSpeedMps)
+                value = formatPace(run.avgSpeedMps)
             )
             StatItem(
                 title = "AVG SPEED",
-                value = String.format(Locale.getDefault(), "%.1f", run.avgSpeedMps) + " M/s"
+                value = String.format(
+                    LocalLocale.current.platformLocale,
+                    "%.1f",
+                    run.avgSpeedMps
+                ) + " M/s"
             )
         }
     }

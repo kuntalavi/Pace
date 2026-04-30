@@ -22,8 +22,8 @@ import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.rk.pace.R
-import com.rk.pace.common.extension.hasPreciseForegroundLocationPermission
-import com.rk.pace.common.ut.PathUt.toLatL
+import com.rk.pace.data.ut.hasPreciseForegroundLocationPermission
+import com.rk.pace.presentation.ut.PathUt.toLatL
 import com.rk.pace.domain.model.RunPathPoint
 
 @SuppressLint("MissingPermission")

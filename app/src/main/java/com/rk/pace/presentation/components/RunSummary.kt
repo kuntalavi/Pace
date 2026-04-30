@@ -14,9 +14,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.rk.pace.common.extension.formatDistance
-import com.rk.pace.common.ut.TimestampUt.getBarDate
+import com.rk.pace.presentation.ut.TimestampUt.getBarDate
 import com.rk.pace.domain.model.Run
+import com.rk.pace.presentation.ut.FormatUt.formatDistance
 
 @Composable
 fun RunSummary(
@@ -36,7 +36,7 @@ fun RunSummary(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = com.rk.pace.theme.run,
+                imageVector = com.rk.pace.presentation.theme.run,
                 contentDescription = "",
                 tint = MaterialTheme.colorScheme.onBackground
             )
@@ -45,7 +45,7 @@ fun RunSummary(
                     .width(10.dp)
             )
             Text(
-                text = run.distanceMeters.formatDistance(),
+                text = formatDistance(run.distanceMeters),
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontSize = 20.sp
                 )

@@ -28,8 +28,8 @@ import com.rk.pace.presentation.screens.stats.components.WeekNavigator
 import com.rk.pace.presentation.ut.FormatUt.formatDistance
 import com.rk.pace.presentation.ut.FormatUt.formatDuration
 import com.rk.pace.presentation.ut.FormatUt.formatPace
-import com.rk.pace.theme.Black
-import com.rk.pace.theme.add
+import com.rk.pace.presentation.theme.Black
+import com.rk.pace.presentation.theme.add
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable

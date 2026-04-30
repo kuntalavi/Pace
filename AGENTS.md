@@ -7,15 +7,15 @@ Guide for AI agents contributing to the Pace codebase. This document covers arch
 Pace follows **Clean Architecture** with **MVVM** for the presentation layer:
 
 ```
-com.rk.pace/
-├── auth/              # Authentication layer (SignIn/SignUp, Supabase Auth)
-├── domain/            # Business logic (UseCases, interfaces, domain models)
-│   ├── repo/          # Repository interfaces (RunRepo, UserRepo, FeedRepo, SocialRepo, DataRepo)
-│   ├── model/         # Pure data models (Run, User, RunPathPoint)
-│   ├── use_case/      # Use case implementations
-│   └── tracking/      # Tracking interfaces (LocationTracker, TimeTracker, TrackerManager)
-├── data/              # Data layer
-│   ├── room/          # Local database (entities, DAOs, PaceDatabase v12)
+ com.rk.pace/
+ ├── auth/              # Authentication layer (SignIn/SignUp, Supabase Auth)
+ ├── domain/            # Business logic (UseCases, interfaces, domain models)
+ │   ├── repo/          # Repository interfaces (RunRepo, UserRepo, FeedRepo, SocialRepo, DataRepo)
+ │   ├── model/         # Pure data models (Run, User, RunPathPoint)
+ │   ├── use_case/      # Use case implementations
+ │   └── tracking/      # Tracking interfaces (LocationTracker, TimeTracker, TrackerManager)
+ ├── data/              # Data layer
+ │   ├── room/          # Local database (entities, DAOs, PaceDatabase v13)
 │   ├── repo/          # Repository implementations
 │   ├── remote/        # Remote data sources (Firebase Firestore, Supabase)
 │   ├── mapper/        # Entity ↔ Domain ↔ DTO mappings
@@ -76,13 +76,14 @@ com.rk.pace/
 
 ## Database Schema & Entities
 
-### Core Entities (PaceDatabase v12)
-```kotlin
-UserEntity(userId, username, name, email, photoURI, followers, following)
-RunEntity(runId, userId, timestamp, durationMilliseconds, distanceMeters, avgSpeedMps, encodedPath, synced, title)
-RunPathPointEntity(pointId, runId, timestamp, lat, long, speedMps, isPausePoint)
-DeleteRunEntity(runId, userId)  // Track deleted runs for sync
-```
+ ### Core Entities (PaceDatabase v13)
+ ```kotlin
+ UserEntity(userId, username, name, email, photoURI, followers, following)
+ RunEntity(runId, userId, timestamp, durationMilliseconds, distanceMeters, avgSpeedMps, encodedPath, synced, title)
+ RunPathPointEntity(pointId, runId, timestamp, lat, long, speedMps, isPausePoint)
+ DeleteRunEntity(runId, userId)  // Track deleted runs for sync
+ WeekGoalsEntity(weekId, userId, targetDistanceMeters, completed) // Weekly goals table
+ ```
 
 ### Relationships
 - `UserEntity` ← 1:N → `RunEntity` (CASCADE delete)
@@ -188,24 +189,24 @@ fun FeatureScreen(
 
 ## Build & Deployment
 
-### Gradle Configuration
-- **compileSdk 36** (Android 15)
-- **minSdk 24**, **targetSdk 36**
-- **Version**: 0.2.0-alpha
-- **Java 11** compatibility
+ ### Gradle Configuration
+ - **compileSdk 36** (Android 15)
+ - **minSdk 24**, **targetSdk 36**
+ - **Version**: 0.2.0-alpha
+ - **Java 21** compatibility (project uses JavaVersion.VERSION_21)
 
 ### API Keys
 - `local.properties`: GOOGLE_MAPS_API_KEY, MAPBOX_ACCESS_TOKEN
 - BuildConfig fields auto-injected at compile time
 - Manifest placeholders for Maps SDK initialization
 
-### Key Dependencies (See libs.versions.toml)
-- **Compose BOM 2026.02.01**: Latest stable
-- **Hilt 2.59.2**, **KSP 2.3.2** for code generation
-- **Room 2.8.4**: Database
-- **Coroutines 1.10.2**: Async
-- **Ktor 3.4.1**, **Maps 8.2.0**: Networking & maps
-- **Firebase BOM 34.10.0**, **Supabase**: Backend
+ ### Key Dependencies (See gradle/libs.versions.toml)
+ - **Compose BOM 2026.04.01**: Latest stable (updated in libs.versions.toml)
+ - **Hilt 2.59.2**, **KSP 2.3.7** for code generation
+ - **Room 2.8.4**: Database
+ - **Coroutines 1.10.2**: Async
+ - **Ktor 3.4.3**, **Maps 8.3.0**: Networking & maps
+ - **Firebase BOM 34.12.0**, **Supabase**: Backend
 
 ### Build Command
 ```bash

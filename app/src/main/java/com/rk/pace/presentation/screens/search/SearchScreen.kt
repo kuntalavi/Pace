@@ -32,8 +32,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.rk.pace.presentation.components.UserItem
-import com.rk.pace.theme.arrowLeft
-import com.rk.pace.theme.close
+import com.rk.pace.presentation.theme.arrowLeft
+import com.rk.pace.presentation.theme.close
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

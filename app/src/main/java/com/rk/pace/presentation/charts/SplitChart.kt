@@ -19,9 +19,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.rk.pace.common.Constants.shape
-import com.rk.pace.common.ut.PaceUt.formatPace
 import com.rk.pace.domain.model.Split
+import com.rk.pace.presentation.theme.shape
 
 @Composable
 fun SplitChart(
@@ -148,4 +147,12 @@ private fun SplitRow(
                 )
         )
     }
+}
+
+private fun formatPace(paceSeconds: Float): String {
+    val duration = paceSeconds.toInt()
+    val minutes = duration / 60
+    val seconds = duration % 60
+
+    return "%d:%02d".format(minutes, seconds)
 }

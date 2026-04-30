@@ -24,8 +24,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
 
-class AuthRepoImp @Inject
-constructor(
+class AuthRepoImp @Inject constructor(
     private val auth: FirebaseAuth,
     firestore: FirebaseFirestore,
     private val userDao: UserDao,

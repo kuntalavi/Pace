@@ -9,6 +9,7 @@ import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -51,9 +52,11 @@ private fun App(
     }
     if (startDestination != null) {
         PaceTheme {
-            PaceNavGraph(
-                startDestination = startDestination
-            )
+            key(startDestination) {
+                PaceNavGraph(
+                    startDestination = startDestination
+                )
+            }
         }
     }
 }

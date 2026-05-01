@@ -9,6 +9,7 @@ import com.rk.pace.data.ut.InternalStorageHelper
 import com.rk.pace.domain.model.User
 import com.rk.pace.domain.use_case.user.GetMyProfileUseCase
 import com.rk.pace.domain.use_case.user.UpdateMyProfileUseCase
+import com.rk.pace.domain.ut.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -107,17 +108,12 @@ class MyProfileViewModel @Inject constructor(
 
     fun signOut() {
         viewModelScope.launch {
-            signOutUseCase()
-                .fold(
-                    onSuccess = {},
-                    onFailure = { error ->
-//                        _events.send(
-//                            AuthUiEvent.Error(
-//                                error.message ?: "Unknown Error"
-//                            )
-//                        )
-                    }
-                )
+            when (
+                val result = signOutUseCase()
+            ) {
+                is Result.Success -> {}
+                is Result.Error -> {}
+            }
         }
     }
 }

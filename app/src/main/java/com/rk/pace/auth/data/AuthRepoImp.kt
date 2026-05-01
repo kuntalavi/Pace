@@ -1,10 +1,11 @@
 package com.rk.pace.auth.data
 
 import android.net.Uri
+import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.firestore.FirebaseFirestore
-import com.rk.pace.auth.domain.model.AuthResult
 import com.rk.pace.auth.domain.model.AuthState
 import com.rk.pace.auth.domain.repo.AuthRepo
 import com.rk.pace.data.mapper.toDomain
@@ -15,6 +16,8 @@ import com.rk.pace.data.room.dao.UserDao
 import com.rk.pace.data.ut.InternalStorageHelper
 import com.rk.pace.di.IoDispatcher
 import com.rk.pace.domain.model.User
+import com.rk.pace.domain.ut.AuthError
+import com.rk.pace.domain.ut.Result
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -38,9 +41,9 @@ class AuthRepoImp @Inject constructor(
     override fun observeAuthState(): Flow<AuthState> = callbackFlow {
         val authStateListener = FirebaseAuth.AuthStateListener { auth ->
             val user = auth.currentUser
-            if (user != null){
+            if (user != null) {
                 trySend(AuthState.Authenticated)
-            }else {
+            } else {
                 trySend(AuthState.Unauthenticated)
             }
         }
@@ -54,17 +57,13 @@ class AuthRepoImp @Inject constructor(
     private val usersCollection = firestore.collection("users")
 
     private suspend fun checkUsernameExists(username: String): Boolean {
-        return try {
-            val querySnapshot = usersCollection
-                .whereEqualTo("query", username.lowercase())
-                .get()
-                .await()
+        val querySnapshot = usersCollection
+            .whereEqualTo("username", username.lowercase())
+            .limit(1)
+            .get()
+            .await()
 
-            !querySnapshot.isEmpty
-        } catch (e: Exception) {
-            e.printStackTrace()
-            false
-        }
+        return !querySnapshot.isEmpty
     }
 
     override suspend fun signUpWithEmail(
@@ -73,102 +72,120 @@ class AuthRepoImp @Inject constructor(
         email: String,
         password: String,
         photoURI: String?
-    ): AuthResult = withContext(ioDispatcher) {
-        try {
-            val usernameExists = checkUsernameExists(username)
-            if (usernameExists) {
-                return@withContext AuthResult.Error("Username Is Already Taken")
-            }
+    ): Result<User, AuthError.NetWork> =
+        withContext(ioDispatcher) {
+            try {
 
-            val authResult = auth.createUserWithEmailAndPassword(email, password).await()
-            val firebaseUser = authResult.user
+                val usernameExists = checkUsernameExists(username)
+                if (usernameExists) {
+                    return@withContext Result.Error(AuthError.NetWork.USERNAME_ALREADY_EXISTS)
+                }
 
-            if (firebaseUser != null) {
+                val result = auth.createUserWithEmailAndPassword(email, password).await()
+                val firebaseUser =
+                    result.user ?: return@withContext Result.Error(
+                        AuthError.NetWork.UNKNOWN_SERVER_ERROR
+                    )
+
                 val user = User(
                     userId = firebaseUser.uid,
                     username = username.lowercase(),
                     name = name,
                     email = email,
-                    photoURL = "",
-                    photoURI = photoURI, // work here
+                    photoURL = null, // work here
+                    photoURI = photoURI,
                     followers = 0,
                     following = 0,
                 )
-                val userDto = user.toDto()
-                usersCollection.document(firebaseUser.uid).set(userDto).await()
 
-                userDao.insertUser(user.toEntity())
+                try {
+                    val userDto = user.toDto()
+                    usersCollection
+                        .document(firebaseUser.uid)
+                        .set(userDto)
+                        .await()
 
-                AuthResult.Success(user)
-            } else {
-                AuthResult.Error("")
+                    userDao.insertUser(user.toEntity())
+
+                } catch (e: Exception) {
+                    try {
+                        firebaseUser
+                            .delete()
+                            .await()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                    throw e
+                }
+
+                Result.Success(user)
+
+            } catch (e: FirebaseNetworkException) {
+                Result.Error(AuthError.NetWork.NO_INTERNET)
+            } catch (e: FirebaseAuthUserCollisionException) {
+                Result.Error(AuthError.NetWork.USER_ALREADY_EXISTS)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Result.Error(AuthError.NetWork.UNKNOWN_SERVER_ERROR)
             }
-        } catch (e: Exception) {
-            AuthResult.Error(e.message ?: "")
         }
-    }
 
     override suspend fun signInWithEmail(
         email: String,
         password: String
-    ): AuthResult = withContext(ioDispatcher) {
-        try {
-            val authResult = auth.signInWithEmailAndPassword(email, password).await()
-            val firebaseUser = authResult.user
-            if (firebaseUser != null) {
+    ): Result<User, AuthError.NetWork> =
+        withContext(ioDispatcher) {
+            try {
+                val result = auth.signInWithEmailAndPassword(email, password).await()
+                val firebaseUser =
+                    result.user ?: return@withContext Result.Error(
+                        AuthError.NetWork.USER_NOT_FOUND
+                    )
+
                 val userDto = usersCollection.document(firebaseUser.uid)
                     .get()
                     .await()
                     .toObject(UserDto::class.java)
+                    ?: return@withContext Result.Error(AuthError.NetWork.USER_NOT_FOUND)
 
-                if (userDto != null) {
-                    var photoURI: String? = null
-                    if (userDto.photoURL != null) {
-                        val localPath =
-                            internalStorageHelper.downloadSupabaseImageToInternalStorage(
-                                userDto.photoURL,
-                                userDto.userId
-                            )
-                        if (localPath != null) {
-                            photoURI = Uri.fromFile(File(localPath)).toString()
-                        }
+                var photoURI: String? = null
+                if (!userDto.photoURL.isNullOrBlank()) {
+                    val localPath =
+                        internalStorageHelper.downloadSupabaseImageToInternalStorage(
+                            userDto.photoURL,
+                            userDto.userId
+                        )
+                    if (localPath != null) {
+                        photoURI = Uri.fromFile(File(localPath)).toString()
                     }
-                    val user = userDto.toDomain(
-                        photoURI = photoURI
-                    )
-
-                    userDao.insertUser(user.toEntity())
-
-                    AuthResult.Success(user)
-                } else {
-                    AuthResult.Error("MyProfile Not Found")
                 }
-            } else {
-                AuthResult.Error("Authentication Failed")
+                val user = userDto.toDomain(
+                    photoURI = photoURI
+                )
+
+                userDao.insertUser(user.toEntity())
+
+                Result.Success(user)
+
+            } catch (e: FirebaseNetworkException) {
+                Result.Error(AuthError.NetWork.NO_INTERNET)
+            } catch (e: FirebaseAuthInvalidCredentialsException) {
+                Result.Error(AuthError.NetWork.INVALID_CRED)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Result.Error(AuthError.NetWork.UNKNOWN_SERVER_ERROR)
             }
-        } catch (e: Exception) {
-            AuthResult.Error(e.message ?: "")
         }
-    }
 
-    override suspend fun signOut(): Result<Unit> = withContext(ioDispatcher) {
-        try {
-            auth.signOut()
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
+    override suspend fun signOut(): Result<Unit, AuthError.NetWork> =
+        withContext(ioDispatcher) {
+            try {
+                auth.signOut()
+                Result.Success(Unit)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Result.Error(AuthError.NetWork.UNKNOWN_SERVER_ERROR)
+            }
         }
-    }
-
-    override suspend fun resetPassword(email: String): Result<Unit> = withContext(ioDispatcher) {
-        try {
-            auth.sendPasswordResetEmail(email).await()
-            Result.success(Unit)
-        } catch (e: FirebaseAuthInvalidUserException) {
-            Result.failure(e)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
 
 }

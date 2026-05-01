@@ -1,7 +1,9 @@
 package com.rk.pace.auth.domain.use_case
 
-import com.rk.pace.auth.domain.model.AuthResult
 import com.rk.pace.auth.domain.repo.AuthRepo
+import com.rk.pace.domain.model.User
+import com.rk.pace.domain.ut.AuthError
+import com.rk.pace.domain.ut.Result
 import javax.inject.Inject
 
 class SignUpWithEmailUseCase @Inject constructor(
@@ -13,11 +15,15 @@ class SignUpWithEmailUseCase @Inject constructor(
         email: String,
         password: String,
         photoURI: String? = null
-    ): AuthResult {
+    ): Result<User, AuthError.NetWork> {
 
-        //validation
-//        if (email.isBlank() || password.isBlank() || username.isBlank() || name.isBlank() || )
+        return authRepo.signUpWithEmail(
+            name,
+            username,
+            email,
+            password,
+            photoURI
+        )
 
-        return authRepo.signUpWithEmail(name, username, email, password, photoURI)
     }
 }

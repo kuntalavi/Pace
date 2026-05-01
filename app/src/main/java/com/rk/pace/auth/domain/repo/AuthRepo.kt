@@ -1,7 +1,9 @@
 package com.rk.pace.auth.domain.repo
 
-import com.rk.pace.auth.domain.model.AuthResult
 import com.rk.pace.auth.domain.model.AuthState
+import com.rk.pace.domain.model.User
+import com.rk.pace.domain.ut.AuthError
+import com.rk.pace.domain.ut.Result
 import kotlinx.coroutines.flow.Flow
 
 interface AuthRepo {
@@ -15,18 +17,14 @@ interface AuthRepo {
         email: String,
         password: String,
         photoURI: String? = null
-    ): AuthResult
+    ): Result<User, AuthError.NetWork>
 
     suspend fun signInWithEmail(
         email: String,
         password: String
-    ): AuthResult
+    ): Result<User, AuthError.NetWork>
 
-    suspend fun signOut(): Result<Unit>
-
-    suspend fun resetPassword(
-        email: String
-    ): Result<Unit>
+    suspend fun signOut(): Result<Unit, AuthError.NetWork>
 
     // signInWithGoogle(idToken: String): AuthResult
     //

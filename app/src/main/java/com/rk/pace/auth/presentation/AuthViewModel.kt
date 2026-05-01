@@ -2,10 +2,12 @@ package com.rk.pace.auth.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.rk.pace.auth.domain.model.AuthResult
 import com.rk.pace.auth.domain.use_case.SignInWithEmailUseCase
 import com.rk.pace.auth.domain.use_case.SignUpWithEmailUseCase
+import com.rk.pace.auth.domain.use_case.ValidateSignInDataUseCase
+import com.rk.pace.auth.domain.use_case.ValidateSignUpDataUseCase
 import com.rk.pace.domain.repo.RunRepo
+import com.rk.pace.domain.ut.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.channels.Channel
@@ -19,7 +21,9 @@ import kotlinx.coroutines.launch
 class AuthViewModel @Inject constructor(
     private val runRepo: RunRepo,
     private val signUpWithEmailUseCase: SignUpWithEmailUseCase,
-    private val signInWithEmailUseCase: SignInWithEmailUseCase
+    private val signInWithEmailUseCase: SignInWithEmailUseCase,
+    private val validateSignUpDataUseCase: ValidateSignUpDataUseCase,
+    private val validateSignInDataUseCase: ValidateSignInDataUseCase
 ) : ViewModel() {
 
     private var _state = MutableStateFlow(AuthUiState())
@@ -80,49 +84,66 @@ class AuthViewModel @Inject constructor(
         val value = _state.value
 
         viewModelScope.launch {
-            if (value.password != value.confirmPassword) {
-                _events.send(
-                    AuthUiEvent.Error(
-                        "Passwords Dont Match"
-                    )
-                )
-                return@launch
-            }
-
-            _state.update {
-                it.copy(
-                    load = true
-                )
-            }
 
             when (
-                val result = signUpWithEmailUseCase(
+                val result = validateSignUpDataUseCase(
                     value.name,
                     value.username,
                     value.email,
                     value.password,
-                    value.photoURI
+                    value.confirmPassword
                 )
             ) {
-                is AuthResult.Success -> {
-                    _state.update {
-                        it.copy(
-                            load = false
-                        )
-                    }
-                }
+                is Result.Error -> {
 
-                is AuthResult.Error -> {
-                    _state.update {
-                        it.copy(
-                            load = false
-                        )
-                    }
                     _events.send(
                         AuthUiEvent.Error(
-                            result.message
+                            result.message.name
                         )
                     )
+                    return@launch
+
+                }
+
+                is Result.Success -> {
+
+                    _state.update {
+                        it.copy(
+                            load = true
+                        )
+                    }
+
+                    when (
+                        val result = signUpWithEmailUseCase(
+                            value.name,
+                            value.username,
+                            value.email,
+                            value.password,
+                            value.photoURI
+                        )
+                    ) {
+                        is Result.Success -> {
+                            _state.update {
+                                it.copy(
+                                    load = false
+                                )
+                            }
+                        }
+
+                        is Result.Error -> {
+                            _state.update {
+                                it.copy(
+                                    load = false
+                                )
+                            }
+                            _events.send(
+                                AuthUiEvent.Error(
+                                    result.message.name
+                                )
+                            )
+                        }
+                    }
+
                 }
             }
         }
@@ -131,38 +152,61 @@ class AuthViewModel @Inject constructor(
     private fun signIn() {
         val value = _state.value
         viewModelScope.launch {
-            _state.update {
-                it.copy(
-                    load = true
-                )
-            }
 
             when (
-                val result = signInWithEmailUseCase(
+                val result = validateSignInDataUseCase(
                     value.email,
                     value.password
                 )
             ) {
-                is AuthResult.Success -> {
-                    runRepo.restoreRuns(result.user.userId)
-                    _state.update {
-                        it.copy(
-                            load = false
-                        )
-                    }
-                }
+                is Result.Error -> {
 
-                is AuthResult.Error -> {
-                    _state.update {
-                        it.copy(
-                            load = false
-                        )
-                    }
                     _events.send(
                         AuthUiEvent.Error(
-                            result.message
+                            result.message.name
                         )
                     )
+                    return@launch
+
+                }
+
+                is Result.Success -> {
+
+                    _state.update {
+                        it.copy(
+                            load = true
+                        )
+                    }
+
+                    when (
+                        val result = signInWithEmailUseCase(
+                            value.email,
+                            value.password
+                        )
+                    ) {
+                        is Result.Success -> {
+                            runRepo.restoreRuns(result.data.userId)
+                            _state.update {
+                                it.copy(
+                                    load = false
+                                )
+                            }
+                        }
+
+                        is Result.Error -> {
+                            _state.update {
+                                it.copy(
+                                    load = false
+                                )
+                            }
+                            _events.send(
+                                AuthUiEvent.Error(
+                                    result.message.name
+                                )
+                            )
+                        }
+                    }
+
                 }
             }
 

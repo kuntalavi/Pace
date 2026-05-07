@@ -2,50 +2,80 @@ package com.rk.pace.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 
-val White = Color(0xFFFFFFFF)
 val Black = Color(0xFF000000)
-
-val Red = Color.Red
 val Gray = Color(0xFF666565)
-val Green = Color.Green
-val Amber = Color(0xFFFFC107)
 
-/*
-* PRIMARY - TEAL
- */
-val Teal900  = Color(0xFF04342C)
-val Teal800  = Color(0xFF085041)
-val Teal600  = Color(0xFF0F6E56)
-val Teal400  = Color(0xFF1D9E75)
-val Teal200  = Color(0xFF5DCAA5)
-val Teal100  = Color(0xFF9FE1CB)
-val Teal50   = Color(0xFFE1F5EE)
-
-/*
-* SECONDARY - AMBER
- */
-val Amber900 = Color(0xFF412402)
-val Amber600 = Color(0xFF854F0B)
-val Amber400 = Color(0xFFBA7517)
-val Amber200 = Color(0xFFEF9F27)
-val Amber100 = Color(0xFFFAC775)
-val Amber50  = Color(0xFFFAEEDA)
-
-/*
-* NEUTRAL - CHARCOAL
- */
-val Gray900  = Color(0xFF2C2C2A)
-val Gray800  = Color(0xFF444441)
-val Gray600  = Color(0xFF5F5E5A)
-val Gray400  = Color(0xFF888780)
-val Gray200  = Color(0xFFB4B2A9)
-val Gray100  = Color(0xFFD3D1C7)
-val Gray50   = Color(0xFFF1EFE8)
-
-/*
-* SEMANTIC
- */
 val Success = Color(0xFF1D9E75)
 val Error = Color(0xFFE24B4A)
-val Warn = Color(0xFFEF9F27)
-val Info = Color(0xFF378ADD)
+
+val primaryLight = Color(0xFF0F6B57)
+val onPrimaryLight = Color(0xFFFFFFFF)
+val primaryContainerLight = Color(0xFFA2F2D9)
+val onPrimaryContainerLight = Color(0xFF005141)
+val secondaryLight = Color(0xFF4B635B)
+val onSecondaryLight = Color(0xFFFFFFFF)
+val secondaryContainerLight = Color(0xFFCDE9DE)
+val onSecondaryContainerLight = Color(0xFF344C44)
+val tertiaryLight = Color(0xFF416277)
+val onTertiaryLight = Color(0xFFFFFFFF)
+val tertiaryContainerLight = Color(0xFFC5E7FF)
+val onTertiaryContainerLight = Color(0xFF294A5E)
+val errorLight = Color(0xFFBA1A1A)
+val onErrorLight = Color(0xFFFFFFFF)
+val errorContainerLight = Color(0xFFFFDAD6)
+val onErrorContainerLight = Color(0xFF93000A)
+val backgroundLight = Color(0xFFF5FBF7)
+val onBackgroundLight = Color(0xFF171D1B)
+val surfaceLight = Color(0xFFF5FBF7)
+val onSurfaceLight = Color(0xFF171D1B)
+val surfaceVariantLight = Color(0xFFDBE5DF)
+val onSurfaceVariantLight = Color(0xFF3F4945)
+val outlineLight = Color(0xFF6F7975)
+val outlineVariantLight = Color(0xFFBFC9C4)
+val scrimLight = Color(0xFF000000)
+val inverseSurfaceLight = Color(0xFF2B322F)
+val inverseOnSurfaceLight = Color(0xFFECF2EE)
+val inversePrimaryLight = Color(0xFF86D6BE)
+val surfaceDimLight = Color(0xFFD5DBD7)
+val surfaceBrightLight = Color(0xFFF5FBF7)
+val surfaceContainerLowestLight = Color(0xFFFFFFFF)
+val surfaceContainerLowLight = Color(0xFFEFF5F1)
+val surfaceContainerLight = Color(0xFFE9EFEB)
+val surfaceContainerHighLight = Color(0xFFE3EAE5)
+val surfaceContainerHighestLight = Color(0xFFDEE4E0)
+
+val primaryDark = Color(0xFF86D6BE)
+val onPrimaryDark = Color(0xFF00382C)
+val primaryContainerDark = Color(0xFF005141)
+val onPrimaryContainerDark = Color(0xFFA2F2D9)
+val secondaryDark = Color(0xFFB2CCC2)
+val onSecondaryDark = Color(0xFF1D352E)
+val secondaryContainerDark = Color(0xFF344C44)
+val onSecondaryContainerDark = Color(0xFFCDE9DE)
+val tertiaryDark = Color(0xFFA9CBE3)
+val onTertiaryDark = Color(0xFF0E3447)
+val tertiaryContainerDark = Color(0xFF294A5E)
+val onTertiaryContainerDark = Color(0xFFC5E7FF)
+val errorDark = Color(0xFFFFB4AB)
+val onErrorDark = Color(0xFF690005)
+val errorContainerDark = Color(0xFF93000A)
+val onErrorContainerDark = Color(0xFFFFDAD6)
+val backgroundDark = Color(0xFF0F1512)
+val onBackgroundDark = Color(0xFFDEE4E0)
+val surfaceDark = Color(0xFF0F1512)
+val onSurfaceDark = Color(0xFFDEE4E0)
+val surfaceVariantDark = Color(0xFF3F4945)
+val onSurfaceVariantDark = Color(0xFFBFC9C4)
+val outlineDark = Color(0xFF89938E)
+val outlineVariantDark = Color(0xFF3F4945)
+val scrimDark = Color(0xFF000000)
+val inverseSurfaceDark = Color(0xFFDEE4E0)
+val inverseOnSurfaceDark = Color(0xFF2B322F)
+val inversePrimaryDark = Color(0xFF0F6B57)
+val surfaceDimDark = Color(0xFF0F1512)
+val surfaceBrightDark = Color(0xFF343B38)
+val surfaceContainerLowestDark = Color(0xFF090F0D)
+val surfaceContainerLowDark = Color(0xFF171D1B)
+val surfaceContainerDark = Color(0xFF1B211F)
+val surfaceContainerHighDark = Color(0xFF252B29)
+val surfaceContainerHighestDark = Color(0xFF303634)

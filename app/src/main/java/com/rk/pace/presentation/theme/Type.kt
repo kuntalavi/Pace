@@ -1,154 +1,111 @@
 package com.rk.pace.presentation.theme
 
 import androidx.compose.material3.Typography
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 import com.rk.pace.R
 
-val SpaceGrotesk = FontFamily(
-    Font(R.font.space_grotesk_light, FontWeight.Light),
-    Font(R.font.space_grotesk_regular, FontWeight.Normal),
-    Font(R.font.space_grotesk_medium, FontWeight.Medium),
-    Font(R.font.space_grotesk_semibold, FontWeight.SemiBold),
-    Font(R.font.space_grotesk_bold, FontWeight.Bold),
+val PJSANS = FontFamily(
+    Font(
+        resId = R.font.pj_sans,
+        weight = FontWeight.Light
+    ),
+    Font(
+        resId = R.font.pj_sans_r,
+        weight = FontWeight.Normal
+    ),
+    Font(
+        resId = R.font.pj_sans_m,
+        weight = FontWeight.Medium
+    ),
+    Font(
+        resId = R.font.pj_sans_sb,
+        weight = FontWeight.SemiBold
+    ),
+    Font(
+        resId = R.font.pj_sans_b,
+        weight = FontWeight.Bold
+    ),
 )
+
+val base = Typography()
 
 val PaceTypography = Typography(
-    /*
-    * DISPLAY
-    * */
-    displayLarge = TextStyle(
-        fontFamily = SpaceGrotesk,
-        fontWeight = FontWeight.Bold,
-        fontSize   = 57.sp,
-        lineHeight = 64.sp,
-        letterSpacing = (-0.25).sp,
-    ),
 
-    displayMedium = TextStyle(
-        fontFamily = SpaceGrotesk,
-        fontWeight = FontWeight.Bold,
-        fontSize   = 45.sp,
-        lineHeight = 52.sp,
-        letterSpacing = 0.sp,
-    ),
+    displayLarge = base
+        .displayLarge.copy(
+            fontFamily = PJSANS
+        ),
 
-    displaySmall = TextStyle(
-        fontFamily = SpaceGrotesk,
-        fontWeight = FontWeight.SemiBold,
-        fontSize   = 36.sp,
-        lineHeight = 44.sp,
-        letterSpacing = 0.sp,
-    ),
+    displayMedium = base
+        .displayMedium.copy(
+            fontFamily = PJSANS
+        ),
 
-    /*
-    * HEADLINE
-    * */
-    headlineLarge = TextStyle(
-        fontFamily = SpaceGrotesk,
-        fontWeight = FontWeight.SemiBold,
-        fontSize   = 32.sp,
-        lineHeight = 40.sp,
-        letterSpacing = 0.sp,
-    ),
+    displaySmall = base
+        .displaySmall.copy(
+            fontFamily = PJSANS
+        ),
 
-    headlineMedium = TextStyle(
-        fontFamily = SpaceGrotesk,
-        fontWeight = FontWeight.Medium,
-        fontSize   = 28.sp,
-        lineHeight = 36.sp,
-        letterSpacing = 0.sp,
-    ),
+    headlineLarge = base
+        .headlineLarge.copy(
+            fontFamily = PJSANS
+        ),
 
-    headlineSmall = TextStyle(
-        fontFamily = SpaceGrotesk,
-        fontWeight = FontWeight.Medium,
-        fontSize   = 24.sp,
-        lineHeight = 32.sp,
-        letterSpacing = 0.sp,
-    ),
+    headlineMedium = base
+        .headlineMedium.copy(
+            fontFamily = PJSANS
+        ),
 
-    /*
-    * TITLE
-    * */
-    titleLarge = TextStyle(
-        fontFamily = SpaceGrotesk,
-        fontWeight = FontWeight.SemiBold,
-        fontSize   = 22.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp,
-    ),
+    headlineSmall = base
+        .headlineSmall.copy(
+            fontFamily = PJSANS
+        ),
 
-    titleMedium = TextStyle(
-        fontFamily = SpaceGrotesk,
-        fontWeight = FontWeight.Medium,
-        fontSize   = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.15.sp,
-    ),
+    titleLarge = base
+        .titleLarge.copy(
+            fontFamily = PJSANS
+        ),
 
-    titleSmall = TextStyle(
-        fontFamily = SpaceGrotesk,
-        fontWeight = FontWeight.Medium,
-        fontSize   = 14.sp,
-        lineHeight = 20.sp,
-        letterSpacing = 0.1.sp,
-    ),
+    titleMedium = base
+        .titleMedium.copy(
+            fontFamily = PJSANS
+        ),
 
-    /*
-    * BODY
-    * */
-    bodyLarge = TextStyle(
-        fontFamily = SpaceGrotesk,
-        fontWeight = FontWeight.Normal,
-        fontSize   = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.5.sp,
-    ),
+    titleSmall = base
+        .titleSmall.copy(
+            fontFamily = PJSANS
+        ),
 
-    bodyMedium = TextStyle(
-        fontFamily = SpaceGrotesk,
-        fontWeight = FontWeight.Normal,
-        fontSize   = 14.sp,
-        lineHeight = 20.sp,
-        letterSpacing = 0.25.sp,
-    ),
+    bodyLarge = base
+        .bodyLarge.copy(
+            fontFamily = PJSANS
+        ),
 
-    bodySmall = TextStyle(
-        fontFamily = SpaceGrotesk,
-        fontWeight = FontWeight.Normal,
-        fontSize   = 12.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.4.sp,
-    ),
+    bodyMedium = base
+        .bodyMedium.copy(
+            fontFamily = PJSANS
+        ),
 
-    /*
-    * LABEL
-    * */
-    labelLarge = TextStyle(
-        fontFamily = SpaceGrotesk,
-        fontWeight = FontWeight.SemiBold,
-        fontSize   = 14.sp,
-        lineHeight = 20.sp,
-        letterSpacing = 0.1.sp,
-    ),
+    bodySmall = base
+        .bodySmall.copy(
+            fontFamily = PJSANS
+        ),
 
-    labelMedium = TextStyle(
-        fontFamily = SpaceGrotesk,
-        fontWeight = FontWeight.Medium,
-        fontSize   = 12.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.5.sp,
-    ),
+    labelLarge = base
+        .labelLarge.copy(
+            fontFamily = PJSANS
+        ),
 
-    labelSmall = TextStyle(
-        fontFamily = SpaceGrotesk,
-        fontWeight = FontWeight.Medium,
-        fontSize   = 11.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.5.sp,
-    ),
-)
+    labelMedium = base
+        .labelMedium.copy(
+            fontFamily = PJSANS
+        ),
+
+    labelSmall = base
+        .labelSmall.copy(
+            fontFamily = PJSANS
+        ),
+
+    )

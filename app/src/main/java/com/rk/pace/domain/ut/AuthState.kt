@@ -1,4 +1,4 @@
-package com.rk.pace.auth.domain.model
+package com.rk.pace.domain.ut
 
 sealed interface AuthState {
     data object Load : AuthState

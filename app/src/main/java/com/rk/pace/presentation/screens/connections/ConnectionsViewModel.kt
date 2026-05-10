@@ -21,7 +21,7 @@ class ConnectionsViewModel @Inject constructor(
     val userId: String = checkNotNull(savedStateHandle["userId"])
     val tab: Int = savedStateHandle["tab"] ?: 0
 
-    private val _state: MutableStateFlow<ConnectionsState> = MutableStateFlow(ConnectionsState())
+    private val _state: MutableStateFlow<ConnectionsUiState> = MutableStateFlow(ConnectionsUiState())
     val state = _state.asStateFlow()
 
     fun getFollowers() {

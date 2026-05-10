@@ -106,7 +106,7 @@ class RunRepoImp @Inject constructor(
         if (runEntity != null) {
             return runEntity.toDomain()
         }
-        val runDto = firebaseRunDataSource.getRunDtoByRunId(runId)
+        val runDto = firebaseRunDataSource.getRunById(runId)
         if (runDto != null) {
             return runDto.toRunWithPathDomain()
         }

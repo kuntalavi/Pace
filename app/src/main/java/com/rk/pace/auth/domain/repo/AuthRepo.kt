@@ -1,6 +1,6 @@
 package com.rk.pace.auth.domain.repo
 
-import com.rk.pace.auth.domain.model.AuthState
+import com.rk.pace.domain.ut.AuthState
 import com.rk.pace.domain.model.User
 import com.rk.pace.domain.ut.AuthError
 import com.rk.pace.domain.ut.Result

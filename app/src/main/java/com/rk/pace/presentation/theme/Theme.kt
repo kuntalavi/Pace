@@ -8,6 +8,7 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalContext
 
 private val k = lightColorScheme(
@@ -106,9 +107,16 @@ fun PaceTheme(
         else -> k
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = PaceTypography,
-        content = content
-    )
+
+    CompositionLocalProvider(
+        LocalSpace provides Space(),
+        LocalElevation provides Elevation()
+    ){
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = PaceTypography,
+            content = content
+        )
+    }
+
 }

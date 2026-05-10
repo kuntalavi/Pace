@@ -15,10 +15,19 @@ fun GoalsPager(
     onGoalClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val (runGoalProgress, distanceGoalProgress, durationGoalProgress) = weekGoalsProgress
+    val (
+        runGoalProgress,
+        distanceGoalProgress,
+        durationGoalProgress
+    ) =
+        weekGoalsProgress
 
     val pagerState = rememberPagerState(pageCount = { 3 })
-    val pages = listOf(runGoalProgress, distanceGoalProgress, durationGoalProgress)
+    val pages = listOf(
+        runGoalProgress,
+        distanceGoalProgress,
+        durationGoalProgress
+    )
 
     Column(
         modifier = modifier,

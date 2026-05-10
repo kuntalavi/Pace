@@ -4,19 +4,16 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rk.pace.auth.domain.use_case.GetCurrentUserIdUseCase
-import com.rk.pace.presentation.ut.ChartsUt.buildPaceChartData
-import com.rk.pace.presentation.ut.PathUt.toSegments
-import com.rk.pace.presentation.ut.ChartsUt.buildSplitChartData
-import com.rk.pace.di.ApplicationIoCoroutineScope
-import com.rk.pace.domain.model.PacePoint
-import com.rk.pace.domain.model.Run
-import com.rk.pace.domain.model.Split
 import com.rk.pace.domain.use_case.run.DeleteRunUseCase
 import com.rk.pace.domain.use_case.run.GetRunWithPathByRunIdUseCase
+import com.rk.pace.presentation.ut.ChartsUt.buildPaceChartData
+import com.rk.pace.presentation.ut.ChartsUt.buildSplitChartData
+import com.rk.pace.presentation.ut.PathUt.toSegments
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,53 +22,112 @@ import javax.inject.Inject
 class RunStatsViewModel @Inject constructor(
     private val getRunWithPathByRunIdUseCase: GetRunWithPathByRunIdUseCase,
     private val deleteRunUseCase: DeleteRunUseCase,
-    getCurrentUserUseCase: GetCurrentUserIdUseCase,
-    @param:ApplicationIoCoroutineScope private val scope: CoroutineScope,
+    getCurrentUserIdUseCase: GetCurrentUserIdUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     val userId: String = savedStateHandle["userId"] ?: ""
     val runId: String = savedStateHandle["runId"] ?: ""
 
-    private val _isCurrentUser: MutableStateFlow<Boolean> =
-        MutableStateFlow(
-            getCurrentUserUseCase() == userId
+    private val _state: MutableStateFlow<RunStatsUiState> = MutableStateFlow(
+        RunStatsUiState(
+            isCurrentUser = getCurrentUserIdUseCase() == userId
         )
-    val isCurrentUser = _isCurrentUser.asStateFlow()
-
-    private val _state: MutableStateFlow<RunStatsState> = MutableStateFlow(RunStatsState.Load())
+    )
     val state = _state.asStateFlow()
 
-    private val _splits: MutableStateFlow<List<Split>> = MutableStateFlow(emptyList())
-    val splits = _splits.asStateFlow()
-
-    private val _paceChartData: MutableStateFlow<List<PacePoint>> = MutableStateFlow(emptyList())
-    val paceChartData = _paceChartData.asStateFlow()
+    private val _events = Channel<RunStatsEvent>()
+    val events = _events.receiveAsFlow()
 
     init {
-        getRun(runId)
+        getData(runId)
     }
 
-    private fun getRun(runId: String) {
-        if (runId.isEmpty()) return
-        _state.update {
-            RunStatsState.Load()
-        }
-        viewModelScope.launch {
-            val runWithPath = getRunWithPathByRunIdUseCase(runId) ?: return@launch
+    private fun getData(runId: String) {
+
+        if (runId.isEmpty()) {
             _state.update {
-                RunStatsState.Success(runWithPath)
+                it.copy(
+                    load = false,
+                    error = ""
+                )
             }
-            _splits.update {
-                buildSplitChartData(runWithPath.path.toSegments())
+            return
+        }
+
+        viewModelScope.launch {
+
+            _state.update {
+                it.copy(
+                    load = false,
+                    error = null
+                )
             }
-            _paceChartData.update {
-                buildPaceChartData(runWithPath.path)
+
+            val runWithPath = getRunWithPathByRunIdUseCase(runId)
+
+            if (runWithPath == null) {
+                _state.update {
+                    it.copy(
+                        load = false,
+                        error = ""
+                    )
+                }
+                return@launch
             }
+
+            val splits = buildSplitChartData(
+                runWithPath
+                    .path
+                    .toSegments()
+            )
+            val paceChartData = buildPaceChartData(
+                runWithPath.path
+            )
+
+
+            _state.update {
+                it.copy(
+                    load = false,
+                    data = RunStatsData(
+                        run = runWithPath.run,
+                        path = runWithPath.path,
+                        splits = splits,
+                        paceChartData = paceChartData
+                    ),
+                    error = null
+                )
+            }
+
+        }
+
+    }
+
+    fun onAction(action: RunStatsAction) {
+        when (action) {
+            RunStatsAction.OnDeleteRunClick -> deleteRun()
         }
     }
 
-    fun deleteRun(run: Run) {
-        scope.launch { deleteRunUseCase(run) }
+    private fun deleteRun() {
+        val run = _state.value.data?.run ?: return
+
+        viewModelScope.launch {
+
+            try {
+                deleteRunUseCase(run)
+                _events.send(
+                    RunStatsEvent.RunDeleted
+                )
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _events.send(
+                    RunStatsEvent.Error(message = "")
+                )
+            }
+
+        }
+
     }
+
 }

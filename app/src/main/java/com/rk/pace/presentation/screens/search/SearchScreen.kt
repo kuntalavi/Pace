@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.rk.pace.presentation.components.UserItem
+import com.rk.pace.presentation.components.PaceUser
 import com.rk.pace.presentation.theme.arrowLeft
 import com.rk.pace.presentation.theme.close
 
@@ -146,7 +146,7 @@ fun SearchScreen(
                                 user.userId
                             }
                         ) { user ->
-                            UserItem(
+                            PaceUser(
                                 user = user,
                                 onClick = {
                                     keyboardController?.hide()

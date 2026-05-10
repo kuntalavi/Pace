@@ -33,19 +33,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.rk.pace.presentation.ut.TimestampUt.getDate
 import com.rk.pace.domain.model.FeedPost
 import com.rk.pace.domain.model.Run
 import com.rk.pace.domain.model.User
-import com.rk.pace.presentation.components.PaceStatItem
+import com.rk.pace.presentation.components.PaceStat
 import com.rk.pace.presentation.components.PaceUserDp
 import com.rk.pace.presentation.components.PaceUserDpSize
-import com.rk.pace.presentation.components.StatItemStyle
+import com.rk.pace.presentation.components.StatStyle
+import com.rk.pace.presentation.theme.like
+import com.rk.pace.presentation.theme.unlike
 import com.rk.pace.presentation.ut.FormatUt.formatDistance
 import com.rk.pace.presentation.ut.FormatUt.formatDuration
 import com.rk.pace.presentation.ut.FormatUt.formatPace
-import com.rk.pace.presentation.theme.like
-import com.rk.pace.presentation.theme.unlike
+import com.rk.pace.presentation.ut.TimestampUt.getDate
 
 @Composable
 fun FeedItem(
@@ -117,31 +117,38 @@ fun FeedItem(
 @Composable
 private fun FeedItemStats(run: Run) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 15.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        modifier = Modifier.fillMaxWidth()
     ) {
 
-        PaceStatItem(
-            value = formatDistance(run.distanceMeters),
+        PaceStat(
+            modifier = Modifier.weight(1f),
+            value = formatDistance(
+                run.distanceMeters
+            ),
             label = "DISTANCE",
-            unit = "Km",
-            style = StatItemStyle.Inline
+            unit = "KM",
+            style = StatStyle.POST,
+            horizontalAlignment = Alignment.CenterHorizontally
         )
 
-        PaceStatItem(
-            value = formatPace(run.avgSpeedMps),
+        PaceStat(
+            modifier = Modifier.weight(1f),
+            value = formatPace(
+                run.avgSpeedMps
+            ),
             label = "PACE",
-            unit = "/Km",
-            style = StatItemStyle.Inline
+            style = StatStyle.POST,
+            horizontalAlignment = Alignment.CenterHorizontally
         )
 
-        PaceStatItem(
-            value = formatDuration(run.durationMilliseconds),
-            label = "TIME",
-            unit = "",
-            style = StatItemStyle.Inline
+        PaceStat(
+            modifier = Modifier.weight(1f),
+            value = formatDuration(
+                run.durationMilliseconds
+            ),
+            label = "DURATION",
+            style = StatStyle.POST,
+            horizontalAlignment = Alignment.CenterHorizontally
         )
 
     }

@@ -16,23 +16,19 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.repeatOnLifecycle
 import com.rk.pace.auth.presentation.AuthAction
 import com.rk.pace.auth.presentation.AuthUiEvent
 import com.rk.pace.auth.presentation.AuthViewModel
 import com.rk.pace.presentation.components.ButtonVariant
 import com.rk.pace.presentation.components.PaceButton
-import com.rk.pace.presentation.components.PaceInputBox
-import kotlinx.coroutines.flow.collectLatest
+import com.rk.pace.presentation.components.PaceTextInput
+import com.rk.pace.presentation.ut.ObserveAsEvents
 
 @Composable
 fun SignUpScreen(
@@ -40,31 +36,25 @@ fun SignUpScreen(
 ) {
 
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackbarState = remember { SnackbarHostState() }
 
-    val lifecycleOwner = LocalLifecycleOwner.current
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    LaunchedEffect(
-        key1 = viewModel.events,
-        key2 = lifecycleOwner.lifecycle
-    ) {
-        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewModel.events.collectLatest { event ->
-                when (event) {
-                    is AuthUiEvent.Error -> {
-                        snackbarHostState.showSnackbar(
-                            message = event.message,
-                            duration = SnackbarDuration.Short
-                        )
-                    }
-                }
+    ObserveAsEvents(
+        viewModel.events,
+        latest = true
+    ) { event ->
+        when (event) {
+            is AuthUiEvent.Error -> {
+                snackbarState.showSnackbar(
+                    message = event.message,
+                    duration = SnackbarDuration.Short
+                )
             }
         }
     }
 
     Scaffold(
         snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState) { data ->
+            SnackbarHost(hostState = snackbarState) { data ->
                 Snackbar(
                     containerColor = colorScheme.errorContainer,
                     contentColor = colorScheme.onErrorContainer,
@@ -77,11 +67,11 @@ fun SignUpScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(p)
-                .padding(horizontal = 20.dp)
+                .padding(20.dp)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.Center
         ) {
-            PaceInputBox(
+            PaceTextInput(
                 value = state.name,
                 onValueChange = {
                     viewModel.onAction(
@@ -96,7 +86,7 @@ fun SignUpScreen(
                     .height(20.dp)
             )
 
-            PaceInputBox(
+            PaceTextInput(
                 value = state.username,
                 onValueChange = {
                     viewModel.onAction(
@@ -111,7 +101,7 @@ fun SignUpScreen(
                     .height(20.dp)
             )
 
-            PaceInputBox(
+            PaceTextInput(
                 value = state.email,
                 onValueChange = {
                     viewModel.onAction(
@@ -123,10 +113,10 @@ fun SignUpScreen(
 
             Spacer(
                 modifier = Modifier
-                    .height(24.dp)
+                    .height(20.dp)
             )
 
-            PaceInputBox(
+            PaceTextInput(
                 value = state.password,
                 onValueChange = {
                     viewModel.onAction(
@@ -142,7 +132,7 @@ fun SignUpScreen(
                     .height(20.dp)
             )
 
-            PaceInputBox(
+            PaceTextInput(
                 value = state.confirmPassword,
                 onValueChange = {
                     viewModel.onAction(
@@ -160,7 +150,7 @@ fun SignUpScreen(
 
             PaceButton(
                 modifier = Modifier
-                    .fillMaxWidth(.3f),
+                    .fillMaxWidth(.5f),
                 text = "Sign Up",
                 onClick = {
                     viewModel.onAction(

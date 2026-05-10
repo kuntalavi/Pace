@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.rk.pace.presentation.components.PaceButton
-import com.rk.pace.presentation.components.PaceInputBox
+import com.rk.pace.presentation.components.PaceTextInput
 import com.rk.pace.presentation.components.PaceUserDp
 import com.rk.pace.presentation.components.PaceUserDpSize
 import com.rk.pace.presentation.theme.Gray
@@ -246,7 +246,7 @@ fun InputItem(
 
         Spacer(modifier = Modifier.height(5.dp))
 
-        PaceInputBox(
+        PaceTextInput(
             modifier = Modifier
                 .fillMaxWidth(),
             value = value,

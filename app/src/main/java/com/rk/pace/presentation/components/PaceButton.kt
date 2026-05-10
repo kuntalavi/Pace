@@ -35,6 +35,7 @@ enum class ButtonVariant {
 }
 
 enum class ButtonSize {
+    SMALL,
     MEDIUM,
     LARGE
 }
@@ -79,6 +80,7 @@ fun PaceButton(
     }
 
     val style = when (size) {
+        ButtonSize.SMALL -> typography.titleSmall
         ButtonSize.MEDIUM -> typography.titleMedium
         ButtonSize.LARGE -> typography.titleLarge
     }

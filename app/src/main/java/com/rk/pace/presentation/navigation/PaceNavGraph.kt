@@ -1,11 +1,11 @@
 package com.rk.pace.presentation.navigation
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,14 +41,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.rk.pace.MainViewModel
 import com.rk.pace.presentation.theme.add_people
-import com.rk.pace.presentation.ut.defaultEnterTransition
-import com.rk.pace.presentation.ut.defaultExitTransition
-import com.rk.pace.presentation.ut.defaultPopEnterTransition
-import com.rk.pace.presentation.ut.defaultPopExitTransition
 import kotlin.reflect.KClass
 
 @OptIn(ExperimentalMaterial3Api::class)
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PaceNavGraph(
     viewModel: MainViewModel = hiltViewModel(),
@@ -132,10 +127,10 @@ fun PaceNavGraph(
                 ),
                 navController = navController,
                 startDestination = startDestination,
-                enterTransition = { defaultEnterTransition() },
-                exitTransition = { defaultExitTransition() },
-                popEnterTransition = { defaultPopEnterTransition() },
-                popExitTransition = { defaultPopExitTransition() }
+                enterTransition = { slideInHorizontally { it } },
+                exitTransition = { slideOutHorizontally { -it } },
+                popEnterTransition = { slideInHorizontally { -it } },
+                popExitTransition = { slideOutHorizontally { it } }
             ) {
 
                 rootNavGraph(navController)

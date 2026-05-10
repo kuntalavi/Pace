@@ -35,8 +35,8 @@ class FeedViewModel @Inject constructor(
                     isInitialLoad = true
                 )
             }
-            getFeedUseCase().collect { result ->
-                result.fold(
+            getFeedUseCase()
+                .fold(
                     onSuccess = { posts ->
                         _state.update {
                             it.copy(
@@ -54,7 +54,6 @@ class FeedViewModel @Inject constructor(
                         }
                     }
                 )
-            }
         }
     }
 
@@ -65,8 +64,8 @@ class FeedViewModel @Inject constructor(
                     isRefreshing = true
                 )
             }
-            getFeedUseCase().collect { result ->
-                result.fold(
+            getFeedUseCase()
+                .fold(
                     onSuccess = { posts ->
                         _state.update {
                             it.copy(
@@ -84,7 +83,6 @@ class FeedViewModel @Inject constructor(
                         }
                     }
                 )
-            }
         }
     }
 
@@ -116,7 +114,7 @@ class FeedViewModel @Inject constructor(
         }
     }
 
-    fun clearLikedByUsers(){
+    fun clearLikedByUsers() {
         _state.update { state ->
             state.copy(
                 likedByUsers = emptyList()
@@ -124,7 +122,7 @@ class FeedViewModel @Inject constructor(
         }
     }
 
-    fun getLikedByUsers(likedByUserId: List<String>){
+    fun getLikedByUsers(likedByUserId: List<String>) {
         _state.update {
             it.copy(
                 isLikedByUsersLoading = true

@@ -8,6 +8,9 @@ data class FeedState(
     val likedByUsers: List<User> = emptyList(),
     val isLikedByUsersLoading: Boolean = false,
 
+    val isLikesUsersLoad: Boolean = false,
+    val showLikesBottomSheet: Boolean = false,
+
     val isInitialLoad: Boolean = false,
     val isRefreshing: Boolean = false,
 

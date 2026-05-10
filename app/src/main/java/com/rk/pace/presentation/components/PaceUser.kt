@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.sp
 import com.rk.pace.domain.model.User
 
 @Composable
-fun UserItem(
+fun PaceUser(
     user: User,
     onClick: () -> Unit
 ) {

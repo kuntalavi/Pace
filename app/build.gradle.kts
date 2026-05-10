@@ -35,6 +35,8 @@ android {
         }
     }
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
+
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
@@ -45,6 +47,8 @@ android {
 }
 
 dependencies {
+
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 
     implementation(libs.coil.network.okhttp)
 
@@ -96,7 +100,6 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
 
-    // Test
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -8,7 +8,8 @@ import com.rk.pace.domain.model.WeekGoalsProgress
 import javax.inject.Inject
 
 class MapWeekGoalsToWeekGoalsProgress @Inject constructor() {
-    operator fun invoke(weekRuns: List<Run>, weekGoals: WeekGoals,): WeekGoalsProgress {
+
+    operator fun invoke(weekRuns: List<Run>, weekGoals: WeekGoals): WeekGoalsProgress {
 
         val distanceMeters = weekRuns.sumOf { run ->
             run.distanceMeters.toLong()
@@ -42,4 +43,5 @@ class MapWeekGoalsToWeekGoalsProgress @Inject constructor() {
             durationGoalProgress = durationGoalProgress
         )
     }
+
 }

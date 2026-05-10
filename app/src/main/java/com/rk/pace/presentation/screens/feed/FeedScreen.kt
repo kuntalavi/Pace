@@ -24,6 +24,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -36,8 +37,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.rk.pace.presentation.components.UserItem
+import androidx.lifecycle.repeatOnLifecycle
+import com.rk.pace.presentation.components.PaceUser
 import com.rk.pace.presentation.screens.feed.components.FeedItem
 import com.rk.pace.presentation.theme.like
 
@@ -54,6 +58,16 @@ fun FeedScreen(
     val sheetState = rememberModalBottomSheetState()
 
     var likes by remember { mutableIntStateOf(0) }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    LaunchedEffect(key1 = lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(
+            Lifecycle.State.RESUMED
+        ) {
+            viewmodel.refreshFeed()
+        }
+    }
 
     when {
         state.isInitialLoad -> {
@@ -174,7 +188,7 @@ fun FeedScreen(
                                     user.userId
                                 }
                             ) { user ->
-                                UserItem(
+                                PaceUser(
                                     user = user,
                                     onClick = {
                                         showBottomSheet = false

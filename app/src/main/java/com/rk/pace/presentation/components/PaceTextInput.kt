@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.sp
 import com.rk.pace.presentation.theme.Gray
 
 @Composable
-fun PaceInputBox(
+fun PaceTextInput(
     modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,

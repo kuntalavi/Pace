@@ -1,15 +1,12 @@
 package com.rk.pace.domain.ut
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.temporal.TemporalAdjusters
 
 object WeekBoundsUt {
-
-    @RequiresApi(Build.VERSION_CODES.O)
+    
     fun getWeekBounds(weekOffset: Int): Pair<Long, Long> {
         val t = LocalDate.now()
 
@@ -24,4 +21,5 @@ object WeekBoundsUt {
 
         return weekStart to weekEnd
     }
+
 }

@@ -16,14 +16,22 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.rk.pace.domain.model.WeekGoals
 import com.rk.pace.presentation.components.PaceButton
 import com.rk.pace.presentation.theme.arrowLeft
+import com.rk.pace.presentation.ut.ObserveAsEvents
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddGoalScreen(
     modifier: Modifier = Modifier,
     viewModel: StatsViewModel = hiltViewModel(),
-    goBack: () -> Unit
+    onBack: () -> Unit
 ) {
+
+    ObserveAsEvents(viewModel.events) { event ->
+        when (event) {
+            is StatsEvent.OnBack -> onBack()
+            else -> {}
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -60,14 +68,16 @@ fun AddGoalScreen(
             )
             PaceButton(
                 onClick = {
-                    viewModel.updateWeekGoals(
-                        WeekGoals(
-                            runs = 10,
-                            distanceMeters = 10f,
-                            durationMilliseconds = 10
+                    viewModel.onAction(
+                        StatsAction.OnUpdateGoals(
+                            WeekGoals(
+                                runs = 10,
+                                distanceMeters = 10f,
+                                durationMilliseconds = 10
+                            )
                         )
                     )
-                    goBack()
+                    onBack()
                 },
                 text = "START GOAL"
             )

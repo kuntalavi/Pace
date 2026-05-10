@@ -1,7 +1,5 @@
 package com.rk.pace.presentation.screens.stats
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,17 +19,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.rk.pace.presentation.components.PaceStatCard
+import com.rk.pace.presentation.components.PaceStat
 import com.rk.pace.presentation.screens.stats.components.DistanceCard
 import com.rk.pace.presentation.screens.stats.components.GoalsPager
 import com.rk.pace.presentation.screens.stats.components.WeekNavigator
+import com.rk.pace.presentation.theme.Black
+import com.rk.pace.presentation.theme.add
 import com.rk.pace.presentation.ut.FormatUt.formatDistance
 import com.rk.pace.presentation.ut.FormatUt.formatDuration
 import com.rk.pace.presentation.ut.FormatUt.formatPace
-import com.rk.pace.presentation.theme.Black
-import com.rk.pace.presentation.theme.add
+import com.rk.pace.presentation.ut.ObserveAsEvents
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun StatsScreen(
     modifier: Modifier = Modifier,
@@ -40,16 +38,30 @@ fun StatsScreen(
     onGoalClick: () -> Unit
 ) {
 
-    val weekDistanceChartData by viewModel.weekDistanceChartData.collectAsStateWithLifecycle()
-    val weekStats by viewModel.weekStats.collectAsStateWithLifecycle()
-    val weekLabel by viewModel.weekLabel.collectAsStateWithLifecycle()
-    val canGoForward by viewModel.canGoForward.collectAsStateWithLifecycle()
-    val weekGoalsProgress by viewModel.weekGoalsProgress.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
-    val (runGoalProgress, distanceGoalProgress, durationGoalProgress) = weekGoalsProgress
+    ObserveAsEvents(viewModel.events) { event ->
+        when (event) {
+            is StatsEvent.GoToAddGoal -> onAddGoalClick()
+            is StatsEvent.GoToGoal -> onGoalClick()
+            else -> {}
+        }
+    }
 
-    val isAnyGoalSet = runGoalProgress.isSet || distanceGoalProgress.isSet || durationGoalProgress.isSet
-    val areAllGoalsSet = runGoalProgress.isSet && distanceGoalProgress.isSet && durationGoalProgress.isSet
+    val weekGoalsProgress = state.data.weekGoalsProgress
+    val (
+        runGoalProgress,
+        distanceGoalProgress,
+        durationGoalProgress
+    ) =
+        weekGoalsProgress
+    val weekStats = state.data.weekStats
+    val weekDistanceChartData = state.data.weekDistanceChartData
+
+    val isAnyGoalSet =
+        runGoalProgress.isSet || distanceGoalProgress.isSet || durationGoalProgress.isSet
+    val areAllGoalsSet =
+        runGoalProgress.isSet && distanceGoalProgress.isSet && durationGoalProgress.isSet
 
     Box(
         modifier = modifier.fillMaxSize()
@@ -63,10 +75,9 @@ fun StatsScreen(
 //            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             WeekNavigator(
-                weekLabel = weekLabel,
-                canGoForward = canGoForward,
-                onPrevious = { viewModel.goToPreviousWeek() },
-                onNext = { viewModel.goToNextWeek() }
+                weekLabel = state.weekLabel,
+                canGoForward = state.canGoForward,
+                onAction = viewModel::onAction
             )
 
             DistanceCard(
@@ -75,20 +86,18 @@ fun StatsScreen(
             )
 
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                modifier = Modifier.fillMaxWidth()
             ) {
-                PaceStatCard(
+                PaceStat(
+                    modifier = Modifier.weight(1f),
                     label = "AVG PACE",
                     value = formatPace(weekStats.avgSpeedMps),
-                    unit = "/KM",
-                    modifier = Modifier.weight(1f)
+                    unit = "/KM"
                 )
-                PaceStatCard(
+                PaceStat(
+                    modifier = Modifier.weight(1f),
                     label = "TOTAL TIME",
-                    value = formatDuration(weekStats.durationMilliseconds),
-                    unit = "",
-                    modifier = Modifier.weight(1f)
+                    value = formatDuration(weekStats.durationMilliseconds)
                 )
             }
 
@@ -116,7 +125,11 @@ fun StatsScreen(
 
                 GoalsPager(
                     weekGoalsProgress = weekGoalsProgress,
-                    onGoalClick = { onGoalClick() }
+                    onGoalClick = {
+                        viewModel.onAction(
+                            StatsAction.OnGoalClick
+                        )
+                    }
                 )
 
             } else {
@@ -125,7 +138,11 @@ fun StatsScreen(
                     style = MaterialTheme.typography.titleLarge
                 )
                 IconButton(
-                    onClick = { onAddGoalClick() }
+                    onClick = {
+                        viewModel.onAction(
+                            StatsAction.OnAddGoalClick
+                        )
+                    }
                 ) {
                     Icon(
                         imageVector = add,

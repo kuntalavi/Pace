@@ -1,13 +1,11 @@
 package com.rk.pace.domain.use_case.stat
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.rk.pace.domain.model.Run
 import com.rk.pace.domain.model.WeekStats
 import javax.inject.Inject
 
 class GetWeekStatsUseCase @Inject constructor() {
-    @RequiresApi(Build.VERSION_CODES.O)
+
     operator fun invoke(runs: List<Run>): WeekStats {
         if (runs.isEmpty()) {
             return WeekStats(
@@ -37,4 +35,5 @@ class GetWeekStatsUseCase @Inject constructor() {
             avgSpeedMps = avgSpeedMps
         )
     }
+
 }

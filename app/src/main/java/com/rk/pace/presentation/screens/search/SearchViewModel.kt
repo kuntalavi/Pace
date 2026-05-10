@@ -21,7 +21,7 @@ class SearchViewModel @Inject constructor(
     private val searchUsersUseCase: SearchUsersUseCase
 ) : ViewModel() {
 
-    private val _state: MutableStateFlow<SearchScreenState> = MutableStateFlow(SearchScreenState())
+    private val _state: MutableStateFlow<SearchUiState> = MutableStateFlow(SearchUiState())
     val state = _state
 
     init {

@@ -61,7 +61,7 @@ class GpsStatusTrackerImp @Inject constructor(
         }
     }
         .distinctUntilChanged()
-        .debounce(3000L)
+        .debounce(2000L)
         .conflate()
         .flowOn(ioDispatcher)
 }

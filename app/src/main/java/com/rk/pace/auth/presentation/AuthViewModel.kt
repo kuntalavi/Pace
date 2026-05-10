@@ -98,7 +98,7 @@ class AuthViewModel @Inject constructor(
 
                     _events.send(
                         AuthUiEvent.Error(
-                            result.message.name
+                            result.error.name
                         )
                     )
                     return@launch
@@ -138,7 +138,7 @@ class AuthViewModel @Inject constructor(
                             }
                             _events.send(
                                 AuthUiEvent.Error(
-                                    result.message.name
+                                    result.error.name
                                 )
                             )
                         }
@@ -163,7 +163,7 @@ class AuthViewModel @Inject constructor(
 
                     _events.send(
                         AuthUiEvent.Error(
-                            result.message.name
+                            result.error.name
                         )
                     )
                     return@launch
@@ -201,7 +201,7 @@ class AuthViewModel @Inject constructor(
                             }
                             _events.send(
                                 AuthUiEvent.Error(
-                                    result.message.name
+                                    result.error.name
                                 )
                             )
                         }

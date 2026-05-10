@@ -6,7 +6,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.firestore.FirebaseFirestore
-import com.rk.pace.auth.domain.model.AuthState
 import com.rk.pace.auth.domain.repo.AuthRepo
 import com.rk.pace.data.mapper.toDomain
 import com.rk.pace.data.mapper.toDto
@@ -17,6 +16,7 @@ import com.rk.pace.data.ut.InternalStorageHelper
 import com.rk.pace.di.IoDispatcher
 import com.rk.pace.domain.model.User
 import com.rk.pace.domain.ut.AuthError
+import com.rk.pace.domain.ut.AuthState
 import com.rk.pace.domain.ut.Result
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.awaitClose

@@ -14,8 +14,8 @@ import com.rk.pace.domain.model.RunState
 import com.rk.pace.presentation.components.ButtonSize
 import com.rk.pace.presentation.components.ButtonVariant
 import com.rk.pace.presentation.components.PaceButton
-import com.rk.pace.presentation.components.PaceStatItem
-import com.rk.pace.presentation.components.StatItemStyle
+import com.rk.pace.presentation.components.PaceStat
+import com.rk.pace.presentation.components.StatStyle
 import com.rk.pace.presentation.ut.FormatUt.formatDistance
 import com.rk.pace.presentation.ut.FormatUt.formatDuration
 import com.rk.pace.presentation.ut.FormatUt.formatPace
@@ -39,22 +39,22 @@ fun RunFullSheet(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            PaceStatItem(
+            PaceStat(
                 value = formatDistance(runState.distanceMeters),
                 label = "DISTANCE",
                 unit = "KM",
-                style = StatItemStyle.Hero
+                style = StatStyle.HERO
             )
-            PaceStatItem(
+            PaceStat(
                 value = formatDuration(runState.durationMilliseconds),
                 label = "DURATION",
-                style = StatItemStyle.Hero
+                style = StatStyle.HERO
             )
-            PaceStatItem(
+            PaceStat(
                 value = formatPace(runState.avgSpeedMps),
                 label = "AVG PACE",
                 unit = "/KM",
-                style = StatItemStyle.Hero
+                style = StatStyle.HERO
             )
 
             if (!runState.isAct) {

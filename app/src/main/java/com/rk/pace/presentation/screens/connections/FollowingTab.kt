@@ -12,7 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.rk.pace.domain.model.User
-import com.rk.pace.presentation.components.UserItem
+import com.rk.pace.presentation.components.PaceUser
 
 @Composable
 fun FollowingTab(
@@ -27,7 +27,7 @@ fun FollowingTab(
             contentPadding = PaddingValues(20.dp)
         ) {
             items(following) { follow ->
-                UserItem(
+                PaceUser(
                     user = follow,
                     onClick = {
                         onUserClick(follow.userId)

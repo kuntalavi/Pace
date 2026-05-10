@@ -7,6 +7,7 @@ import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.rk.pace.data.remote.dto.FollowerDto
 import com.rk.pace.data.remote.dto.UserDto
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.github.jan.supabase.SupabaseClient
@@ -19,7 +20,7 @@ import javax.inject.Inject
 
 class FirebaseUserDataSource @Inject constructor(
     @param:ApplicationContext private val context: Context,
-    firestore: FirebaseFirestore,
+    private val firestore: FirebaseFirestore,
     private val supabase: SupabaseClient,
     private val auth: FirebaseAuth
 ) {
@@ -30,6 +31,24 @@ class FirebaseUserDataSource @Inject constructor(
     private val usersCollection = firestore.collection("users")
 
     fun getCurrentUserId(): String? = auth.currentUser?.uid
+
+    suspend fun getFollowingUserIds(userId: String?): List<String> {
+        return try {
+            if (userId == null) return emptyList()
+
+            val followersSnapshot = firestore.collection("followers")
+                .whereEqualTo("followerId", userId) // followers documents where follower is myself
+                .get()
+                .await()
+
+            followersSnapshot.documents.mapNotNull { document ->
+                document.toObject(FollowerDto::class.java)?.followingId
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
+        }
+    }
 
     suspend fun incrementFollowerCount(userId: String, amount: Long = 1) {
         try {

@@ -16,19 +16,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rk.pace.domain.model.PacePoint
-import com.rk.pace.domain.model.RunWithPath
+import com.rk.pace.domain.model.Run
 import com.rk.pace.domain.model.Split
 import com.rk.pace.presentation.charts.PaceChart
 import com.rk.pace.presentation.charts.SplitChart
-import com.rk.pace.presentation.components.PaceStatCard
+import com.rk.pace.presentation.components.PaceStat
 import com.rk.pace.presentation.ut.FormatUt.formatDistance
 import com.rk.pace.presentation.ut.FormatUt.formatDuration
 import com.rk.pace.presentation.ut.FormatUt.formatPace
-import kotlin.text.ifEmpty
 
 @Composable
 fun SheetContent(
-    run: RunWithPath,
+    run: Run,
     splits: List<Split>,
     paceChartData: List<PacePoint>
 ) {
@@ -42,7 +41,7 @@ fun SheetContent(
         Spacer(modifier = Modifier.height(10.dp))
 
         Text(
-            text = run.run.title.uppercase().ifEmpty { "RUNNING" },
+            text = run.title.uppercase().ifEmpty { "RUNNING" },
             fontSize = 24.sp,
             fontWeight = FontWeight.Medium,
             letterSpacing = 1.sp
@@ -52,17 +51,17 @@ fun SheetContent(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            PaceStatCard(
+            PaceStat(
+                modifier = Modifier.weight(1f),
                 label = "DISTANCE",
-                value = formatDistance(run.run.distanceMeters),
-                unit = "KM",
-                modifier = Modifier.weight(1f)
+                value = formatDistance(run.distanceMeters),
+                unit = "KM"
             )
-            PaceStatCard(
+            PaceStat(
+                modifier = Modifier.weight(1f),
                 label = "TIME",
-                value = formatDuration(run.run.durationMilliseconds),
-                unit = "",
-                modifier = Modifier.weight(1f)
+                value = formatDuration(run.durationMilliseconds),
+                unit = ""
             )
         }
 
@@ -70,17 +69,17 @@ fun SheetContent(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            PaceStatCard(
+            PaceStat(
+                modifier = Modifier.weight(1f),
                 label = "AVG PACE",
-                value = formatPace(run.run.avgSpeedMps),
-                unit = "/KM",
-                modifier = Modifier.weight(1f)
+                value = formatPace(run.avgSpeedMps),
+                unit = ""
             )
-            PaceStatCard(
+            PaceStat(
+                modifier = Modifier.weight(1f),
                 label = "AVG SPEED",
-                value = "%.2f".format(run.run.avgSpeedMps),
-                unit = "MPS",
-                modifier = Modifier.weight(1f)
+                value = "%.2f".format(run.avgSpeedMps),
+                unit = "MPS"
             )
         }
 
@@ -90,6 +89,10 @@ fun SheetContent(
 
         PaceChart(
             data = paceChartData
+        )
+
+        Spacer(
+            modifier = Modifier.height(20.dp)
         )
     }
 }

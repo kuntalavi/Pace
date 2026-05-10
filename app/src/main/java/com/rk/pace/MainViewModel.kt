@@ -2,7 +2,7 @@ package com.rk.pace
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.rk.pace.auth.domain.model.AuthState
+import com.rk.pace.domain.ut.AuthState
 import com.rk.pace.auth.domain.use_case.ObserveAuthStateUseCase
 import com.rk.pace.domain.tracker.TrackerManager
 import dagger.hilt.android.lifecycle.HiltViewModel

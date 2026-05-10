@@ -16,13 +16,13 @@ fun NavGraphBuilder.rootNavGraph(
 
     composable<Route.Root.AddGoal> {
         AddGoalScreen(
-            goBack = { navController.popBackStack() }
+            onBack = { navController.popBackStack() }
         )
     }
 
     composable<Route.Root.RunStats> {
         RunStatsScreen(
-            goBack = { navController.popBackStack() }
+            onBack = { navController.popBackStack() }
         )
     }
 

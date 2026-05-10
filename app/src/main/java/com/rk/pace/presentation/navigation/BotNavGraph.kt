@@ -1,7 +1,5 @@
 package com.rk.pace.presentation.navigation
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -10,7 +8,6 @@ import com.rk.pace.presentation.screens.feed.FeedScreen
 import com.rk.pace.presentation.screens.my_profile.UserScreen
 import com.rk.pace.presentation.screens.stats.StatsScreen
 
-@RequiresApi(Build.VERSION_CODES.O)
 fun NavGraphBuilder.botNavGraph(
     navController: NavController
 ) {
@@ -46,9 +43,7 @@ fun NavGraphBuilder.botNavGraph(
                         Route.Root.AddGoal
                     )
                 },
-                onGoalClick = {
-
-                }
+                onGoalClick = { }
             )
         }
 

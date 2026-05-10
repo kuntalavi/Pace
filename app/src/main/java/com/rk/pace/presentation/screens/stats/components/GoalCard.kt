@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.rk.pace.domain.model.GoalProgress
 import com.rk.pace.domain.model.GoalType
 import com.rk.pace.presentation.charts.GoalPieChart
-import com.rk.pace.presentation.components.PaceStatCard
+import com.rk.pace.presentation.components.PaceStat
 import com.rk.pace.presentation.ut.FormatUt.formatDistance
 import com.rk.pace.presentation.ut.FormatUt.formatDuration
 
@@ -67,18 +67,18 @@ fun GoalCard(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
 
-        ){
-            PaceStatCard(
+            ) {
+            PaceStat(
+                modifier = Modifier.weight(1f),
                 label = "PROGRESS",
                 value = progressValue,
-                unit = unit,
-                        modifier = Modifier.weight(1f)
+                unit = unit
             )
-            PaceStatCard(
+            PaceStat(
+                modifier = Modifier.weight(1f),
                 label = "GOAL",
                 value = goalValue,
-                unit = unit,
-                modifier = Modifier.weight(1f)
+                unit = unit
             )
         }
 

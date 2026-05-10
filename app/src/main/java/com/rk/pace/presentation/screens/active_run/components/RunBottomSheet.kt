@@ -19,8 +19,8 @@ import com.rk.pace.domain.model.RunState
 import com.rk.pace.presentation.components.ButtonSize
 import com.rk.pace.presentation.components.ButtonVariant
 import com.rk.pace.presentation.components.PaceButton
-import com.rk.pace.presentation.components.PaceStatItem
-import com.rk.pace.presentation.components.StatItemStyle
+import com.rk.pace.presentation.components.PaceStat
+import com.rk.pace.presentation.components.StatStyle
 import com.rk.pace.presentation.ut.FormatUt.formatDistance
 import com.rk.pace.presentation.ut.FormatUt.formatDuration
 import com.rk.pace.presentation.ut.FormatUt.formatPace
@@ -90,11 +90,11 @@ fun RunBottomSheet(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    PaceStatItem(
+                    PaceStat(
                         value = stat.value,
                         label = stat.label,
                         unit = stat.unit,
-                        style = StatItemStyle.Hero
+                        style = StatStyle.HERO
                     )
                 }
             }

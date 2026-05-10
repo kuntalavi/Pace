@@ -1,8 +1,9 @@
 [versions]
-agp = "9.2.0"
+agp = "9.2.1"
 bom = "3.5.0"
 coilNetworkOkhttp = "3.4.0"
 coreSplashscreen = "1.2.0"
+desugar_jdk_libs = "2.1.5"
 firebaseBom = "34.12.0"
 kotlin = "2.3.21"
 coreKtx = "1.18.0"
@@ -38,6 +39,7 @@ androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", versi
 auth-kt = { module = "io.github.jan-tennert.supabase:auth-kt" }
 bom = { module = "io.github.jan-tennert.supabase:bom", version.ref = "bom" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilNetworkOkhttp" }
+desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar_jdk_libs" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }

@@ -1,7 +1,5 @@
 package com.rk.pace.domain.use_case.stat
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.rk.pace.domain.model.DayDistance
 import com.rk.pace.domain.model.Run
 import java.time.DayOfWeek
@@ -13,7 +11,7 @@ import java.time.temporal.TemporalAdjusters
 import javax.inject.Inject
 
 class MapWeekRunsToChartData @Inject constructor() {
-    @RequiresApi(Build.VERSION_CODES.O)
+
     operator fun invoke(runs: List<Run>, weekOffset: Int): List<DayDistance> {
 
         val t = LocalDate.now()
@@ -45,4 +43,5 @@ class MapWeekRunsToChartData @Inject constructor() {
         }
 
     }
+
 }

@@ -89,7 +89,9 @@ fun PaceBotNavBar(
                     )
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    indicatorColor = colorScheme.primaryContainer
+                    indicatorColor = colorScheme.primary.copy(
+                        alpha = .2f
+                    )
                 )
             )
         }

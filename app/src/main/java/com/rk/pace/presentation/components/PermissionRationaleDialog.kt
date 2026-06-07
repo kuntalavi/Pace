@@ -1,10 +1,10 @@
 package com.rk.pace.presentation.components
 
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import com.rk.pace.presentation.theme.shape
 
 @Composable
 fun PermissionRationaleDialog(
@@ -17,7 +17,7 @@ fun PermissionRationaleDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        shape = shape,
+        shape = shapes.extraSmall,
         title = {
             Text(
                 text = title,

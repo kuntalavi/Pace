@@ -135,14 +135,14 @@ class UserProfileViewModel @Inject constructor(
                     },
                     onFailure = { error ->
                         _state.update {
-                            UserProfileState.Error(error.message ?: "Error")
+                            UserProfileState.Error(error.message ?: "ChangesSaveError")
                         }
                     }
                 )
 
             } catch (e: Exception) {
                 _state.update {
-                    UserProfileState.Error(e.message ?: "Error")
+                    UserProfileState.Error(e.message ?: "ChangesSaveError")
                 }
             }
         }

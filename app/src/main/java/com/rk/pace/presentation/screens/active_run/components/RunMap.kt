@@ -79,7 +79,7 @@ fun RunMap(
                         location.lat,
                         location.long
                     ),
-                    18f
+                    16f
                 )
             )
             isInitialCenterDone = true
@@ -94,7 +94,7 @@ fun RunMap(
                         location.lat,
                         location.long
                     ),
-                    18f
+                    16f
                 )
             )
         }
@@ -104,11 +104,12 @@ fun RunMap(
         if (isAct && !paused) {
             location?.let {
                 cameraPositionState.animate(
-                    update = CameraUpdateFactory.newLatLng(
+                    update = CameraUpdateFactory.newLatLngZoom(
                         LatLng(
                             location.lat,
                             location.long
-                        )
+                        ),
+                        16f
                     )
                 )
             }

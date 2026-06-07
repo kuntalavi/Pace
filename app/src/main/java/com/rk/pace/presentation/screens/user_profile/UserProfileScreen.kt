@@ -36,6 +36,9 @@ import com.rk.pace.presentation.components.PaceUserDp
 import com.rk.pace.presentation.components.PaceUserDpSize
 import com.rk.pace.presentation.components.RunSummary
 import com.rk.pace.presentation.theme.arrowLeft
+import com.rk.pace.presentation.theme.scheme
+import com.rk.pace.presentation.theme.space
+import com.rk.pace.presentation.theme.tvpo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,12 +66,12 @@ fun UserProfileScreen(
                 topBar = {
                     CenterAlignedTopAppBar(
                         colors = TopAppBarDefaults.topAppBarColors(
-                            containerColor = MaterialTheme.colorScheme.background
+                            containerColor = scheme.background
                         ),
                         title = {
                             Text(
                                 text = "",
-                                style = MaterialTheme.typography.titleLarge
+                                style = tvpo.titleLarge
                             )
                         },
                         navigationIcon = {
@@ -94,11 +97,13 @@ fun UserProfileScreen(
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize(),
-                        contentPadding = PaddingValues(20.dp)
+                        contentPadding = PaddingValues(
+                            space.large
+                        )
                     ) {
                         item {
                             PaceUserDp(
-                                imageUrl = currentState.userProfileUiState.user.photoURL, // draw first letter of name if no photo is there
+                                imageUrl = currentState.userProfileUiState.user.photoURL,
                                 size = PaceUserDpSize.XLarge
                             )
 
@@ -108,8 +113,7 @@ fun UserProfileScreen(
                                 text = currentState.userProfileUiState.user.name.uppercase(),
                                 style = MaterialTheme.typography.titleLarge.copy(
                                     fontWeight = FontWeight.Bold,
-                                    letterSpacing = 1.sp,
-                                    color = MaterialTheme.colorScheme.primary
+                                    letterSpacing = 1.sp
                                 )
                             )
 
@@ -117,8 +121,7 @@ fun UserProfileScreen(
                                 text = "#${currentState.userProfileUiState.user.username}",
                                 style = MaterialTheme.typography.titleSmall.copy(
                                     fontWeight = FontWeight.Medium,
-                                    letterSpacing = 1.sp,
-                                    color = MaterialTheme.colorScheme.primary
+                                    letterSpacing = 1.sp
                                 )
                             )
 
@@ -137,15 +140,17 @@ fun UserProfileScreen(
                                     contentPadding = PaddingValues(0.dp)
                                 ) {
                                     Text(
-                                        text = "${currentState.userProfileUiState.user.followers} FOLLOWERS",
-                                        style = MaterialTheme.typography.titleMedium.copy(
-                                            fontWeight = FontWeight.Bold,
-                                            letterSpacing = 1.sp
-                                        )
+                                        text = "${currentState.userProfileUiState.user.followers} Followers",
+                                        style = tvpo.titleMedium,
+                                        color = scheme.onSurfaceVariant
                                     )
                                 }
 
-                                Spacer(modifier = Modifier.width(10.dp))
+                                Spacer(
+                                    modifier = Modifier.width(
+                                        space.small
+                                    )
+                                )
 
                                 TextButton(
                                     onClick = {
@@ -157,11 +162,9 @@ fun UserProfileScreen(
                                     contentPadding = PaddingValues(0.dp)
                                 ) {
                                     Text(
-                                        text = "${currentState.userProfileUiState.user.following} FOLLOWING",
-                                        style = MaterialTheme.typography.titleMedium.copy(
-                                            fontWeight = FontWeight.Bold,
-                                            letterSpacing = 1.sp
-                                        )
+                                        text = "${currentState.userProfileUiState.user.following} Following",
+                                        style = tvpo.titleMedium,
+                                        color = scheme.onSurfaceVariant
                                     )
                                 }
                             }
@@ -177,7 +180,7 @@ fun UserProfileScreen(
                                     },
                                     text = if (!currentState.userProfileUiState.isFollowed) "FOLLOW" else "FOLLOWING",
                                     enabled = !currentState.userProfileUiState.followJ,
-                                    variant = ButtonVariant.Filled
+                                    variant = if (currentState.userProfileUiState.isFollowed) ButtonVariant.Outlined else ButtonVariant.Filled
                                 )
                             }
 
@@ -188,10 +191,7 @@ fun UserProfileScreen(
 
                             Text(
                                 text = "RUNS",
-                                style = MaterialTheme.typography.titleLarge.copy(
-                                    fontWeight = FontWeight.Medium,
-                                    letterSpacing = 1.sp
-                                )
+                                style = tvpo.titleLarge
                             )
                             Spacer(
                                 modifier = Modifier
@@ -224,7 +224,9 @@ fun UserProfileScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = currentState.message)
+                Text(
+                    text = currentState.message
+                )
             }
         }
     }

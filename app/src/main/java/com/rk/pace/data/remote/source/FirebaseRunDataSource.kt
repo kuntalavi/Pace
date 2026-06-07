@@ -20,7 +20,6 @@ class FirebaseRunDataSource @Inject constructor(
 
     suspend fun getRunsByUserIds(userIds: List<String?>): List<RunDto> =
         withContext(ioDispatcher) {
-            return@withContext try {
 
                 if (userIds.isEmpty()) return@withContext emptyList()
 
@@ -46,11 +45,7 @@ class FirebaseRunDataSource @Inject constructor(
                     .awaitAll()
                     .flatten()
 
-                runsDtos
-            } catch (e: Exception) {
-                e.printStackTrace()
-                emptyList()
-            }
+                return@withContext runsDtos
         }
 
     suspend fun getUserRuns(userId: String): List<RunDto> =
@@ -89,8 +84,11 @@ class FirebaseRunDataSource @Inject constructor(
             }
         }
 
-    suspend fun likeRun(runId: String, currentUserId: String) {
-        try {
+    suspend fun likeRun(
+        runId: String,
+        currentUserId: String
+    ): Boolean {
+        return try {
             firestore.collection("runs")
                 .document(runId)
                 .update(
@@ -98,15 +96,20 @@ class FirebaseRunDataSource @Inject constructor(
                         "likes" to FieldValue.increment(1),
                         "likedBy" to FieldValue.arrayUnion(currentUserId)
                     )
-                ).await()
+                )
+                .await()
+            true
         } catch (e: Exception) {
             e.printStackTrace()
-            // fallback emit to update ui
+            false
         }
     }
 
-    suspend fun unlikeRun(runId: String, currentUserId: String) {
-        try {
+    suspend fun unlikeRun(
+        runId: String,
+        currentUserId: String
+    ): Boolean {
+        return try {
             firestore.collection("runs")
                 .document(runId)
                 .update(
@@ -116,9 +119,10 @@ class FirebaseRunDataSource @Inject constructor(
                     )
                 )
                 .await()
+            true
         } catch (e: Exception) {
             e.printStackTrace()
-            // fallback emit to update ui
+            false
         }
     }
 }

@@ -33,7 +33,6 @@ class FirebaseUserDataSource @Inject constructor(
     fun getCurrentUserId(): String? = auth.currentUser?.uid
 
     suspend fun getFollowingUserIds(userId: String?): List<String> {
-        return try {
             if (userId == null) return emptyList()
 
             val followersSnapshot = firestore.collection("followers")
@@ -41,13 +40,9 @@ class FirebaseUserDataSource @Inject constructor(
                 .get()
                 .await()
 
-            followersSnapshot.documents.mapNotNull { document ->
+            return followersSnapshot.documents.mapNotNull { document ->
                 document.toObject(FollowerDto::class.java)?.followingId
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            emptyList()
-        }
     }
 
     suspend fun incrementFollowerCount(userId: String, amount: Long = 1) {

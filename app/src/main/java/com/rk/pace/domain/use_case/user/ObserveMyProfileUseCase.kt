@@ -2,12 +2,13 @@ package com.rk.pace.domain.use_case.user
 
 import com.rk.pace.domain.model.User
 import com.rk.pace.domain.repo.UserRepo
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetMyProfileUseCase @Inject constructor(
+class ObserveMyProfileUseCase @Inject constructor(
     private val userRepo: UserRepo
 ) {
-    suspend operator fun invoke(): Result<User> {
-        return userRepo.getMyProfile()
+    operator fun invoke(): Flow<User?> {
+        return userRepo.observeMyProfile()
     }
 }

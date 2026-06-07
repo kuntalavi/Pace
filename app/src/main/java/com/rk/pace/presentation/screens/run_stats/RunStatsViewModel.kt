@@ -85,7 +85,6 @@ class RunStatsViewModel @Inject constructor(
                 runWithPath.path
             )
 
-
             _state.update {
                 it.copy(
                     load = false,

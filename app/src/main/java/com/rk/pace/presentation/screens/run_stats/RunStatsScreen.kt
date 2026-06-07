@@ -98,6 +98,7 @@ fun RunStatsScreen(
         } else if (state.data != null) {
 
             val data = state.data!!
+
             BottomSheetScaffold(
                 snackbarHost = {
                     SnackbarHost(hostState = snackbarState) { data ->

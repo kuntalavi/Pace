@@ -26,7 +26,7 @@ class SyncRunWorker @AssistedInject constructor(
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
 
-            val runsToDelete = deleteRunDao.getAllDeleteRuns() //
+            val runsToDelete = deleteRunDao.getAllDeleteRuns()
 
             runsToDelete.forEach { deleteRun ->
                 try {
@@ -41,7 +41,7 @@ class SyncRunWorker @AssistedInject constructor(
                 deleteRunDao.removeDeleteRun(deleteRun)
             }
 
-            val unsyncedRuns = runDao.getUnsyncedRunsWithPath() //
+            val unsyncedRuns = runDao.getUnsyncedRunsWithPath()
             if (unsyncedRuns.isEmpty()) {
                 return@withContext Result.success()
             }
@@ -67,4 +67,5 @@ class SyncRunWorker @AssistedInject constructor(
         }
 
     }
+
 }

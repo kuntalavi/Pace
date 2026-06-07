@@ -44,8 +44,8 @@ class RunTrackService : LifecycleService() {
                         trackerManager.runState.collect { runState ->
                             notification.updateNotification(
                                 paused = runState.paused,
-                                distanceMeters = runState.distanceMeters,
-                                durationMilliseconds = runState.durationMilliseconds
+                                distance = runState.distanceMeters,
+                                duration = runState.durationMilliseconds
                             )
                         }
                     }

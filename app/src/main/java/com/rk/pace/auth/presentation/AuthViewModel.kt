@@ -7,6 +7,7 @@ import com.rk.pace.auth.domain.use_case.SignUpWithEmailUseCase
 import com.rk.pace.auth.domain.use_case.ValidateSignInDataUseCase
 import com.rk.pace.auth.domain.use_case.ValidateSignUpDataUseCase
 import com.rk.pace.domain.repo.RunRepo
+import com.rk.pace.domain.repo.UserRepo
 import com.rk.pace.domain.ut.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -20,6 +21,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val runRepo: RunRepo,
+    private val userRepo: UserRepo,
     private val signUpWithEmailUseCase: SignUpWithEmailUseCase,
     private val signInWithEmailUseCase: SignInWithEmailUseCase,
     private val validateSignUpDataUseCase: ValidateSignUpDataUseCase,
@@ -185,6 +187,7 @@ class AuthViewModel @Inject constructor(
                         )
                     ) {
                         is Result.Success -> {
+                            userRepo.restoreUser()
                             runRepo.restoreRuns(result.data.userId)
                             _state.update {
                                 it.copy(

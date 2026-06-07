@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -24,6 +23,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
@@ -34,6 +34,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.rk.pace.presentation.components.PaceUser
 import com.rk.pace.presentation.theme.arrowLeft
 import com.rk.pace.presentation.theme.close
+import com.rk.pace.presentation.theme.scheme
+import com.rk.pace.presentation.theme.tvpo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,7 +55,8 @@ fun SearchScreen(
         topBar = {
             SearchBar(
                 colors = SearchBarDefaults.colors(
-                    dividerColor = MaterialTheme.colorScheme.background
+                    dividerColor = scheme.background,
+                    containerColor = scheme.surface
                 ),
                 inputField = {
                     SearchBarDefaults.InputField(
@@ -113,7 +116,7 @@ fun SearchScreen(
                         viewModel.onClearQuery()
                     }
                 },
-                shape = RoundedCornerShape(0.dp)
+                shape = RectangleShape
             ) {
                 if (state.isSearching) {
                     Box(
@@ -168,8 +171,8 @@ fun SearchScreen(
         ) {
             Text(
                 text = "Search for friends to track runs together!",
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                style = tvpo.bodyLarge.copy(
+                    color = scheme.onSurfaceVariant
                 )
             )
         }

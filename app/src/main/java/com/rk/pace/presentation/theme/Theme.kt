@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalContext
 
-private val k = lightColorScheme(
+private val light = lightColorScheme(
 
     primary = primaryLight,
     onPrimary = onPrimaryLight,
@@ -104,15 +104,15 @@ fun PaceTheme(
         }
 
         darkTheme -> dark
-        else -> k
+        else -> light
     }
 
 
     CompositionLocalProvider(
-        LocalSpace provides Space(),
-        LocalElevation provides Elevation()
+        LocalSpace provides Space()
     ){
         MaterialTheme(
+            shapes = Shapes,
             colorScheme = colorScheme,
             typography = PaceTypography,
             content = content

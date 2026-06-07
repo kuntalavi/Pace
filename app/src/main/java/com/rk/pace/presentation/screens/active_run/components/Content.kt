@@ -22,6 +22,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
@@ -45,7 +46,7 @@ import com.rk.pace.domain.tracker.GpsStrength
 import com.rk.pace.presentation.theme.Gray
 import com.rk.pace.presentation.theme.arrowLeft
 import com.rk.pace.presentation.theme.navigationFilled
-import com.rk.pace.presentation.theme.shape
+import com.rk.pace.presentation.theme.space
 
 @SuppressLint("ConfigurationScreenWidthHeight")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -89,7 +90,7 @@ fun Content(
                             WindowInsets.navigationBars
                     )
                     .padding(
-                        20.dp
+                        space.xLarge
                     )
             ) {
                 if (expanded) {
@@ -115,7 +116,7 @@ fun Content(
         },
         sheetDragHandle = { },
         sheetShape = RectangleShape,
-        sheetPeekHeight = 250.dp,
+        sheetPeekHeight = 220.dp,
         sheetMaxWidth = Dp.Unspecified
     ) { p ->
         Box(
@@ -174,7 +175,7 @@ fun Content(
                                     onClick = onBack,
                                     modifier = Modifier.background(
                                         colorScheme.surface,
-                                        shape = shape
+                                        shape = shapes.extraSmall
                                     )
                                 ) {
                                     Icon(
@@ -187,7 +188,7 @@ fun Content(
                                 onClick = { },
                                 modifier = Modifier.background(
                                     colorScheme.surface,
-                                    shape = shape
+                                    shape = shapes.extraSmall
                                 )
                             ) {
                                 GpsStrengthIndicator(
@@ -201,7 +202,7 @@ fun Content(
                             enabled = context.hasPreciseForegroundLocationPermission(),
                             modifier = Modifier.background(
                                 colorScheme.surface,
-                                shape = shape
+                                shape = shapes.extraSmall
                             )
                         ) {
                             Icon(

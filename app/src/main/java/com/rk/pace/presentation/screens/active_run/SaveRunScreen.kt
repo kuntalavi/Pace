@@ -37,7 +37,12 @@ import com.rk.pace.presentation.components.ButtonVariant
 import com.rk.pace.presentation.components.PaceButton
 import com.rk.pace.presentation.components.PaceTextInput
 import com.rk.pace.presentation.screens.run_stats.components.RunStatsMap
+import com.rk.pace.presentation.screens.stats.components.PaceStat
 import com.rk.pace.presentation.theme.delete
+import com.rk.pace.presentation.theme.space
+import com.rk.pace.presentation.ut.FormatUt.formatDistance
+import com.rk.pace.presentation.ut.FormatUt.formatDuration
+import com.rk.pace.presentation.ut.FormatUt.formatPace
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -159,6 +164,51 @@ fun SaveRunScreen(
                     },
                     placeholder = "TITLE"
                 )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(
+                        space.medium
+                    )
+                ) {
+                    PaceStat(
+                        modifier = Modifier.weight(1f),
+                        title = "DISTANCE",
+                        value = formatDistance(runState.distanceMeters),
+                        unit = "KM"
+                    )
+                    PaceStat(
+                        modifier = Modifier.weight(1f),
+                        title = "TIME",
+                        value = formatDuration(runState.durationMilliseconds)
+                    )
+                }
+
+                Spacer(
+                    modifier = Modifier.height(
+                        space.large
+                    )
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(
+                        space.medium
+                    )
+                ) {
+                    PaceStat(
+                        modifier = Modifier.weight(1f),
+                        title = "AVG PACE",
+                        value = formatPace(runState.avgSpeedMps),
+                        unit = "/KM"
+                    )
+                    PaceStat(
+                        modifier = Modifier.weight(1f),
+                        title = "AVG SPEED",
+                        value = "%.2f".format(runState.avgSpeedMps),
+                        unit = "MPS"
+                    )
+                }
 
             }
         }

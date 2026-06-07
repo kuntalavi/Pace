@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.rk.pace.data.room.entity.UserEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UserDao {
@@ -14,7 +15,10 @@ interface UserDao {
     suspend fun insertUser(user: UserEntity)
 
     @Query("SELECT * FROM users LIMIT 1")
-    suspend fun getUser(): UserEntity?
+    fun observeUser(): Flow<UserEntity?>
+
+    @Query("SELECT * FROM users LIMIT 1")
+    fun fetchUser(): UserEntity?
 
     @Update
     suspend fun updateUser(user: UserEntity)

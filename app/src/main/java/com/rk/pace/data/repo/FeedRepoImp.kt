@@ -74,17 +74,30 @@ class FeedRepoImp @Inject constructor(
             Result.success(list)
 
         } catch (e: Exception) {
+            e.printStackTrace()
             Result.failure(e)
         }
 
     }
 
-    override suspend fun likePost(postId: String, currentUserId: String) {
-        firebaseRunDataSource.likeRun(postId, currentUserId)
+    override suspend fun likePost(
+        postId: String,
+        currentUserId: String
+    ): Boolean {
+        return firebaseRunDataSource.likeRun(
+            postId,
+            currentUserId
+        )
     }
 
-    override suspend fun unlikePost(postId: String, currentUserId: String) {
-        firebaseRunDataSource.unlikeRun(postId, currentUserId)
+    override suspend fun unlikePost(
+        postId: String,
+        currentUserId: String
+    ): Boolean {
+        return firebaseRunDataSource.unlikeRun(
+            postId,
+            currentUserId
+        )
     }
 
 }

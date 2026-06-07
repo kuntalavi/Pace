@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.rk.pace.presentation.theme.arrowLeft
+import com.rk.pace.presentation.theme.scheme
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -92,7 +93,8 @@ fun ConnectionsScreen(
                         },
                         text = {
                             Text(
-                                text = title
+                                text = title,
+                                color = scheme.onSurface
                             )
                         }
                     )

@@ -1,7 +1,6 @@
 package com.rk.pace.presentation.screens.my_profile
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,12 +9,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -26,69 +24,136 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.rk.pace.presentation.components.ButtonVariant
 import com.rk.pace.presentation.components.PaceButton
 import com.rk.pace.presentation.components.PaceUserDp
 import com.rk.pace.presentation.components.PaceUserDpSize
+import com.rk.pace.presentation.components.RunSummary
 import com.rk.pace.presentation.theme.edit
+import com.rk.pace.presentation.theme.scheme
+import com.rk.pace.presentation.theme.space
+import com.rk.pace.presentation.theme.tvpo
+import com.rk.pace.presentation.ut.ObserveAsEvents
 
 @Composable
-fun UserScreen(
+fun UserScreenRoot(
     viewModel: MyProfileViewModel = hiltViewModel(),
     onEditClick: () -> Unit,
     onFollowersClick: (userId: String, tab: Int) -> Unit,
-    onFollowingClick: (userId: String, tab: Int) -> Unit
+    onFollowingClick: (userId: String, tab: Int) -> Unit,
+    onRunClick: (userId: String, runId: String) -> Unit
 ) {
+
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-        viewModel.getMyProfile()
-    }
+    ObserveAsEvents(
+        flow = viewModel.events
+    ) { event ->
 
-    when (val state = state) {
-        is MyProfileState.Load -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
+        when (event) {
+
+            MyProfileEvent.OnEditClick -> onEditClick()
+
+            is MyProfileEvent.OnFollowersClick -> {
+                onFollowersClick(
+                    event.userId,
+                    event.tab
+                )
             }
+
+            is MyProfileEvent.OnFollowingClick -> {
+                onFollowingClick(
+                    event.userId,
+                    event.tab
+                )
+            }
+
+            is MyProfileEvent.OnRunClick -> {
+                onRunClick(
+                    event.userId,
+                    event.runId
+                )
+            }
+
+            else -> {}
+
         }
 
-        is MyProfileState.Success -> {
-            Box(
-                modifier = Modifier.fillMaxSize()
+    }
+
+    UserScreen(
+        state = state,
+        onAction = viewModel::onAction
+    )
+
+}
+
+@Composable
+fun UserScreen(
+    state: MyProfileUiState,
+    onAction: (MyProfileAction) -> Unit
+) {
+
+    if (state.load) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+    } else if (state.error != null) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = state.error,
+                color = scheme.error
+            )
+        }
+    } else {
+
+        if (state.user == null) return
+
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(
+                        space.large
+                    )
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(20.dp)
-                        .verticalScroll(rememberScrollState())
-                ) {
+                item {
 
                     PaceUserDp(
                         imageUrl = state.user.photoURI,
                         size = PaceUserDpSize.XLarge
                     )
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(
+                        modifier = Modifier.height(
+                            space.small
+                        )
+                    )
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
                             text = state.user.name.uppercase(),
-                            style = MaterialTheme.typography.titleLarge.copy(
+                            style = tvpo.titleLarge.copy(
                                 fontWeight = FontWeight.Bold,
-                                letterSpacing = 1.sp,
-                                color = MaterialTheme.colorScheme.primary
+                                letterSpacing = 1.sp
                             )
                         )
                         IconButton(
                             onClick = {
-                                onEditClick()
+                                onAction(
+                                    MyProfileAction.OnEditClick
+                                )
                             }
                         ) {
                             Icon(
@@ -100,10 +165,9 @@ fun UserScreen(
 
                     Text(
                         text = "#${state.user.username}",
-                        style = MaterialTheme.typography.titleSmall.copy(
+                        style = tvpo.titleSmall.copy(
                             fontWeight = FontWeight.Medium,
                             letterSpacing = 1.sp,
-                            color = MaterialTheme.colorScheme.primary
                         )
                     )
 
@@ -114,7 +178,7 @@ fun UserScreen(
 
                         TextButton(
                             onClick = {
-                                onFollowersClick(
+                                MyProfileAction.OnFollowersClick(
                                     state.user.userId,
                                     0
                                 )
@@ -122,54 +186,90 @@ fun UserScreen(
                             contentPadding = PaddingValues(0.dp)
                         ) {
                             Text(
-                                text = "${state.user.followers} FOLLOWERS",
-                                style = MaterialTheme.typography.titleMedium.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    letterSpacing = 1.sp
-                                )
+                                text = "${state.user.followers} Followers",
+                                style = tvpo.titleMedium,
+                                color = scheme.onSurfaceVariant
                             )
                         }
 
-                        Spacer(modifier = Modifier.width(10.dp))
+                        Spacer(
+                            modifier = Modifier.width(
+                                space.small
+                            )
+                        )
 
                         TextButton(
                             onClick = {
-                                onFollowingClick(
-                                    state.user.userId,
-                                    1
+                                onAction(
+                                    MyProfileAction.OnFollowingClick(
+                                        state.user.userId,
+                                        1
+                                    )
                                 )
                             },
                             contentPadding = PaddingValues(0.dp)
                         ) {
                             Text(
-                                text = "${state.user.following} FOLLOWING",
-                                style = MaterialTheme.typography.titleMedium.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    letterSpacing = 1.sp
-                                )
+                                text = "${state.user.following} Following",
+                                style = tvpo.titleMedium,
+                                color = scheme.onSurfaceVariant
                             )
                         }
                     }
 
+                    Text(
+                        text = "RUNS",
+                        style = tvpo.titleLarge
+                    )
+
+                    Spacer(
+                        modifier = Modifier.height(
+                            space.medium
+                        )
+                    )
+
+                }
+
+                items(
+                    items = state.runs,
+                    key = { run ->
+                        run.runId
+                    }
+                ) { run ->
+                    RunSummary(
+                        run = run,
+                        onClick = {
+                            onAction(
+                                MyProfileAction.OnRunClick(
+                                    run.userId,
+                                    run.runId
+                                )
+                            )
+                        }
+                    )
+                }
+
+                item {
+
+                    Spacer(
+                        modifier = Modifier.height(
+                            space.small
+                        )
+                    )
+
                     PaceButton(
                         onClick = {
-                            viewModel.signOut()
+                            onAction(
+                                MyProfileAction.OnSignOutClick
+                            )
                         },
-                        text = "LOG OUT"
+                        text = "LOG OUT",
+                        variant = ButtonVariant.Tonal
                     )
                 }
             }
         }
-
-        is MyProfileState.Error -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(text = state.message)
-
-            }
-        }
     }
+
 
 }

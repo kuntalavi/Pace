@@ -65,14 +65,30 @@ class UserRepoImp @Inject constructor(
         return@withContext
     }
 
-    override suspend fun getMyProfile(): Result<User> = withContext(ioDispatcher) {
+    override fun observeMyProfile(): Flow<User?> {
+
+        val userEntity = userDao.observeUser()
+
+        return userEntity.map {
+            it?.toDomain()
+        }
+
+    }
+
+    override suspend fun fetchMyProfile(): Result<User> = withContext(ioDispatcher) {
+
+        val userEntity = userDao.fetchUser()
+
+        return@withContext if (userEntity != null) {
+            Result.success(userEntity.toDomain())
+        } else {
+            Result.failure(Exception("MyProfile Not Found"))
+        }
+
+    }
+
+    override suspend fun restoreUser(): Result<User> = withContext(ioDispatcher) {
         try {
-            val userEntity = userDao.getUser()
-
-            if (userEntity != null) {
-                return@withContext Result.success(userEntity.toDomain())
-            }
-
             val currentUserId = firebaseUserDataSource.getCurrentUserId()
                 ?: return@withContext Result.failure(Exception("MyProfile Not logged In"))
 
@@ -88,7 +104,7 @@ class UserRepoImp @Inject constructor(
                         photoURI = Uri.fromFile(File(localPath)).toString()
                     }
                 }
-                //
+
                 userDao.insertUser(
                     (userDto.toDomain(photoURI = photoURI)).toEntity()
                 )
@@ -96,7 +112,6 @@ class UserRepoImp @Inject constructor(
             } else {
                 Result.failure(Exception("MyProfile Not Found"))
             }
-
         } catch (e: Exception) {
             Result.failure(e)
         }

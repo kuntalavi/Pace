@@ -8,7 +8,7 @@ import com.rk.pace.R
 
 val PJSANS = FontFamily(
     Font(
-        resId = R.font.pj_sans,
+        resId = R.font.pj_sans_l,
         weight = FontWeight.Light
     ),
     Font(
@@ -26,7 +26,7 @@ val PJSANS = FontFamily(
     Font(
         resId = R.font.pj_sans_b,
         weight = FontWeight.Bold
-    ),
+    )
 )
 
 val base = Typography()

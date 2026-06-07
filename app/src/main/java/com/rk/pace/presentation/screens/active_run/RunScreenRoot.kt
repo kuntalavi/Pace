@@ -89,7 +89,9 @@ fun RunScreenRoot(
         )
     }
 
-    LaunchedEffect(key1 = state.openSystemLocationPrompt) {
+    LaunchedEffect(
+        key1 = state.openSystemLocationPrompt
+    ) {
         if (state.openSystemLocationPrompt) {
             locationPermissionLauncher.launch(
                 arrayOf(

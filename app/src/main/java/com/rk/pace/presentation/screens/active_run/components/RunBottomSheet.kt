@@ -14,13 +14,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.rk.pace.domain.model.RunState
 import com.rk.pace.presentation.components.ButtonSize
 import com.rk.pace.presentation.components.ButtonVariant
 import com.rk.pace.presentation.components.PaceButton
-import com.rk.pace.presentation.components.PaceStat
-import com.rk.pace.presentation.components.StatStyle
+import com.rk.pace.presentation.theme.space
 import com.rk.pace.presentation.ut.FormatUt.formatDistance
 import com.rk.pace.presentation.ut.FormatUt.formatDuration
 import com.rk.pace.presentation.ut.FormatUt.formatPace
@@ -29,7 +27,7 @@ import kotlinx.coroutines.delay
 data class StatPage(
     val label: String,
     val value: String,
-    val unit: String?
+    val unit: String = ""
 )
 
 @Composable
@@ -45,8 +43,8 @@ fun RunBottomSheet(
 
     val stats = listOf(
         StatPage("DISTANCE", formatDistance(runState.distanceMeters), "KM"),
-        StatPage("DURATION", formatDuration(runState.durationMilliseconds), null),
-        StatPage("AVG PACE", formatPace(runState.avgSpeedMps), "/KM")
+        StatPage("AVG PACE", formatPace(runState.avgSpeedMps), "/KM"),
+        StatPage("DURATION", formatDuration(runState.durationMilliseconds))
     )
 
     val pagerState = rememberPagerState(pageCount = { stats.size })
@@ -76,7 +74,9 @@ fun RunBottomSheet(
                 .fillMaxWidth()
                 .wrapContentHeight(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+            verticalArrangement = Arrangement.spacedBy(
+                space.large
+            )
         ) {
 
             HorizontalPager(
@@ -90,11 +90,10 @@ fun RunBottomSheet(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    PaceStat(
+                    PaceRunStat(
+                        title = stat.label,
                         value = stat.value,
-                        label = stat.label,
-                        unit = stat.unit,
-                        style = StatStyle.HERO
+                        unit = stat.unit
                     )
                 }
             }
@@ -129,7 +128,6 @@ fun RunBottomSheet(
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
                     PaceButton(
-                        modifier = Modifier.fillMaxWidth(.4f),
                         text = "RESUME",
                         onClick = {
                             resume()
@@ -138,12 +136,11 @@ fun RunBottomSheet(
                         size = ButtonSize.LARGE
                     )
                     PaceButton(
-                        modifier = Modifier.fillMaxWidth(.6f),
                         text = "STOP",
                         onClick = {
                             stop()
                         },
-                        variant = ButtonVariant.Filled,
+                        variant = ButtonVariant.Tonal,
                         size = ButtonSize.LARGE
                     )
                 }

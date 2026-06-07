@@ -1,15 +1,17 @@
 package com.rk.pace.presentation.navigation
 
+import androidx.compose.runtime.State
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
-import com.rk.pace.presentation.screens.feed.FeedScreen
-import com.rk.pace.presentation.screens.my_profile.UserScreen
+import com.rk.pace.presentation.screens.feed.FeedScreenRoot
+import com.rk.pace.presentation.screens.my_profile.UserScreenRoot
 import com.rk.pace.presentation.screens.stats.StatsScreen
 
 fun NavGraphBuilder.botNavGraph(
-    navController: NavController
+    navController: NavController,
+    reload: State<Long>
 ) {
 
     navigation<Route.Root.BotNav>(
@@ -17,7 +19,8 @@ fun NavGraphBuilder.botNavGraph(
     ) {
 
         composable<Route.BotNav.Feed> {
-            FeedScreen(
+            FeedScreenRoot(
+                reload = reload.value,
                 onRunClick = { userId, runId ->
                     navController.navigate(
                         Route.Root.RunStats(
@@ -48,7 +51,7 @@ fun NavGraphBuilder.botNavGraph(
         }
 
         composable<Route.BotNav.MyProfile> {
-            UserScreen(
+            UserScreenRoot(
                 onEditClick = {
                     navController.navigate(Route.Root.EditProfile)
                 },
@@ -67,6 +70,15 @@ fun NavGraphBuilder.botNavGraph(
                             tab = tab
                         )
                     )
+                },
+                onRunClick = { userId, runId ->
+                    navController.navigate(
+                        Route.Root.RunStats(
+                            userId,
+                            runId
+                        )
+                    )
+
                 }
             )
         }

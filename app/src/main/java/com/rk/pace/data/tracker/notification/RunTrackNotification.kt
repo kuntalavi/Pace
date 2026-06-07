@@ -82,13 +82,11 @@ class RunTrackNotification @Inject constructor(
 
     fun updateNotification(
         paused: Boolean,
-        distanceMeters: Float,
-        durationMilliseconds: Long
+        distance: Float,
+        duration: Long
     ) {
-        var distance = formatDistance(distanceMeters)
-        val time = formatDuration(durationMilliseconds)
-
-        if (distance == "-") distance = "0"
+        val distance = formatDistance(distance)
+        val time = formatDuration(duration)
 
         val notification = baseNotification
             .setContentTitle("$distance km")

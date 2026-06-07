@@ -1,14 +1,22 @@
 package com.rk.pace.presentation.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-val shape = RoundedCornerShape(4.dp)
+val Shapes = Shapes(
+    extraSmall = RoundedCornerShape(4.dp),
+    small = RoundedCornerShape(8.dp),
+    medium = RoundedCornerShape(16.dp),
+    large = RoundedCornerShape(24.dp),
+)
 
 data class Space(
     val xSmall: Dp = 4.dp,
@@ -18,22 +26,19 @@ data class Space(
     val xLarge: Dp = 32.dp
 )
 
-data class Elevation(
-    val lev0: Dp = 0.dp,
-    val lev1: Dp = 2.dp,
-    val lev2: Dp = 8.dp,
-    val lev3: Dp = 16.dp
-)
-
 val LocalSpace = compositionLocalOf { Space() }
-val LocalElevation = compositionLocalOf { Elevation() }
 
-val MaterialTheme.space: Space
+val space: Space
     @Composable
     @ReadOnlyComposable
     get() = LocalSpace.current
 
-val MaterialTheme.elevation: Elevation
+val scheme: ColorScheme
     @Composable
     @ReadOnlyComposable
-    get() = LocalElevation.current
+    get() = MaterialTheme.colorScheme
+
+val tvpo: Typography
+    @Composable
+    @ReadOnlyComposable
+    get() = MaterialTheme.typography

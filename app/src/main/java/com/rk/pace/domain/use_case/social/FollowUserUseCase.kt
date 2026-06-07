@@ -15,7 +15,7 @@ class FollowUserUseCase @Inject constructor(
 
             userRepo.incrementFollowerCount(targetUserId)
 
-            val currentUser = userRepo.getMyProfile().getOrNull()
+            val currentUser = userRepo.fetchMyProfile().getOrNull()
             if (currentUser != null) {
                 userRepo.incrementFollowingCount(currentUser.userId)
                 userRepo.updateLocalUser(

@@ -64,9 +64,10 @@ object ChartsUt {
     }
 
     fun filterPacePoints(data: List<PacePoint>): List<PacePoint> {
-        return data.filter {
-            it.paceMinPerKm in 1f..15f
-        }
+        return data
+//        return data.filter {
+//            it.paceMinPerKm in 1..15f
+//        }
     }
 
     fun sampleByDistance(
@@ -125,95 +126,91 @@ object ChartsUt {
 //    }
 
     /**
-     * Error
+     * ChangesSaveError
      */
 
     fun buildSplitChartData(
         path: List<List<RunPathPoint>>,
         splitDistanceMeters: Float = 1000f
     ): List<Split> {
-
         val splits = mutableListOf<Split>()
 
-        var cumulativeDistance = 0f
-        var splitStartTime: Long? = null
-        var nextSplitDistance = splitDistanceMeters
         var splitIndex = 1
-
-        var prev: RunPathPoint? = null
+        var currentSplitTime = 0L
+        var currentSplitDistance = 0f
 
         for (segment in path) {
-            for (point in segment) {
+            // CRITICAL: This MUST be inside the segment loop to ignore pauses!
+            var prev: RunPathPoint? = null
 
+            for (point in segment) {
                 if (prev == null) {
                     prev = point
-                    splitStartTime = point.timestamp
                     continue
                 }
 
                 val distance = DistanceUt.getDistance(prev, point)
                 val timeDelta = point.timestamp - prev.timestamp
 
-                val previousDistance = cumulativeDistance
-                cumulativeDistance += distance
+//                // --- 🛑 ANOMALY FILTER (The Zig-Zag Killer) ---
+//                if (timeDelta <= 0L) continue // Ignore identical or backward timestamps
 
-                while (cumulativeDistance >= nextSplitDistance) {
+                val speedMps = distance / (timeDelta / 1000f)
 
-                    val distanceNeeded =
-                        nextSplitDistance - previousDistance
+//                // Human sprint record is ~10.4 m/s.
+//                // If GPS says you moved faster than 15 m/s (54 km/h), it's a glitch. SKIP IT.
+//                if (speedMps > 15f) continue
+//                // ----------------------------------------------
 
-                    val ratio = distanceNeeded / distance
+                var remainingSegDistance = distance
+                var remainingSegTime = timeDelta
 
-                    val interpolatedTime =
-                        prev.timestamp + (timeDelta * ratio).toLong()
+                // Accumulate chunks into splits
+                while (currentSplitDistance + remainingSegDistance >= splitDistanceMeters) {
+                    val distanceNeeded = splitDistanceMeters - currentSplitDistance
+                    val ratio = if (remainingSegDistance > 0) distanceNeeded / remainingSegDistance else 0f
+                    val timeNeeded = (remainingSegTime * ratio).toLong()
 
-                    val splitDuration =
-                        interpolatedTime - splitStartTime!!
+                    currentSplitTime += timeNeeded
+                    currentSplitDistance += distanceNeeded
 
-                    val paceSeconds =
-                        (splitDuration / 1000f) / (splitDistanceMeters / 1000f)
+                    val paceSeconds = (currentSplitTime / 1000f) / (splitDistanceMeters / 1000f)
 
                     splits.add(
                         Split(
                             index = splitIndex,
-                            durationMilliseconds = splitDuration,
+                            durationMilliseconds = currentSplitTime,
                             paceSeconds = paceSeconds
                         )
                     )
 
                     splitIndex++
-                    splitStartTime = interpolatedTime
-                    nextSplitDistance += splitDistanceMeters
+
+                    remainingSegDistance -= distanceNeeded
+                    remainingSegTime -= timeNeeded
+                    currentSplitTime = 0L
+                    currentSplitDistance = 0f
                 }
 
+                currentSplitDistance += remainingSegDistance
+                currentSplitTime += remainingSegTime
+
+                // Only update 'prev' if the point passed the speed filter
                 prev = point
             }
         }
 
-        val lastPoint = path.lastOrNull()?.lastOrNull()
-
-        if (lastPoint != null && splitStartTime != null) {
-
-            val remainingDistance =
-                cumulativeDistance - (nextSplitDistance - splitDistanceMeters)
-
-            if (remainingDistance > 0f) {
-
-                val splitDuration =
-                    lastPoint.timestamp - splitStartTime
-
-                val paceSeconds =
-                    (splitDuration / 1000f) / (remainingDistance / 1000f)
-
-                splits.add(
-                    Split(
-                        index = splitIndex,
-                        distanceMeters = remainingDistance,
-                        durationMilliseconds = splitDuration,
-                        paceSeconds = paceSeconds
-                    )
+        // Add the final incomplete split (e.g., the 0.37 km at the end)
+        if (currentSplitDistance > 0f) {
+            val paceSeconds = (currentSplitTime / 1000f) / (currentSplitDistance / 1000f)
+            splits.add(
+                Split(
+                    index = splitIndex,
+                    distanceMeters = currentSplitDistance,
+                    durationMilliseconds = currentSplitTime,
+                    paceSeconds = paceSeconds
                 )
-            }
+            )
         }
 
         return splits

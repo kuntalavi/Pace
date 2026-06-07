@@ -1,6 +1,7 @@
 package com.rk.pace.presentation.ut
 
 import android.net.Uri
+import androidx.compose.ui.graphics.Color
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.rk.pace.BuildConfig
@@ -71,8 +72,15 @@ object MapUt {
         encodedPath: List<String>,
         width: Int,
         height: Int,
-        color: String = "f44336"
+        color: Color
     ): String {
+
+        val hex = String.format(
+            "%02X%02X%02X",
+            (color.red * 255).roundToInt(),
+            (color.green * 255).roundToInt(),
+            (color.blue * 255).roundToInt()
+        )
 
         val pathWidth = 10
 
@@ -80,7 +88,7 @@ object MapUt {
             .filter { it.isNotBlank() }
             .joinToString(",") { encoded ->
                 val safeEncoded = Uri.encode(encoded)
-                "path-${pathWidth}+$color($safeEncoded)"
+                "path-${pathWidth}+$hex($safeEncoded)"
             }
         if (overlays.isEmpty()) return ""
 

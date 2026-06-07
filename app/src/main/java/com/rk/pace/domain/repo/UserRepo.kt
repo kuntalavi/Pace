@@ -13,7 +13,9 @@ interface UserRepo {
     suspend fun incrementFollowingCount(userId: String, amount: Long = 1)
     suspend fun decrementFollowerCount(userId: String, amount: Long = 1)
     suspend fun decrementFollowingCount(userId: String, amount: Long = 1)
-    suspend fun getMyProfile(): Result<User>
+    fun observeMyProfile(): Flow<User?>
+    suspend fun fetchMyProfile(): Result<User>
+    suspend fun restoreUser(): Result<User>
     suspend fun observeUserProfile(userId: String): Flow<Result<User>>
     suspend fun getLikedByUsersByUsersIds(usersIds: List<String>): Result<List<User>>
 }

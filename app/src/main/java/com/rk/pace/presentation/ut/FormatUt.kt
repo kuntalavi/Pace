@@ -7,15 +7,14 @@ object FormatUt {
     * */
 
     fun formatDistance(meters: Float): String {
-        if (meters == 0f) return "-"
-        val km = "%.2f".format(meters / 1000f)
+        if (meters == 0f) return "0"
 
-        return if (km[2] == '0' && km[0] == '0') "0"
-        else km
+        val km = "%.2f".format(meters / 1000f)
+        return km
     }
 
     fun formatPace(speedMps: Float): String {
-        if (speedMps <= 0f) return "-"
+        if (speedMps <= 0f) return "0"
 
         val paceMpkm = 1000 / (speedMps * 60)
 
@@ -26,7 +25,7 @@ object FormatUt {
     }
 
     fun formatDuration(ms: Long): String {
-        if (ms == 0L) return "-"
+        if (ms == 0L) return "0"
 
         val s = ms / 1000
         val hours = s / 3600

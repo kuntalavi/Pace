@@ -3,19 +3,16 @@ package com.rk.pace.presentation.screens.active_run.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.rk.pace.domain.model.RunState
 import com.rk.pace.presentation.components.ButtonSize
 import com.rk.pace.presentation.components.ButtonVariant
 import com.rk.pace.presentation.components.PaceButton
-import com.rk.pace.presentation.components.PaceStat
-import com.rk.pace.presentation.components.StatStyle
+import com.rk.pace.presentation.theme.space
 import com.rk.pace.presentation.ut.FormatUt.formatDistance
 import com.rk.pace.presentation.ut.FormatUt.formatDuration
 import com.rk.pace.presentation.ut.FormatUt.formatPace
@@ -31,30 +28,26 @@ fun RunFullSheet(
 ) {
 
     Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        modifier = Modifier.fillMaxSize()
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+            verticalArrangement = Arrangement.SpaceAround
         ) {
-            PaceStat(
+            PaceRunStat(
+                title = "DISTANCE",
                 value = formatDistance(runState.distanceMeters),
-                label = "DISTANCE",
-                unit = "KM",
-                style = StatStyle.HERO
+                unit = "KM"
             )
-            PaceStat(
-                value = formatDuration(runState.durationMilliseconds),
-                label = "DURATION",
-                style = StatStyle.HERO
-            )
-            PaceStat(
+            PaceRunStat(
+                title = "AVG PACE",
                 value = formatPace(runState.avgSpeedMps),
-                label = "AVG PACE",
-                unit = "/KM",
-                style = StatStyle.HERO
+                unit = "/KM"
+            )
+            PaceRunStat(
+                title = "DURATION",
+                value = formatDuration(runState.durationMilliseconds),
             )
 
             if (!runState.isAct) {
@@ -81,13 +74,14 @@ fun RunFullSheet(
                     size = ButtonSize.LARGE
                 )
             } else {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceAround
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(
+                        space.small
+                    )
                 ) {
                     PaceButton(
-                        modifier = Modifier.fillMaxWidth(.4f),
+                        modifier = Modifier.fillMaxWidth(),
                         text = "RESUME",
                         onClick = {
                             resume()
@@ -96,12 +90,12 @@ fun RunFullSheet(
                         size = ButtonSize.LARGE
                     )
                     PaceButton(
-                        modifier = Modifier.fillMaxWidth(.6f),
+                        modifier = Modifier.fillMaxWidth(),
                         text = "STOP",
                         onClick = {
                             stop()
                         },
-                        variant = ButtonVariant.Filled,
+                        variant = ButtonVariant.Tonal,
                         size = ButtonSize.LARGE
                     )
                 }

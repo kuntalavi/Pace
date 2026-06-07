@@ -18,9 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme.colorScheme
-import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,30 +26,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.text.PlatformTextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rk.pace.domain.model.FeedPost
-import com.rk.pace.domain.model.Run
 import com.rk.pace.domain.model.User
-import com.rk.pace.presentation.components.PaceStat
 import com.rk.pace.presentation.components.PaceUserDp
 import com.rk.pace.presentation.components.PaceUserDpSize
-import com.rk.pace.presentation.components.StatStyle
 import com.rk.pace.presentation.theme.like
+import com.rk.pace.presentation.theme.scheme
+import com.rk.pace.presentation.theme.space
+import com.rk.pace.presentation.theme.tvpo
 import com.rk.pace.presentation.theme.unlike
-import com.rk.pace.presentation.ut.FormatUt.formatDistance
-import com.rk.pace.presentation.ut.FormatUt.formatDuration
-import com.rk.pace.presentation.ut.FormatUt.formatPace
-import com.rk.pace.presentation.ut.TimestampUt.getDate
+import com.rk.pace.presentation.ut.TimestampUt.getBarDate
 
 @Composable
 fun FeedItem(
     post: FeedPost,
-    toggleLike: () -> Unit,
-    onLikesClick: () -> Unit,
+    onPostLieIconClick: () -> Unit,
+    onPostLiesClick: () -> Unit,
     onUserClick: () -> Unit,
     onRunClick: () -> Unit
 ) {
@@ -59,105 +52,86 @@ fun FeedItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(
+                vertical = space.medium
+            )
             .clickable {
                 onRunClick()
             },
         shape = RectangleShape,
         colors = CardDefaults.cardColors(
-            containerColor = colorScheme.surface
+            containerColor = scheme.background
         )
     ) {
+
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 20.dp)
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement
+                .spacedBy(
+                    space.medium
+                )
         ) {
 
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
+                    .padding(
+                        horizontal = space.large
+                    ),
+                verticalArrangement = Arrangement
+                    .spacedBy(
+                        space.small
+                    )
             ) {
 
                 FeedItemUser(
                     user = post.user,
-                    run = post.run,
+                    date = getBarDate(post.run.timestamp),
                     onUserClick = onUserClick
                 )
 
-                Spacer(modifier = Modifier.height(10.dp))
+                if (post.run.title != "") {
+                    Text(
+                        text = post.run.title,
+                        style = tvpo.titleLarge,
+                    )
+                }else {
+                    Spacer(
+                        modifier = Modifier.height(
+                            space.xSmall
+                        )
+                    )
+                }
 
-                Text(
-                    text = post.run.title.ifEmpty { "Run" },
-                    style = typography.titleLarge,
-                    letterSpacing = 1.sp
+                FeedItemStats(
+                    distance = post.run.distanceMeters,
+                    speed = post.run.avgSpeedMps,
+                    duration = post.run.durationMilliseconds
                 )
 
-                Spacer(modifier = Modifier.height(10.dp))
-
-                FeedItemStats(post.run)
-
-                Spacer(modifier = Modifier.height(10.dp))
             }
 
-            FeedItemMap(post.run.encodedPath)
-
-            Spacer(modifier = Modifier.height(10.dp))
+            FeedItemMap(
+                post.run.encodedPath
+            )
 
             FeedItemLike(
-                likes = post.run.likes,
-                isLikedByMe = post.isLikedByMe,
-                toggleLike = toggleLike,
-                onLikesClick = onLikesClick
+                lies = post.run.likes,
+                isLiedByMe = post.isLikedByMe,
+                switchLie = onPostLieIconClick,
+                onLiesClick = onPostLiesClick
             )
+
         }
-    }
-}
-
-@Composable
-private fun FeedItemStats(run: Run) {
-    Row(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-
-        PaceStat(
-            modifier = Modifier.weight(1f),
-            value = formatDistance(
-                run.distanceMeters
-            ),
-            label = "DISTANCE",
-            unit = "KM",
-            style = StatStyle.POST,
-            horizontalAlignment = Alignment.CenterHorizontally
-        )
-
-        PaceStat(
-            modifier = Modifier.weight(1f),
-            value = formatPace(
-                run.avgSpeedMps
-            ),
-            label = "PACE",
-            style = StatStyle.POST,
-            horizontalAlignment = Alignment.CenterHorizontally
-        )
-
-        PaceStat(
-            modifier = Modifier.weight(1f),
-            value = formatDuration(
-                run.durationMilliseconds
-            ),
-            label = "DURATION",
-            style = StatStyle.POST,
-            horizontalAlignment = Alignment.CenterHorizontally
-        )
 
     }
+
 }
 
 @Composable
 private fun FeedItemUser(
     user: User,
-    run: Run,
+    date: String,
     onUserClick: () -> Unit
 ) {
     Row(
@@ -174,7 +148,11 @@ private fun FeedItemUser(
             }
         )
 
-        Spacer(modifier = Modifier.width(10.dp))
+        Spacer(
+            modifier = Modifier.width(
+                space.small
+            )
+        )
 
         Column(
             modifier = Modifier
@@ -186,24 +164,16 @@ private fun FeedItemUser(
             Text(
                 text = user.name.uppercase(),
                 textAlign = TextAlign.Center,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium,
-                letterSpacing = 2.sp,
-                style = LocalTextStyle.current.copy(
-                    platformStyle = PlatformTextStyle(includeFontPadding = false),
-                    lineHeight = 12.sp
+                style = tvpo.titleSmall.copy(
+                    letterSpacing = 2.sp
                 )
             )
 
             Text(
-                text = getDate(run.timestamp),
+                text = date,
                 textAlign = TextAlign.Center,
-                fontSize = 8.sp,
-                letterSpacing = 1.sp,
-                style = LocalTextStyle.current.copy(
-                    platformStyle = PlatformTextStyle(includeFontPadding = false),
-                    lineHeight = 8.sp
-                )
+                style = tvpo.labelSmall,
+                color = scheme.onSurfaceVariant
             )
 
         }
@@ -212,14 +182,14 @@ private fun FeedItemUser(
 
 @Composable
 private fun FeedItemLike(
-    likes: Int,
-    isLikedByMe: Boolean,
-    toggleLike: () -> Unit,
-    onLikesClick: () -> Unit
+    lies: Int,
+    isLiedByMe: Boolean,
+    switchLie: () -> Unit,
+    onLiesClick: () -> Unit
 ) {
 
     val transition = updateTransition(
-        targetState = isLikedByMe
+        targetState = isLiedByMe
     )
     val heartScale by transition.animateFloat(
         transitionSpec = {
@@ -236,33 +206,33 @@ private fun FeedItemLike(
         if (state) 1.3f else 1.0f
     }
     val heartColor by animateColorAsState(
-        targetValue = if (isLikedByMe) colorScheme.primary else colorScheme.primary,
+        targetValue = if (isLiedByMe) colorScheme.primary else colorScheme.primary,
         label = ""
     )
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp),
+            .padding(horizontal = space.large),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
 
         Icon(
-            imageVector = if (isLikedByMe) like else unlike,
+            imageVector = if (isLiedByMe) like else unlike,
             contentDescription = "",
             tint = heartColor,
             modifier = Modifier
-                .clickable { toggleLike() }
+                .clickable { switchLie() }
                 .scale(heartScale)
         )
 
-        if (likes > 0) {
+        if (lies > 0) {
             Text(
-                text = "$likes",
+                text = "$lies",
                 letterSpacing = 1.sp,
                 modifier = Modifier
-                    .clickable { onLikesClick() }
+                    .clickable { onLiesClick() }
             )
         }
     }

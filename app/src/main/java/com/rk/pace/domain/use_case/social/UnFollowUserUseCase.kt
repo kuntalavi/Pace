@@ -15,7 +15,7 @@ class UnFollowUserUseCase @Inject constructor(
 
             userRepo.decrementFollowerCount(targetUserId)
 
-            val currentUser = userRepo.getMyProfile().getOrNull()
+            val currentUser = userRepo.fetchMyProfile().getOrNull()
             if (currentUser != null) {
                 userRepo.decrementFollowingCount(currentUser.userId)
                 userRepo.updateLocalUser(

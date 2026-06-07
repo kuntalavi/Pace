@@ -4,7 +4,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.rk.pace.presentation.screens.connections.ConnectionsScreen
-import com.rk.pace.presentation.screens.my_profile.EditProfileScreen
+import com.rk.pace.presentation.screens.my_profile.EditProfileScreenRoot
 import com.rk.pace.presentation.screens.run_stats.RunStatsScreen
 import com.rk.pace.presentation.screens.search.SearchScreen
 import com.rk.pace.presentation.screens.stats.AddGoalScreen
@@ -38,8 +38,8 @@ fun NavGraphBuilder.rootNavGraph(
     }
 
     composable<Route.Root.EditProfile> {
-        EditProfileScreen(
-            goBack = { navController.popBackStack() }
+        EditProfileScreenRoot(
+            onBack = { navController.popBackStack() }
         )
     }
 

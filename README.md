@@ -69,6 +69,12 @@
 ## 🗺️ Architecture
 
 <img width="500" height="1000" alt="pace_architecture" src="https://github.com/user-attachments/assets/da65d9d6-c22a-4612-8fe3-d8e79d750d9c" />
+<br>
+<br>
+<br>
+<img width="500" height="1000" alt="Untitled Diagram drawio (1)" src="https://github.com/user-attachments/assets/140b982a-6997-4587-8999-f8275b8fbd87" />
+
+
 
 
 ---

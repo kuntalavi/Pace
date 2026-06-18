@@ -66,6 +66,13 @@
 
 ---
 
+## 🗺️ Architecture
+
+<img width="500" height="1000" alt="pace_architecture" src="https://github.com/user-attachments/assets/da65d9d6-c22a-4612-8fe3-d8e79d750d9c" />
+
+
+---
+
 ## 🪛 Tech Stack
 
 * **Kotlin** - Modern, concise, and safe programming language

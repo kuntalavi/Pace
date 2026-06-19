@@ -68,11 +68,18 @@
 
 ## 🗺️ Architecture
 
-<img width="500" height="1000" alt="pace_architecture" src="https://github.com/user-attachments/assets/da65d9d6-c22a-4612-8fe3-d8e79d750d9c" />
+### Architecture Overview
+Pace follows Clean Architecture with an MVI presentation layer, structured around an offline-first data strategy. Room is the single source of truth for all user-owned data — writes happen locally first and sync to Firebase in the background via WorkManager, with deletions tracked separately to survive the row being removed locally before the remote copy is deleted. A small set of screens that display other users' content (Feed, Profiles, Search, Connections) bypass this entirely and read directly from Firebase, since that data isn't owned by the local user and doesn't need to be cached offline.
+
+<img width="500" height="1000" alt="Untitled Diagram drawio (3)" src="https://github.com/user-attachments/assets/5fd62175-799d-4d4f-bc06-8a7aede46052" />
+
 <br>
-<br>
-<br>
-<img width="500" height="1000" alt="Untitled Diagram drawio (1)" src="https://github.com/user-attachments/assets/140b982a-6997-4587-8999-f8275b8fbd87" />
+
+### Run Tracking Feature Architecture
+The run tracking feature is orchestrated by a singleton TrackerManager, shared between the ViewModel and a foreground Service so tracking state stays consistent whether the app is in the foreground or backgrounded. It coordinates location and time tracking into a single live RunState, controls the foreground Service's lifecycle to prevent the OS from killing the process mid-run, and keeps a persistent notification updated with live progress — tapping it returns the user to the active run.
+
+<img width="500" height="1000" alt="Untitled Diagram drawio (5)" src="https://github.com/user-attachments/assets/18a59c65-a3a9-4dd2-9e83-a5ce506a74b2" />
+
 
 
 
